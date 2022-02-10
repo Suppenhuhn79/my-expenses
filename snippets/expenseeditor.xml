@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<ps:pagesnippets xmlns:ps="https://github.com/suppenhuhn79/pagesnippets">
+	<ps:script src="expenseeditor.js"/>
+	<ps:stylesheet src="expenseeditor.css"/>
+	<ps:snippet name="expenseEditor">
+			<div id="expense-editor" data-choice-client="expense-editor">
+				<div class="client-header">
+					<span name="title">add expense</span>
+				</div>
+				<div class="wrapper sticky-bottom">
+					<div name="category-selector">
+					</div>
+					<div>
+					<table name="inputs">
+						<thead>
+							<tr>
+								<td>[yday]</td>
+								<td colspan="3"><input name="dat" type="date" required="required" /></td>
+								<td>[cal]</td>
+							</tr><tr>
+								<td><!-- fas:f51e coins --></td>
+								<td colspan="3"><div name="amt">0</div></td>
+								<td name="pmt" class="click">[pmt]</td>
+							</tr><tr>
+								<!-- <td><!- fas:f304 pen -></td> -->
+								<td colspan="5"><input name="txt" type="text" placeholder="annotation..."/></td>
+								<!-- <td>&#x00a0;</td> -->
+							</tr>
+						</thead>
+						<tbody name="keypad" class="click">
+							<tr>
+								<td name="clone" class="far">&#xf24d;<!-- far:f24d clone --></td>
+								<td data-keycode="7">7</td>
+								<td data-keycode="8">8</td>
+								<td data-keycode="9">9</td>
+								<td data-keycode="__backspace__" class="fas">&#xf55a;<!-- backspace --></td>
+							</tr><tr>
+								<td class="disabled fas">&#xf01e;</td>
+								<td data-keycode="4">4</td>
+								<td data-keycode="5">5</td>
+								<td data-keycode="6">6</td>
+								<td name="apply" class="fas" rowspan="3">&#xf00c;<!-- check --></td>
+								<!-- <td>&#x00a0;</td> -->
+							</tr><tr>
+								<td name="delete" class="fas red">&#xf2ed;<!-- fas:f2ed --></td>
+								<td data-keycode="1">1</td>
+								<td data-keycode="2">2</td>
+								<td data-keycode="3">3</td>
+							</tr><tr>
+								<td name="cancel" class="fas">&#xf00d;</td>
+								<td data-keycode="__clearall__">CE</td>
+								<td data-keycode="0">0</td>
+								<td data-keycode="." name="decimal-separator">.</td>
+								<!-- <td>&#x00a0;</td> -->
+							</tr>
+						</tbody>
+					</table>
+					</div>
+				</div>
+			</div>
+	</ps:snippet>
+</ps:pagesnippets>

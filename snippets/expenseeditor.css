@@ -1,0 +1,97 @@
+#expense-editor [name="category-selector"] {
+	display: flex;
+	padding: 0.5rem 0;
+	overflow: scroll;
+}
+
+#expense-editor [name="category-selector"] > div {
+	padding: 0.3em;
+}
+#expense-editor [name="category-selector"] > div:first-child {
+	margin-left: 0.5em;
+}
+#expense-editor [name="category-selector"] > div:last-child {
+	margin-right: 0.5em;
+}
+#expense-editor [name="category-selector"] .label {
+	min-width: 3.5rem;
+	text-align: center;
+}
+#expense-editor [name="category-selector"] .back {
+	color: #888;
+	font-size: 1.5em;
+	/* max-width: 2rem; */
+	/* flex: 1; */
+	margin: 0;
+}
+
+#expense-editor [name="amt"] {
+	text-align: center;
+	font-size: 1.2rem;
+	padding-left: 1em;
+}
+#expense-editor [name="pmt"] div {
+	margin: 0 1rem;
+}
+#expense-editor [name="pmt"] div .pmt-icon {
+	font-size: 1.2rem;
+	height: auto;
+}
+
+#expense-editor input {
+	display: block;
+	width: 100%;
+	font-size: 1rem;
+	font-family: var(--font);
+	text-align: center;
+	border: none;
+	outline: none;
+	box-shadow: none;
+}
+#expense-editor input[name="txt"]::placeholder {
+	color: #aaa;
+	font-style: italic;
+}
+
+#expense-editor table {
+	border: none;
+	border-collapse: collapse;
+	border-spacing: 0;
+	width: 100%;
+	/* background-color: #ccc; */
+}
+#expense-editor table td {
+	/* width: 20vw; */
+	min-width: 20vw;
+	max-width: 20vw;
+	padding: 0.5rem 0;
+	text-align: center;
+	vertical-align: middle;
+}
+
+#expense-editor thead td {
+	border-top: 1px solid #ddd;
+}
+
+#expense-editor thead td[colspan="3"] {
+	width: 60%;
+}
+
+#expense-editor tbody {
+	background: linear-gradient(to bottom, #fff 0%, #f0f0f0 80%, #e0e0e0 100%);
+}
+
+#expense-editor tbody tr {
+	height: min(20vw, 8vh);
+}
+#expense-editor tbody td {
+	border-top: 1px solid #aaa;
+}
+#expense-editor tbody td + td {
+	border-left: 1px solid #aaa;
+}
+
+#expense-editor tbody .disabled {
+	opacity: 20%;
+	cursor: not-allowed;
+}

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<ps:pagesnippets xmlns:ps="https://github.com/suppenhuhn79/pagesnippets">
+	<ps:script src="iconeditor.js"/>
+	<ps:script src="iconeditor-colors.js"/>
+	<ps:stylesheet src="iconeditor.css"/>
+	<ps:snippet name="iconSelector">
+		<div id="icon-editor" data-choice-client="icon-editor">
+			<div class="client-header">
+				<span name="title">(icon editor)</span>
+			</div>
+			<div name="headline" class="headline">&#x00a0;</div>
+			<div class="wrapper flex-fill overflow-hidden">
+				<div class="element-head-wrapper">
+					<div class="element-head">
+						<div name="icon-preview-wrapper" class="icon-preview-wrapper">
+							<i name="icon-preview"></i>
+						</div>
+						<input type="text" name="object-label" class="object-label flex-fill" />
+					</div>
+					<div class="conditional on-paymentmethod">
+						<div name="check-default" class="wide-flex click" data-check="default">
+							<i class="">&#xf005;<!--star--></i>
+							<span class="nowrap">Set als default</span>
+						</div>
+						<div name="check-exclude" class="wide-flex click" data-check="exclude">
+							<i class="">&#xf070;<!--eye-slash--></i>
+							<span class="nowrap">Exclude from statistics</span>
+						</div>
+					</div>
+				</div>
+			<!-- </div> -->
+			<div data-choice-group="iconeditor-tab" class="top wide-flex tabs">
+				<div data-choice="icon-selection" class="flex-fill">
+					<span>ICON</span>
+				</div>
+				<div data-choice="color-selection" name="color-tab-button" class="conditional on-mastercategory on-paymentmethod flex-fill">
+					<span>COLOR</span>
+				</div>
+			</div>
+			<div data-choice-clients-group="iconeditor-tab" class="high-flex flex-fill overflow-hidden">
+				<div data-choice-client="icon-selection" class="high-flex flex-fill overflow-hidden">
+					<div name="known-icons-list" data-choice-group="iconeditor-icon" class="autowrap-grid flex-fill overflow-scroll">
+					</div>
+					<div name="custom-icon-editor" class="wide-flex">
+						<select name="fa-scope" size="1" ps:onchange="onCustomIconEdited">
+							<option value="far">Regular</option>
+							<option value="fas">Solid</option>
+							<option value="fab">Brands</option>
+						</select>
+						<input name="unicode-codepoint" type="text" pattern="[0-9a-f]{4}" required="required" ps:onkeyup="onCustomIconEdited"/>
+					</div>
+				</div>
+				<div data-choice-client="color-selection" name="color-selector" class="high-flex flex-fill overflow-hidden">
+
+					<!-- <div" class="high-flex flex-fill"> -->
+					<div name="colorselector-bubbles" class="autowrap-grid flex-fill overflow-scroll" data-choice-group="iconeditor-color">
+					</div>
+					<div class="tuners">
+						<input name="lightness" type="range" min="0.2" max="0.7" step="0.1" ps:onchange="setLightness"/>
+						<input name="saturation" type="range" min="0.2" max="1" step="0.1" ps:onchange="setSaturation"/>
+					</div>
+					<!-- </div> -->
+
+				</div>
+			</div>
+			<div class="buttons wide-flex">
+				<div name="ok" class="fas flex-fill">&#xf00c;</div>
+				<div name="cancel" class="fas flex-fill">&#xf00d;</div>
+			</div>
+		</div>
+	</div>
+</ps:snippet>
+</ps:pagesnippets>

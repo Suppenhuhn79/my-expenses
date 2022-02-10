@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="css/core.css" />
+		<link rel="stylesheet" href="css/myx.css" />
+		<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet" />
+		<script src="lib/vanilla-tools/htmlbuilder.js"></script>
+		<style>
+			a {
+				color: inherit;
+			}
+			table {
+				border-collapse: collapse;
+				max-width: max-content;
+				margin: 0 auto 1rem auto;
+			}
+			td {
+				border: 1px solid #aaa;
+				padding: 0.3rem;
+				max-width: 50vw;
+				word-break: break-all;
+				vertical-align: top;
+				font-family: monospace;
+				color: #999;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="header">
+			<h1>my expenses</h1>
+		</div>
+		<div id="client" style="overflow: scroll">
+			<div id="not-signed-in" class="fullscreen-client" style="height: auto; display: none;">
+				<div class="fullscreen-msg">
+					<div class="icon far">&#xf119;</div>
+					<div class="label">Your sign in attempt was not successful.</div>
+					<table id="table"></table>
+					<div id="signin-button" class="click">Click here to try again.</div>
+					<div><a href=".">Continue anyway</a></div>
+				</div>
+			</div>
+		</div>
+		<script src="https://apis.google.com/js/client.js"></script>
+		<script src="lib/googleapp-api.js"></script>
+		<script>
+			let hash = window.location;
+			let home = window.location.origin + window.location.pathname.substr(0, window.location.pathname.lastIndexOf("/") + 1);
+
+			if (/[#&?]scope=[^&]*https:\/\/www\.googleapis\.com\/auth\/drive\.appdata/.test(hash) === true)
+			// if (true)
+			{
+				/* get auth info from Google API */
+				gapi.load("client:auth2", () => {
+					gapi.client
+						.init({
+							apiKey: googleappApi.API_KEY,
+							clientId: googleappApi.CLIENT_ID,
+							scope: googleappApi.SCOPES,
+						})
+						.then(() => {
+							let authInstance = gapi.auth2.getAuthInstance();
+							let token = authInstance.currentUser.get().getAuthResponse().access_token;
+							let expiresInSeconds = authInstance.currentUser.get().getAuthResponse().expires_in;
+							let expirationDate = new Date();
+							console.log(token);
+							expirationDate.setTime(expirationDate.getTime() + parseInt(expiresInSeconds) * 1000);
+							googleappApi.tokenCookie.set(token, expirationDate);
+							/* continue */
+							window.location.replace(home);
+						});
+				});
+			}
+			else
+			{
+				let rex = /[#&?]([^=]+)=([^&]+)/g;
+				let rem = rex.exec(hash);
+				let tableElement = document.getElementById("table");
+				while (rem) {
+					tableElement.appendChild(htmlBuilder.newElement("tr", htmlBuilder.newElement("td", rem[1]), htmlBuilder.newElement("td", decodeURIComponent(rem[2]))));
+					rem = rex.exec(hash);
+				}
+				document.getElementById("not-signed-in").style.display = null;
+			}
+		</script>
+	</body>
+</html>
