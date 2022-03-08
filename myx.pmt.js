@@ -7,14 +7,22 @@ const myxPaymentMethods = function (myx)
 	let defaultId;
 	let elements = getNames(document.getElementById(MODULE_NAME));
 
+	let sortable = new Sortable(elements.content, {
+		draggable: ".item",
+		handle: ".dragger-ns",
+		dataIdAttr: "data-id",
+		animation: 150,
+		onEnd: () => order = sortable.toArray()
+	});
+
 	let modeHandler = clientModeHandler(MODULE_NAME, elements,
-		() => { return { items: data, order: order, defaultId: defaultId }; },
-		(modifiedData) => { data = modifiedData.items; order = modifiedData.order; defaultId = modifiedData.defaultId; });
+		/*getter*/ () => { return { items: data, order: order, defaultId: defaultId }; },
+		/*setter*/ (modifiedData) => { data = modifiedData.items; order = modifiedData.order; defaultId = modifiedData.defaultId; });
+	modeHandler.onSave = save;
 
 	elements.editButton.onclick = () => modeHandler.setMode("edit");
 	elements.addButton.onclick = () => promptEditor();
 	elements.applyeditsButton.onclick = () => modeHandler.setMode("default");
-	modeHandler.onSave = save;
 
 	function init ()
 	{
@@ -81,10 +89,11 @@ const myxPaymentMethods = function (myx)
 		for (let id of order)
 		{
 			let div = htmlBuilder.newElement("div.item",
+				{ 'data-id': id },
 				renderIcon(id),
 				htmlBuilder.newElement("div.flex-fill.big", data[id].label, { 'data-key': id, onclick: onItemClick }),
 				htmlBuilder.newElement("div.for-mode.default-mode.pmt-def-flag.fas", (defaultId === id) ? "&#xf005;" : ""),
-				htmlBuilder.newElement("div.for-mode.edit-mode.fas", "&#xf0dc;")
+				htmlBuilder.newElement("div.for-mode.edit-mode.dragger-ns.fas", "&#xf0dc;")
 			);
 			if (data[id].exclude)
 			{

@@ -76,7 +76,7 @@
 }
 #client .content .item .for-mode {
 	color: #ddd;
-	cursor: pointer;
+	/* cursor: pointer; */
 	align-self: center;
 }
 
@@ -292,4 +292,23 @@
 	border-bottom-width: 2px;
 	border-radius: 0.2rem;
 	box-shadow: 0 0.1rem 0.2rem 0.01rem #00000040;
+}
+
+.dragger-ns {
+	cursor: ns-resize;
+	padding: 0 1em;
+	opacity: 1;
+}
+.sortable-chosen {
+	box-shadow: 0 0 10px 5px #00000080;
+	background-color: #eee !important;
+	cursor: ns-resize !important;
+	z-index: 1;
+	position: relative;
+}
+.sortable-drag {
+	visibility: hidden;
+	outline: 4px solid yellow !important;
+	background-color: red !important;
+	/* display: none; */
 }
