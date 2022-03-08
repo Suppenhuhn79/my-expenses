@@ -11,7 +11,7 @@ const myxPaymentMethods = function (myx)
 		draggable: ".item",
 		handle: ".dragger-ns",
 		dataIdAttr: "data-id",
-		animation: 150,
+		animation: 350,
 		onEnd: () => order = sortable.toArray()
 	});
 

@@ -307,8 +307,5 @@
 	position: relative;
 }
 .sortable-drag {
-	visibility: hidden;
-	outline: 4px solid yellow !important;
-	background-color: red !important;
-	/* display: none; */
+	opacity: 0 !important;
 }
