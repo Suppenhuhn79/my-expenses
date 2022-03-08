@@ -111,6 +111,10 @@ const myxPaymentMethods = function (myx)
 		const EDIT_EXISTING = 2;
 		let editorMode = (!!id) ? EDIT_EXISTING : ADD_NEW;
 		console.log(id, editorMode);
+		if (editorMode === ADD_NEW)
+		{
+			modeHandler.setMode("edit");
+		}
 		let itemToEdit = (editorMode === EDIT_EXISTING) ? data[id] : { label: "New payment method" };
 		itemToEdit.meta = {
 			type: "payment-method",
@@ -120,20 +124,16 @@ const myxPaymentMethods = function (myx)
 		};
 		myx.iconEditor.popup("pmt", itemToEdit, (editedObj, isDefault) =>
 		{
-			console.log(editedObj);
 			if (editorMode === ADD_NEW)
 			{
 				id = myx.newId();
 				data[id] = editedObj;
 				order.push(id);
-				save();
-				// modeHandler.setMode("default");
 			}
 			else
 			{
 				data[id] = Object.assign({}, editedObj);
 			}
-			console.log(id, data);
 			if (isDefault)
 			{
 				defaultId = id;
@@ -141,13 +141,11 @@ const myxPaymentMethods = function (myx)
 			choices.choose("active-tab", MODULE_NAME);
 			elements.content.querySelector("[data-key='" + id + "']").scrollIntoView();
 		});
-
 	};
 
 	function onItemClick (mouseEvent)
 	{
 		let id = mouseEvent.target.dataset.key;
-		console.log(modeHandler.currentMode, id);
 		switch (modeHandler.currentMode)
 		{
 			case "edit":
