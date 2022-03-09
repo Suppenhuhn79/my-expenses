@@ -196,11 +196,8 @@ const myxPaymentMethods = function (myx)
 				promptEditor(id);
 				break;
 			case "search":
-				myx.expenses.setFilter({
-					pmt: id,
-					months: myx.expenses.availibleMonths
-				}, MODULE_NAME);
-				choices.choose("active-tab", myx.expenses.moduleName);
+				myx.expenses.setFilter({ pmt: id }, MODULE_NAME);
+				// choices.choose("active-tab", myx.expenses.moduleName);
 				break;
 			default:
 		}

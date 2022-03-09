@@ -9,11 +9,7 @@ const myxExpenses = function (myx, paymentMethods, categories)
 	let modeHandler = new ModuleModeHandler(elements._self);
 	let editor;
 
-	elements.cancelSearchButton.onclick = () =>
-	{
-		choices.choose("active-tab", filter._origin);
-		setFilter(null);
-	};
+	elements.cancelSearchButton.onclick = () => { choices.choose("active-tab", filter._origin); };
 
 	function loadFromFile (fileName = "data-1.csv")
 	{
@@ -103,16 +99,17 @@ const myxExpenses = function (myx, paymentMethods, categories)
 	 */
 	function setFilter (filterObj, originModuleName)
 	{
-		filter.pmt = filterObj?.pmt;
-		filter.cat = filterObj?.cat;
-		filter.months = filterObj?.months || [myx.selectedMonth.asIsoString];
+		filter.pmt = filterObj.pmt;
+		filter.cats = filterObj.cats || ((!!filterObj.cat) ? [filterObj.cat] : []);
+		filter.months = filterObj.months || availibleMonths;
 		filter._origin = originModuleName;
-		if (!!filter.cat || !!filter.pmt)
+		console.log("filter set:", filter);
+		if ((filter.cats.length > 0) || !!filter.pmt)
 		{
 			let searchHint = "";
-			if (!!filter.cat)
+			if (!!filter.cats)
 			{
-				searchHint += categories.getLabel(filter.cat);
+				searchHint += categories.getLabel(filter.cats[0]);
 			}
 			else if (!!filter.pmt)
 			{
@@ -124,13 +121,19 @@ const myxExpenses = function (myx, paymentMethods, categories)
 			}
 			elements.searchFilter.innerText = searchHint;
 			modeHandler.setMode("search");
+			choices.choose("active-tab", myx.expenses.moduleName);
 			renderList();
 		}
 		else
 		{
 			modeHandler.setMode("default");
 		}
-	};
+	}
+
+	function resetFilter ()
+	{
+		setFilter({ months: [myx.selectedMonth.asIsoString] });
+	}
 
 	function _renderNavItem (navElement, targetMonth)
 	{
@@ -172,16 +175,16 @@ const myxExpenses = function (myx, paymentMethods, categories)
 	};
 
 	/**
-	 * @param {string} month render data of this month ("YYYY-MM")
-	 * @param {date} [scrollToDate] scroll this date into view after rendering complete
 	 */
-	function renderList (scrollToDate = null)
+	function renderList ()
 	{
 		elements.navCurrent.innerText = myx.selectedMonth.asText;
 		_renderNavItem(elements.navPrevious, calcRelativeMonth(myx.selectedMonth.asIsoString, -1));
 		_renderNavItem(elements.navNext, calcRelativeMonth(myx.selectedMonth.asIsoString, +1));
 		htmlBuilder.removeAllChildren(elements.content);
 		let items = [];
+		elements.content.scrollTop = 0;
+		console.log("filter applied:", filter);
 		for (let month of filter.months)
 		{
 			if (hasAnyData(month))
@@ -196,7 +199,7 @@ const myxExpenses = function (myx, paymentMethods, categories)
 						currentDay = item.dat.getDate();
 						headline = renderHeadline(item.dat);
 					}
-					if (((!filter.cat) || (item.cat === filter.cat))
+					if (((filter.cats.length === 0) || (filter.cats.includes(item.cat)))
 						&& ((!filter.pmt) || (item.pmt === filter.pmt)))
 					{
 						if (!!headline)
@@ -227,19 +230,7 @@ const myxExpenses = function (myx, paymentMethods, categories)
 				htmlBuilder.newElement("div.label", "Nothing here.")
 			));
 		}
-		if (!!scrollToDate)
-		{
-			let dateElement = elements.content.querySelector("[data-date='" + scrollToDate + "']");
-			if (!!dateElement)
-			{
-				dateElement.scrollIntoView({ block: "start", behavior: "smooth" });
-			}
-		}
-		else
-		{
-			elements.content.scrollTo({ top: 0, behavior: "auto" });
-		}
-	};
+	}
 
 	function popupEditor (item, dataMonth, dataIndex)
 	{
@@ -275,9 +266,10 @@ const myxExpenses = function (myx, paymentMethods, categories)
 			}
 			choices.choose("active-tab", MODULE_NAME);
 			setFilter({ months: [itemMonth] });
-			renderList(itemDate);
+			renderList();
+			elements.content.querySelector("[data-date='" + itemDate + "']").scrollIntoView({ block: "start", behavior: "smooth" });
 		});
-	};
+	}
 
 	function onAddExpenseClick ()
 	{
@@ -303,18 +295,17 @@ const myxExpenses = function (myx, paymentMethods, categories)
 	{
 		editor = expenseEditor(paymentMethods, categories, myx.client);
 	});
-	// modeHandler.setMode("default");
-	setFilter();
+	resetFilter();
 
 	return { // publish members
 		get moduleName () { return MODULE_NAME; },
-		get data () { return data; },
-		get availibleMonths () { return availibleMonths; },
+		// get data () { return data; },
+		// get availibleMonths () { return availibleMonths; },
 		hasAnyData: hasAnyData,
 		loadFromFile: loadFromFile,
-		saveToFile: save,
-		enter: renderList,
-		leave: () => { setFilter(null); },
+		// saveToFile: save,
+		enter: () => { resetFilter(); renderList(); },
+		leave: () => { resetFilter(); },
 		setFilter: setFilter,
 		exportAsCsv: getCsv,
 		edit: popupEditor

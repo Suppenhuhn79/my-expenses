@@ -107,10 +107,10 @@ const myxCategories = function (myx)
 			let category = data[id];
 			let labelElement = htmlBuilder.newElement("div.flex-fill",
 				htmlBuilder.newElement("span.big.click", category.label,
-					{ 'data-key': id, onclick: onItemClick } /*,
+					{ 'data-key': id, onclick: onItemClick },
 					htmlBuilder.newElement("span.for-mode.search-mode.fas",
-						{ style: "color:" + getColor(id), 'data-key': id, onclick: onItemClick },
-						"&#x00a0;&#xf069;")*/ ));
+						{ style: "color:" + getColor(id), 'data-key': id, onclick: onSearchAllClick },
+						"&#x00a0;&#xf069;")));
 			let subCatDiv = htmlBuilder.newElement("div.subcats");
 			for (let key of category.subCategories || [])
 			{
@@ -292,14 +292,24 @@ const myxCategories = function (myx)
 				promptEditor(id, mouseEvent.target.dataset.masterKey);
 				break;
 			case "search":
-				myx.expenses.setFilter({
-					cat: id,
-					months: myx.expenses.availibleMonths
-				}, MODULE_NAME);
+				myx.expenses.setFilter({ cat: id }, MODULE_NAME);
 				choices.choose("active-tab", myx.expenses.moduleName);
 				break;
 			default:
 		}
+	}
+
+	/**
+	 * Sets expenses filter to category and all sub-categories and switches to expenses tab.
+	 * @param {MouseEvent} mouseEvent click event on asterisk element
+	 */
+	function onSearchAllClick (mouseEvent)
+	{
+		mouseEvent.stopPropagation();
+		let id = mouseEvent.target.dataset.key;
+		console.log([id].concat(getSubCategories(id)));
+		myx.expenses.setFilter({ cats: [id].concat(getSubCategories(id)) }, MODULE_NAME);
+		// choices.choose("active-tab", myx.expenses.moduleName);
 	}
 
 	return { // publish members
