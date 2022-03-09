@@ -16,14 +16,18 @@ const myxPaymentMethods = function (myx)
 	});
 
 	let modeHandler = clientModeHandler(MODULE_NAME, elements,
-		/*getter*/ () => { return { items: data, order: order, defaultId: defaultId }; },
-		/*setter*/ (modifiedData) => { data = modifiedData.items; order = modifiedData.order; defaultId = modifiedData.defaultId; });
+		/*getter*/() => { return { items: data, order: order, defaultId: defaultId }; },
+		/*setter*/(modifiedData) => { data = modifiedData.items; order = modifiedData.order; defaultId = modifiedData.defaultId; });
 	modeHandler.onSave = save;
 
 	elements.editButton.onclick = () => modeHandler.setMode("edit");
 	elements.addButton.onclick = () => promptEditor();
 	elements.applyeditsButton.onclick = () => modeHandler.setMode("default");
 
+	/**
+	 * Initializes the module by loading payment methods from config file on Google Drive.
+	 * @returns {Promise}
+	 */
 	function init ()
 	{
 		return new Promise((resolve) =>
@@ -36,8 +40,11 @@ const myxPaymentMethods = function (myx)
 				resolve();
 			});
 		});
-	};
+	}
 
+	/**
+	 * Saves payment methods to file on Google Drive.
+	 */
 	async function save ()
 	{
 		myx.xhrBegin();
@@ -48,11 +55,22 @@ const myxPaymentMethods = function (myx)
 		}).then(myx.xhrSuccess, myx.xhrError);
 	};
 
+
+	/**
+	 * Provides the label of a payment method.
+	 * @param {String} id of the payment method
+	 * @returns {String} label of the payment method
+	 */
 	function getLabel (id)
 	{
 		return data[id].label;
 	}
 
+	/**
+	 * Pops up a menu to prompt for a payment method.
+	 * @param {HTMLElement} alignElement element to align the menu to
+	 * @param {Function} callback function to call on selection with (selectedPaymentMethod: String)
+	 */
 	function prompt (alignElement, callback)
 	{
 		let menuItems = [];
@@ -72,17 +90,25 @@ const myxPaymentMethods = function (myx)
 			}
 		});
 		menubox.popup(null, null, alignElement, "end right, middle");
-	};
+	}
 
+	/**
+	 * Provides a HTML element with the icon of a payment method.
+	 * @param {String} id id of payment method to get the icon for
+	 * @returns {HTMLDivElement} HTML element with the payment methods icon
+	 */
 	function renderIcon (id)
 	{
 		let icon = myx.getIconAttributes(data[id].icon);
 		return htmlBuilder.newElement("div.pmt-icon",
 			{ style: "color:" + data[id].color },
 			htmlBuilder.newElement("i." + icon.faScope, icon.htmlEntity));
-	};
+	}
 
-	function renderList (mode = modeHandler.currentMode)
+	/**
+	 * Puts a list of all payment methods to the "content"-element
+	 */
+	function renderList ()
 	{
 		htmlBuilder.removeAllChildren(elements.content);
 		elements.content.appendChild(htmlBuilder.newElement("div.headline", "&#x00a0;"));
@@ -102,15 +128,18 @@ const myxPaymentMethods = function (myx)
 			elements.content.appendChild(div);
 		}
 		elements.content.querySelector("[data-key='" + defaultId + "']").parentElement.classList.add("default-selected");
-		modeHandler.setMode(mode);
-	};
+		modeHandler.setMode(modeHandler.currentMode);
+	}
 
+	/**
+	 * Opens the Iconeditor for modifing a payment method or creating a new one.
+	 * @param {String=} id id of payment method to edit; if empty a new payment method will be created
+	 */
 	function promptEditor (id)
 	{
 		const ADD_NEW = 1;
 		const EDIT_EXISTING = 2;
 		let editorMode = (!!id) ? EDIT_EXISTING : ADD_NEW;
-		console.log(id, editorMode);
 		if (editorMode === ADD_NEW)
 		{
 			modeHandler.setMode("edit");
@@ -141,26 +170,30 @@ const myxPaymentMethods = function (myx)
 			choices.choose("active-tab", MODULE_NAME);
 			elements.content.querySelector("[data-key='" + id + "']").scrollIntoView();
 		});
-	};
+	}
 
+	/**
+	 * Handles clicks on items in the list depending on the current mode:
+	 * - "edit": pops up the IconEditor to edit the payment method.
+	 * @param {MouseEvent} mouseEvent mouse event triggered by the click
+	 */
 	function onItemClick (mouseEvent)
 	{
 		let id = mouseEvent.target.dataset.key;
 		switch (modeHandler.currentMode)
 		{
 			case "edit":
-				promptEditor(id, mouseEvent.target.dataset.masterKey);
+				promptEditor(id);
 				break;
 			default:
 		}
-	};
+	}
 
 	return { // publish members
-		moduleName: MODULE_NAME,
+		get moduleName () { return MODULE_NAME; },
 		init: init,
-		enter: () => renderList(modeHandler.currentMode),
+		enter: renderList,
 		leave: modeHandler.leave,
-		// save: save,
 		get defaultPmt () { return defaultId; },
 		getLabel: getLabel,
 		isExcluded: (id) => (data[id].exclude === true),
