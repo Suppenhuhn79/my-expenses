@@ -70,7 +70,7 @@ const myxPaymentMethods = function (myx)
 	/**
 	 * Pops up a menu to prompt for a payment method.
 	 * @param {HTMLElement} alignElement element to align the menu to
-	 * @param {Function} callback function to call on selection with (selectedPaymentMethod: String)
+	 * @param {Function} callback `function(selectedPaymentMethod: String)` to call on selection
 	 */
 	function prompt (alignElement, callback)
 	{
@@ -92,7 +92,6 @@ const myxPaymentMethods = function (myx)
 		});
 		menubox.popup(null, null, alignElement, "end right, middle");
 	}
-
 	/**
 	 * Provides a HTML element with the icon of a payment method.
 	 * @param {String} id id of payment method to get the icon for
@@ -132,8 +131,8 @@ const myxPaymentMethods = function (myx)
 	}
 
 	/**
-	 * Opens the Iconeditor for modifing a payment method or creating a new one.
-	 * @param {String=} id id of payment method to edit; if empty a new payment method will be created
+	 * Opens the IconEditor for modifing a payment method or creating a new one.
+	 * @param {String} [id] id of payment method to edit; if empty, a new payment method will be created
 	 */
 	function promptEditor (id)
 	{
@@ -175,6 +174,7 @@ const myxPaymentMethods = function (myx)
 	/**
 	 * Handles clicks on items in the list depending on the current mode:
 	 * - "edit": pops up the IconEditor to edit the payment method.
+	 * - "search": sets the expenses filter to the payment method and switches to the expenses module
 	 * @param {MouseEvent} mouseEvent mouse event triggered by the click
 	 */
 	function onItemClick (mouseEvent)
