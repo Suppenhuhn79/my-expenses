@@ -120,7 +120,7 @@ const myxExpenses = function (myx, paymentMethods, categories)
 			}
 			if (filter.months.length === 1)
 			{
-				searchHint += ", " + filter.months[0];
+				searchHint += " in " + getShortMonthText(filter.months[0]);
 			}
 			elements.searchFilter.innerText = searchHint;
 			modeHandler.setMode("search");

@@ -38,16 +38,6 @@ function getNames (element)
 }
 
 /**
- * Extracts the decimals of a number.
- * @param {Number} num input number
- * @returns {Number} decimals of the number or `0`
- */
-function getDecimals (num)
-{
-	return Number(num.toString().split(".")[1]) || 0;
-}
-
-/**
  * Provides a number formatted with current locales thousands separators.
  * @param {String} numStr input number as string
  * @returns {String} integer part of a number formatted with thousands separators
@@ -80,6 +70,17 @@ function calcRelativeMonth (month, relative)
 		shortName: monthNames[tDate.getMonth()].substring(0, 3),
 		isoString: tDate.toIsoFormatText("YM"),
 	};
+}
+
+/**
+ * Provides a short text (month name abbreviated to three letters + year) for a date.
+ * @param {any} month any value that can be converted to a date
+ * @returns {String} short month text ("MMM YYYY")
+ */
+function getShortMonthText (month)
+{
+	let date = new Date(month);
+	return monthNames[date.getMonth()] + "\u00a0" + date.getFullYear();
 }
 
 /**
