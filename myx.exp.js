@@ -308,7 +308,7 @@ const myxExpenses = function (myx, paymentMethods, categories)
 
 	return { // publish members
 		get moduleName () { return MODULE_NAME; },
-		// get data () { return data; },
+		get data () { return data; },
 		// get availibleMonths () { return availibleMonths; },
 		hasAnyData: hasAnyData,
 		loadFromFile: loadFromFile,
