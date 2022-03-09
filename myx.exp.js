@@ -238,6 +238,12 @@ const myxExpenses = function (myx, paymentMethods, categories)
 			{
 				elements.content.appendChild(item);
 			}
+			if (((filter.cats.length > 0) || (!!filter.pmt)) && (filter.months.length === 1))
+			{
+				elements.content.appendChild(htmlBuilder.newElement("button",
+					"Find more",
+					{ onclick: () => setFilter(Object.assign({}, filter, { months: null }), filter._origin) }));
+			}
 			if (modeHandler.currentMode === "default")
 			{
 				elements.content.appendChild(htmlBuilder.newElement("div.spacer"));
