@@ -89,7 +89,7 @@ const myxExpenses = function (myx, paymentMethods, categories)
 	 */
 	function hasAnyData (month)
 	{
-		return (!!(data[month]) && (data[month].length > 0));
+		return ((!!data[month]) && (data[month].length > 0));
 	};
 
 	/**
@@ -130,6 +130,10 @@ const myxExpenses = function (myx, paymentMethods, categories)
 		}
 	}
 
+	/**
+	 * Resets the filter. Only filter criteria is the currently selected month.
+	 * Calls `setFilter()`.
+	 */
 	function resetFilter ()
 	{
 		setFilter({ months: [myx.selectedMonth.asIsoString] });
@@ -147,13 +151,18 @@ const myxExpenses = function (myx, paymentMethods, categories)
 		navElement.parentElement.style.visibility = (hasAnyData(myx.selectedMonth.asIsoString) || hasAnyData(targetMonth.isoString)) ? "visible" : "hidden";
 	}
 
+	/**
+	 * Provides a headline <div> for a date.
+	 * @param {Date} date Date to render the headline for
+	 * @returns {HTMLDivElement} Headline <div> containing a nice date text
+	 */
 	function renderHeadline (date)
 	{
 		return htmlBuilder.newElement("div.headline",
 			{ 'data-date': date.toIsoFormatText("YMD") },
-			htmlBuilder.newElement("span.day", date.getDate() + "."),
-			htmlBuilder.newElement("span.weekay", (modeHandler.currentMode === "search") ? myx.selectedMonth.asText : weekdayNames[date.getDay()]));
-	};
+			weekdayNames[date.getDay()] + ", " + date.getDate() + ". " + monthNames[date.getMonth()] + " " + date.getFullYear()
+		);
+	}
 
 	function renderItem (item, dataIndex)
 	{
