@@ -21,8 +21,10 @@ const myxPaymentMethods = function (myx)
 	modeHandler.onSave = save;
 
 	elements.editButton.onclick = () => modeHandler.setMode("edit");
+	elements.searchButton.onclick = () => modeHandler.setMode("search");
 	elements.addButton.onclick = () => promptEditor();
-	elements.applyeditsButton.onclick = () => modeHandler.setMode("default");
+	elements.applyEditsButton.onclick = () => modeHandler.setMode("default");
+	elements.cancelSearchButton.onclick = () => modeHandler.setMode("default");
 
 	/**
 	 * Initializes the module by loading payment methods from config file on Google Drive.
@@ -54,7 +56,6 @@ const myxPaymentMethods = function (myx)
 			'default': defaultId
 		}).then(myx.xhrSuccess, myx.xhrError);
 	};
-
 
 	/**
 	 * Provides the label of a payment method.
@@ -111,7 +112,6 @@ const myxPaymentMethods = function (myx)
 	function renderList ()
 	{
 		htmlBuilder.removeAllChildren(elements.content);
-		elements.content.appendChild(htmlBuilder.newElement("div.headline", "&#x00a0;"));
 		for (let id of order)
 		{
 			let div = htmlBuilder.newElement("div.item",
@@ -184,6 +184,10 @@ const myxPaymentMethods = function (myx)
 		{
 			case "edit":
 				promptEditor(id);
+				break;
+			case "search":
+				myx.expenses.setFilter({ pmt: id, months: myx.expenses.availibleMonths });
+				choices.choose("active-tab", myx.expenses.moduleName);
 				break;
 			default:
 		}

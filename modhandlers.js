@@ -18,11 +18,19 @@ const clientModeHandler = function (MODULE_NAME, elements, dataGetter, dataSette
 		{
 			setMode("__reset__");
 		}
+		else if (currentMode === "search")
+		{
+			currentMode = "default";
+		}
 	};
 
+	/**
+	 * 
+	 * @param {String} newMode 
+	 */
 	function setMode (newMode)
 	{
-		console.log("setMode", currentMode, "-->", newMode);
+		console.log(MODULE_NAME, "setMode", currentMode, "-->", newMode);
 		if ((typeof dataGetter === "function") && (typeof dataSetter === "function"))
 		{
 			if ((currentMode === "default") && (newMode === "edit"))
@@ -46,18 +54,19 @@ const clientModeHandler = function (MODULE_NAME, elements, dataGetter, dataSette
 				newMode = "default";
 			}
 		}
-		// elements._self.classList.remove(currentMode + "-mode");
 		currentMode = newMode || "default";
 		let modeCssClass = currentMode + "-mode";
 		for (let element of elements._self.querySelectorAll(".for-mode"))
 		{
 			(element.classList.contains(modeCssClass)) ? element.classList.remove("hidden") : element.classList.add("hidden");
 		}
-		// elements._self.classList.add(currentMode + "-mode");
 	};
 
 	return { // public interface
 		get currentMode () { return currentMode; },
+		/**
+		 * @param {Function} func
+		 */
 		set onSave (func) { onSave = func; },
 		setMode: setMode,
 		leave: leave

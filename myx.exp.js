@@ -2,12 +2,18 @@ const myxExpenses = function (myx, paymentMethods, categories)
 {
 	const MODULE_NAME = "expenses-list";
 	let data = {};
+	let filter = {};
+	let fileMonthMap = {};
 	let elements = getNames(document.getElementById("expenses-list"));
 	let modeHandler = clientModeHandler(MODULE_NAME, elements);
 	let editor;
-	let filter;
+	let availibleMonths = [];
 
-	elements.cancelButton.onclick = () => setFilter(null);
+	elements.cancelButton.onclick = () =>
+	{
+		setFilter(null);
+		renderList();
+	};
 
 	function loadFromFile (fileName = "data-1.csv")
 	{
@@ -17,6 +23,7 @@ const myxExpenses = function (myx, paymentMethods, categories)
 			// xhr("GET", "http://christophpc:8800/projekte/my-expenses/~web-mock/" + fileName).then((result) =>
 			googleappApi.loadFile(fileName).then((result) =>
 			{
+				fileMonthMap[fileName] = [];
 				for (let line of result.split("\n"))
 				{
 					if (!!line)
@@ -26,6 +33,7 @@ const myxExpenses = function (myx, paymentMethods, categories)
 						let monthKey = vals[0].substr(0, 7);
 						if (!data[monthKey])
 						{
+							fileMonthMap[fileName].push(monthKey);
 							data[monthKey] = [];
 						}
 						for (let c = 0, cc = KEYS.length; c < cc; c += 1)
@@ -37,6 +45,8 @@ const myxExpenses = function (myx, paymentMethods, categories)
 				}
 				elements.addExpenseButton.classList.remove("hidden");
 				elements.addExpenseButton.onclick = onAddExpenseClick;
+				availibleMonths = availibleMonths.concat(fileMonthMap[fileName]).sort((a, b) => (a.localeCompare(b) * -1));
+				console.log(fileMonthMap, availibleMonths);
 				resolve();
 			});
 		});
@@ -86,21 +96,46 @@ const myxExpenses = function (myx, paymentMethods, categories)
 		return (!!(data[month]) && (data[month].length > 0));
 	};
 
-	function setFilter (catId)
+	function setFilter (filterObj)
 	{
-		filter = catId;
-		if (!!catId)
+		filter.pmt = filterObj?.pmt;
+		filter.cat = filterObj?.cat;
+		filter.months = filterObj?.months || [myx.selectedMonth.asIsoString];
+		if (!!filter.cat || !!filter.pmt)
 		{
-
+			let searchHint = "";
+			if (!!filter.cat)
+			{
+				searchHint += categories.getLabel(filter.cat)
+			}
+			else if (!!filter.pmt)
+			{
+				searchHint += paymentMethods.getLabel(filter.pmt);
+			}
+			if (filter.months.length === 1)
+			{
+				searchHint += ", " + filter.months[0];
+			}
+			elements.searchFilter.innerText = searchHint; //"(( SEARCH ))"; //categories.getLabel(catId) + ", " + myx.selectedMonth.asShortText;
 			modeHandler.setMode("search");
-			elements.searchFilter.innerText = categories.getLabel(catId) + ", " + myx.selectedMonth.asShortText;
 		}
 		else
 		{
 			modeHandler.setMode("default");
 		}
-		renderList();
 	};
+
+	function _renderNavItem (navElement, targetMonth)
+	{
+		navElement.parentElement.onclick = () =>
+		{
+			myx.selectedMonth = targetMonth.isoString;
+			setFilter({ months: [myx.selectedMonth.asIsoString] });
+			renderList();
+		};
+		navElement.innerText = targetMonth.shortName;
+		navElement.parentElement.style.visibility = (hasAnyData(myx.selectedMonth.asIsoString) || hasAnyData(targetMonth.isoString)) ? "visible" : "hidden";
+	}
 
 	function renderHeadline (date)
 	{
@@ -110,11 +145,11 @@ const myxExpenses = function (myx, paymentMethods, categories)
 			htmlBuilder.newElement("span.weekay", (modeHandler.currentMode === "search") ? myx.selectedMonth.asText : weekdayNames[date.getDay()]));
 	};
 
-	function renderItem (item, month, dataIndex)
+	function renderItem (item, dataIndex)
 	{
 		let catLabel = categories.getLabel(item.cat);
 		let div = htmlBuilder.newElement("div.item.click",
-			{ onclick: () => popupEditor(item, month, dataIndex) },
+			{ onclick: () => popupEditor(item, calcRelativeMonth(item.dat, 0).isoString, dataIndex) },
 			categories.renderIcon(item.cat),
 			htmlBuilder.newElement("div.flex-fill.cutoff",
 				htmlBuilder.newElement("div.cutoff.big", item.txt || catLabel),
@@ -131,42 +166,39 @@ const myxExpenses = function (myx, paymentMethods, categories)
 
 	/**
 	 * @param {string} month render data of this month ("YYYY-MM")
-	 * @param {date} scrollToDate scroll this date into view afer rendering complete
+	 * @param {date=} scrollToDate scroll this date into view after rendering complete
 	 */
-	function renderList (month = myx.selectedMonth.asIsoString, scrollToDate = null)
+	function renderList (scrollToDate = null)
 	{
-		function _renderNavItem (navElement, targetMonth)
-		{
-			navElement.parentElement.onclick = () => renderList(targetMonth.isoString);
-			navElement.innerText = targetMonth.shortName;
-			navElement.parentElement.style.visibility = (hasAnyData(month) || hasAnyData(targetMonth.isoString)) ? "visible" : "hidden";
-		}
-		myx.selectedMonth = month;
 		elements.navCurrent.innerText = myx.selectedMonth.asText;
-		_renderNavItem(elements.navPrevious, calcRelativeMonth(month, -1));
-		_renderNavItem(elements.navNext, calcRelativeMonth(month, +1));
+		_renderNavItem(elements.navPrevious, calcRelativeMonth(myx.selectedMonth.asIsoString, -1));
+		_renderNavItem(elements.navNext, calcRelativeMonth(myx.selectedMonth.asIsoString, +1));
 		htmlBuilder.removeAllChildren(elements.content);
 		let items = [];
-		if (hasAnyData(month))
+		for (let month of filter.months)
 		{
-			let currentDay = 0;
-			let headline;
-			for (let i = data[month].length - 1; i >= 0; i -= 1)
+			if (hasAnyData(month))
 			{
-				let item = data[month][i];
-				if (item.dat.getDate() !== currentDay)
+				let currentDay = 0;
+				let headline;
+				for (let i = data[month].length - 1; i >= 0; i -= 1)
 				{
-					currentDay = item.dat.getDate();
-					headline = renderHeadline(item.dat);
-				}
-				if ((item.cat === filter) || (!filter))
-				{
-					if (!!headline)
+					let item = data[month][i];
+					if (item.dat.getDate() !== currentDay)
 					{
-						items.push(headline);
-						headline = null;
+						currentDay = item.dat.getDate();
+						headline = renderHeadline(item.dat);
 					}
-					items.push(renderItem(item, month, i));
+					if (((!filter.cat) || (item.cat === filter.cat))
+						&& ((!filter.pmt) || (item.pmt === filter.pmt)))
+					{
+						if (!!headline)
+						{
+							items.push(headline);
+							headline = null;
+						}
+						items.push(renderItem(item, i));
+					}
 				}
 			}
 		}
@@ -176,7 +208,10 @@ const myxExpenses = function (myx, paymentMethods, categories)
 			{
 				elements.content.appendChild(item);
 			}
-			elements.content.appendChild(htmlBuilder.newElement("div.spacer"));
+			if (modeHandler.currentMode === "default")
+			{
+				elements.content.appendChild(htmlBuilder.newElement("div.spacer"));
+			}
 		}
 		else
 		{
@@ -190,7 +225,7 @@ const myxExpenses = function (myx, paymentMethods, categories)
 			let dateElement = elements.content.querySelector("[data-date='" + scrollToDate + "']");
 			if (!!dateElement)
 			{
-				dateElement.scrollIntoView({ block: "center", behavior: "smooth" });
+				dateElement.scrollIntoView({ block: "start", behavior: "smooth" });
 			}
 		}
 		else
@@ -232,7 +267,8 @@ const myxExpenses = function (myx, paymentMethods, categories)
 				save();
 			}
 			choices.choose("active-tab", MODULE_NAME);
-			renderList(itemMonth, itemDate);
+			setFilter({ months: [itemMonth] });
+			renderList(itemDate);
 		});
 	};
 
@@ -260,11 +296,13 @@ const myxExpenses = function (myx, paymentMethods, categories)
 	{
 		editor = expenseEditor(paymentMethods, categories, myx.client);
 	});
-	modeHandler.setMode("default");
-	
+	// modeHandler.setMode("default");
+	setFilter();
+
 	return { // publish members
-		moduleName: MODULE_NAME,
+		get moduleName () { return MODULE_NAME; },
 		get data () { return data; },
+		get availibleMonths () { return availibleMonths; },
 		hasAnyData: hasAnyData,
 		loadFromFile: loadFromFile,
 		saveToFile: save,

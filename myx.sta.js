@@ -84,35 +84,41 @@ const myxStatistics = function (myx, expenses, categories, paymentMethods)
 	{
 		mouseEvent.stopPropagation();
 		let id = mouseEvent.target.closest("[data-cat]").dataset.cat;
-		expenses.setFilter(id);
+		expenses.setFilter({ months: [myx.selectedMonth.asIsoString], cat: id });
 		choices.choose("active-tab", myx.expenses.moduleName);
+	}
+
+	function _renderNavItem (navElement, targetMonth)
+	{
+		navElement.parentElement.onclick = () =>
+		{
+			myx.selectedMonth = targetMonth.isoString;
+			expenses.setFilter({ months: [myx.selectedMonth.asIsoString] });
+			renderList();
+		};
+		navElement.innerText = targetMonth.shortName;
+		navElement.parentElement.style.visibility = expenses.hasAnyData(myx.selectedMonth.asIsoString) || expenses.hasAnyData(targetMonth.isoString) ? "visible" : "hidden";
 	}
 
 	/**
 	 * 
 	 * @param {iso-string} month
 	 */
-	function renderList (month)
+	function renderList ()
 	{
-		function _renderNavItem (navElement, targetMonth)
-		{
-			navElement.parentElement.onclick = () => renderList(targetMonth.isoString);
-			navElement.innerText = targetMonth.shortName;
-			navElement.parentElement.style.visibility = expenses.hasAnyData(month) || expenses.hasAnyData(targetMonth.isoString) ? "visible" : "hidden";
-		}
-		myx.selectedMonth = month;
-		let monthAsDate = new Date(month);
+		// myx.selectedMonth = month;
+		// let monthAsDate = new Date(month);
 		elements.navCurrent.innerText = myx.selectedMonth.asText;
-		_renderNavItem(elements.navPrevious, calcRelativeMonth(month, -1));
-		_renderNavItem(elements.navNext, calcRelativeMonth(month, +1));
-		if (expenses.hasAnyData(month))
+		_renderNavItem(elements.navPrevious, calcRelativeMonth(myx.selectedMonth.asIsoString, -1));
+		_renderNavItem(elements.navNext, calcRelativeMonth(myx.selectedMonth.asIsoString, +1));
+		if (expenses.hasAnyData(myx.selectedMonth.asIsoString))
 		{
 			htmlBuilder.removeAllChildren(elements.content);
 			elements.content.appendChild(htmlBuilder.newElement("div.headline", "Total expenses per month"));
-			let stats = calcAggs(month);
+			let stats = calcAggs(myx.selectedMonth.asIsoString);
 			stats.aggs.sort((a, b) => (b.total_sum || 0) - (a.total_sum || 0));
 			console.log(stats);
-			elements.content.appendChild(htmlBuilder.newElement("div.item", htmlBuilder.newElement("div.flex-fill.big.bold", monthNames[monthAsDate.getMonth()] + " " + monthAsDate.getFullYear() + " total"), htmlBuilder.newElement("div.amt.big.bold", myx.formatAmountLocale(stats.totals.sum))));
+			elements.content.appendChild(htmlBuilder.newElement("div.item", htmlBuilder.newElement("div.flex-fill.big.bold", myx.selectedMonth.asText + " total"), htmlBuilder.newElement("div.amt.big.bold", myx.formatAmountLocale(stats.totals.sum))));
 			for (let item of stats.aggs)
 			{
 				if (item.total_sum !== undefined)
@@ -123,7 +129,7 @@ const myxStatistics = function (myx, expenses, categories, paymentMethods)
 						for (let subCat of item.subCats)
 						{
 							subCatDiv.appendChild(htmlBuilder.newElement("div.subcat.wide-flex" + ".grey" + (subCat.sum === 0 ? ".zero-sum" : ""),
-								{ 'data-cat': subCat.cat, onclick: onSubcatClick},
+								{ 'data-cat': subCat.cat, onclick: onSubcatClick },
 								categories.renderIcon(subCat.cat),
 								htmlBuilder.newElement("div.flex-fill.click",
 									categories.getLabel(subCat.cat, false)),
@@ -159,9 +165,8 @@ const myxStatistics = function (myx, expenses, categories, paymentMethods)
 		}
 	}
 
-	return {
-		// publish members
-		moduleName: MODULE_NAME,
+	return { // publish members
+		get moduleName () { return MODULE_NAME; },
 		calc: calcAggs,
 		enter: renderList,
 	};

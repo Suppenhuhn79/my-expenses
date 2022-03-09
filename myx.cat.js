@@ -6,14 +6,14 @@ const myxCategories = function (myx)
 	let order = [];
 	let elements = getNames(document.getElementById(MODULE_NAME));
 	let modeHandler = clientModeHandler(MODULE_NAME, elements,
-		() => { return { items: data, order: order }; },
-		(modifiedData) => { data = modifiedData.items; order = modifiedData.order; });
+		/*getter*/() => { return { items: data, order: order }; },
+		/*setter*/(modifiedData) => { data = modifiedData.items; order = modifiedData.order; });
 
 	elements.addButton.onclick = () => promptEditor(); //() => myx.iconEditor.popup(undefined, "#888", console.log);
+	elements.searchButton.onclick = () => modeHandler.setMode("search");
 	elements.editButton.onclick = () => modeHandler.setMode("edit");
-	// elements.searchButton.onclick = () => modeHandler.setMode("search");
-	elements.applyeditsButton.onclick = () => modeHandler.setMode("default");
-	elements.cancelButton.onclick = () => modeHandler.setMode("default");
+	elements.applyEditsButton.onclick = () => modeHandler.setMode("default");
+	elements.cancelSearchButton.onclick = () => modeHandler.setMode("default");
 	modeHandler.onSave = save;
 
 	function init ()
@@ -69,7 +69,7 @@ const myxCategories = function (myx)
 			htmlBuilder.newElement("i." + icon.faScope, icon.htmlEntity));
 	};
 
-	function renderList (mode = modeHandler.currentMode)
+	function renderList ()
 	{
 		htmlBuilder.removeAllChildren(elements.content);
 		for (let id of order)
@@ -95,7 +95,7 @@ const myxCategories = function (myx)
 			);
 			elements.content.appendChild(div);
 		}
-		modeHandler.setMode(mode);
+		modeHandler.setMode(modeHandler.currentMode);
 	};
 
 	function renderSelection (toElement, actuallCatKey, callback)
@@ -165,10 +165,6 @@ const myxCategories = function (myx)
 	function promptEditor (id, masterCategory)
 	{
 		console.log(id, masterCategory);
-		if ((!id) && (!masterCategory))
-		{
-			modeHandler.setMode("edit");
-		}
 		let itemToEdit = (!!id) ? data[id] : { label: "New category" };
 		if (masterCategory)
 		{
@@ -206,7 +202,6 @@ const myxCategories = function (myx)
 			// console.log(id, data);
 			choices.choose("active-tab", MODULE_NAME);
 			elements.content.querySelector("[data-key='" + id + "']").scrollIntoView();
-			modeHandler.setMode("edit");
 		});
 
 	};
@@ -223,19 +218,18 @@ const myxCategories = function (myx)
 				promptEditor(id, mouseEvent.target.dataset.masterKey);
 				break;
 			case "search":
-				modeHandler.setMode("default");
-				myx.expenses.setFilter(id);
+				// modeHandler.setMode("default");
+				myx.expenses.setFilter({ cat: id, months: myx.expenses.availibleMonths });
 				choices.choose("active-tab", myx.expenses.moduleName);
 				break;
 			default:
-				console.log(modeHandler.currentMode, id);
 		}
 	};
 
 	return { // publish members
-		moduleName: MODULE_NAME,
+		get moduleName () { return MODULE_NAME; },
 		init: init,
-		enter: () => renderList(modeHandler.currentMode),
+		enter: renderList,
 		leave: modeHandler.leave,
 		// save: save,
 		get masterCategoryIds () { return order; },
