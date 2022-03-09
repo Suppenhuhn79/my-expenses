@@ -1,7 +1,7 @@
 const expenseEditor = function (paymentMethods, categories, targetElement)
 {
 	let elements = getNames(pageSnippets.expenseEditor.produce());
-	let popupOrigin = popupModuleHandler();
+	let originTabName;
 	let originalMonth;
 	let originalIndex;
 	let originalItem;
@@ -16,14 +16,16 @@ const expenseEditor = function (paymentMethods, categories, targetElement)
 		]
 	}, onConfirmDelete);
 	let amountAsString = "0";
-	elements.clone.onclick = (mouseEvent) => {
+
+	elements.clone.onclick = (mouseEvent) =>
+	{
 		originalIndex = null;
 		currentItem.dat = new Date();
 		checkCapatibilities();
 	};
 	elements.cancel.onclick = (mouseEvent) =>
 	{
-		popupOrigin.returnToOrigin(mouseEvent);
+		choices.choose("active-tab", originTabName);
 	};
 	elements.pmt.onclick = (event) =>
 	{
@@ -103,7 +105,7 @@ const expenseEditor = function (paymentMethods, categories, targetElement)
 
 	function popup (item, dataMonth, dataIndex, callback)
 	{
-		popupOrigin.memorizeOrigin();
+		originTabName = choices.chosen.activeTab;
 		originalItem = JSON.stringify(item);
 		currentItem = Object.assign({
 			dat: new Date(),

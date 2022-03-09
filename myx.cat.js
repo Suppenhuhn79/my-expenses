@@ -106,7 +106,11 @@ const myxCategories = function (myx)
 		{
 			let category = data[id];
 			let labelElement = htmlBuilder.newElement("div.flex-fill",
-				htmlBuilder.newElement("span.big.click", category.label, { 'data-key': id, onclick: onItemClick }));
+				htmlBuilder.newElement("span.big.click", category.label,
+					{ 'data-key': id, onclick: onItemClick } /*,
+					htmlBuilder.newElement("span.for-mode.search-mode.fas",
+						{ style: "color:" + getColor(id), 'data-key': id, onclick: onItemClick },
+						"&#x00a0;&#xf069;")*/ ));
 			let subCatDiv = htmlBuilder.newElement("div.subcats");
 			for (let key of category.subCategories || [])
 			{
@@ -288,7 +292,10 @@ const myxCategories = function (myx)
 				promptEditor(id, mouseEvent.target.dataset.masterKey);
 				break;
 			case "search":
-				myx.expenses.setFilter({ cat: id, months: myx.expenses.availibleMonths });
+				myx.expenses.setFilter({
+					cat: id,
+					months: myx.expenses.availibleMonths
+				}, MODULE_NAME);
 				choices.choose("active-tab", myx.expenses.moduleName);
 				break;
 			default:

@@ -4,15 +4,15 @@ const myxExpenses = function (myx, paymentMethods, categories)
 	let data = {};
 	let filter = {};
 	let fileMonthMap = {};
-	let elements = getNames(document.getElementById("expenses-list"));
-	let modeHandler = clientModeHandler(MODULE_NAME, elements);
-	let editor;
 	let availibleMonths = [];
+	let elements = getNames(document.getElementById("expenses-list"));
+	let modeHandler = new ModuleModeHandler(elements._self);
+	let editor;
 
-	elements.cancelButton.onclick = () =>
+	elements.cancelSearchButton.onclick = () =>
 	{
+		choices.choose("active-tab", filter._origin);
 		setFilter(null);
-		renderList();
 	};
 
 	function loadFromFile (fileName = "data-1.csv")
@@ -96,17 +96,23 @@ const myxExpenses = function (myx, paymentMethods, categories)
 		return (!!(data[month]) && (data[month].length > 0));
 	};
 
-	function setFilter (filterObj)
+	/**
+	 * 
+	 * @param {{pmt: {String=}}} filterObj foo
+	 * @param {String} originModuleName module name where the filter came from (where to return to)
+	 */
+	function setFilter (filterObj, originModuleName)
 	{
 		filter.pmt = filterObj?.pmt;
 		filter.cat = filterObj?.cat;
 		filter.months = filterObj?.months || [myx.selectedMonth.asIsoString];
+		filter._origin = originModuleName;
 		if (!!filter.cat || !!filter.pmt)
 		{
 			let searchHint = "";
 			if (!!filter.cat)
 			{
-				searchHint += categories.getLabel(filter.cat)
+				searchHint += categories.getLabel(filter.cat);
 			}
 			else if (!!filter.pmt)
 			{
@@ -116,8 +122,9 @@ const myxExpenses = function (myx, paymentMethods, categories)
 			{
 				searchHint += ", " + filter.months[0];
 			}
-			elements.searchFilter.innerText = searchHint; //"(( SEARCH ))"; //categories.getLabel(catId) + ", " + myx.selectedMonth.asShortText;
+			elements.searchFilter.innerText = searchHint;
 			modeHandler.setMode("search");
+			renderList();
 		}
 		else
 		{
@@ -166,7 +173,7 @@ const myxExpenses = function (myx, paymentMethods, categories)
 
 	/**
 	 * @param {string} month render data of this month ("YYYY-MM")
-	 * @param {date=} scrollToDate scroll this date into view after rendering complete
+	 * @param {date} [scrollToDate] scroll this date into view after rendering complete
 	 */
 	function renderList (scrollToDate = null)
 	{

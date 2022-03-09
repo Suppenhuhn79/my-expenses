@@ -84,7 +84,10 @@ const myxStatistics = function (myx, expenses, categories, paymentMethods)
 	{
 		mouseEvent.stopPropagation();
 		let id = mouseEvent.target.closest("[data-cat]").dataset.cat;
-		expenses.setFilter({ months: [myx.selectedMonth.asIsoString], cat: id });
+		expenses.setFilter({
+			cat: id,
+			months: [myx.selectedMonth.asIsoString]
+		}, MODULE_NAME);
 		choices.choose("active-tab", myx.expenses.moduleName);
 	}
 
