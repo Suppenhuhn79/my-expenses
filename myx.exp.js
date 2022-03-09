@@ -118,7 +118,7 @@ const myxExpenses = function (myx, paymentMethods, categories)
 		if ((filter.cats.length > 0) || !!filter.pmt)
 		{
 			let searchHint = "";
-			if (!!filter.cats)
+			if (filter.cats.length > 0)
 			{
 				searchHint += categories.getLabel(filter.cats[0]);
 			}
