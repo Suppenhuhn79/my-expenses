@@ -268,3 +268,11 @@ i.fab {
 .dummy.w9 {
 	width: 9em;
 }
+@keyframes dummy-gradient {
+	0% {
+		background-position: 200% 0%;
+	}
+	100% {
+		background-position: -100% 0%;
+	}
+}
