@@ -114,6 +114,7 @@ const myxExpenses = function (myx, paymentMethods, categories)
 		filter.months = filterObj.months || availibleMonths;
 		filter._origin = originModuleName;
 		console.log("filter set:", filter);
+		htmlBuilder.removeAllChildren(elements.searchHint);
 		if ((filter.cats.length > 0) || !!filter.pmt)
 		{
 			let searchHint = "";
@@ -125,11 +126,11 @@ const myxExpenses = function (myx, paymentMethods, categories)
 			{
 				searchHint += paymentMethods.getLabel(filter.pmt);
 			}
+			elements.searchHint.appendChild(htmlBuilder.newElement("div.cutoff", "\u00a0", searchHint));
 			if (filter.months.length === 1)
 			{
-				searchHint += " in " + getShortMonthText(filter.months[0]);
+				elements.searchHint.appendChild(htmlBuilder.newElement("div", "\u00a0", "in " + getShortMonthText(filter.months[0])));
 			}
-			elements.searchFilter.innerText = searchHint;
 			modeHandler.setMode("search");
 			choices.choose("active-tab", myx.expenses.moduleName);
 			renderList();

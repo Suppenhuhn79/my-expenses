@@ -80,7 +80,7 @@ function calcRelativeMonth (month, relative)
 function getShortMonthText (month)
 {
 	let date = new Date(month);
-	return monthNames[date.getMonth()] + "\u00a0" + date.getFullYear();
+	return monthNames[date.getMonth()].substring(0, 3) + "\u00a0" + date.getFullYear();
 }
 
 /**
