@@ -27,7 +27,6 @@ const iconEditor = function (targetElement)
 	];
 	const DEFAULT_ICON = "fas:f128";
 	const DEFAULT_COLOR = "#888";
-	let popupOrigin = popupModuleHandler();
 	let elements = {};
 	let currentObject = {};
 
@@ -72,7 +71,7 @@ const iconEditor = function (targetElement)
 
 	function popup (mode, obj, callback)
 	{
-		popupOrigin.memorizeOrigin();
+		let originTabName = choices.chosen.activeTab;
 		currentObject = Object.assign({}, {
 			label: "?",
 			icon: DEFAULT_ICON,
@@ -89,10 +88,11 @@ const iconEditor = function (targetElement)
 			(checked.includes("exclude")) ? currentObject.exclude = true : delete currentObject.exclude;
 			delete currentObject.meta;
 			console.log("return", currentObject, checked.includes("default"));
+			choices.choose("active-tab", originTabName);
 			callback(currentObject, checked.includes("default"));
 		};
 		elements._self.classList = obj.meta.cssModifier;
-		elements.cancel.onclick = popupOrigin.returnToOrigin;
+		elements.cancel.onclick = () => choices.choose("active-tab", originTabName);
 		elements.title.innerText = obj.meta.header;
 		elements.headline.innerText = obj.meta.headline || "\u00a0";
 		choices.choose("active-tab", "icon-editor");

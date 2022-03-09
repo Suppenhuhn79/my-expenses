@@ -1,17 +1,3 @@
-/* TODO: Agenda:
-# Statistics nav just like expenses
-/ render lists on init() and update only, not on every enter()
-# Search expenses, starting from Statistics (selected month only)
-- Check Google refresh token
-# re_google on error
-- Clone expenses
-- Repeating expenses
-# PMT: Set default / Exclude
-- EXP: Month select menu
-- Search expenses, starting from Categories (all data)
-- index of months (which month is in which file? which file hat which months?)
-*/
-// TODO: review all .scollTo()
 const myx = function ()
 {
 	let activeTab = null;
@@ -20,28 +6,10 @@ const myx = function ()
 	let bottomMenu = document.getElementById("bottom-menu");
 	let xhrActivityIndicator = document.getElementById("xhr-indicator");
 
-	function init (promiseResults)
+	document.getElementById("bottom-menu").onclick = (mouseEvent) =>
 	{
-		choices.onChoose("active-tab", onTabChosen);
-		myx.expenses.loadFromFile().then(() =>
-		{
-			// choices.choose("active-tab", myx.statistics.moduleName);
-			choices.choose("active-tab", myx.expenses.moduleName);
-		});
-	};
-
-	function onTabChosen (tabName, event)
-	{
-		activeTab?.leave?.(tabName);
-		if (tabName.endsWith("-editor"))
-		{
-			bottomMenu.classList.add("hidden");
-		}
-		else
-		{
-			bottomMenu.classList.remove("hidden");
-		}
-		switch (tabName)
+		activeTab?.leave?.();
+		switch (mouseEvent.target.closest("[data-choice]").dataset.choice)
 		{
 			case myx.paymentMethods.moduleName:
 				activeTab = myx.paymentMethods;
@@ -56,8 +24,31 @@ const myx = function ()
 				activeTab = myx.statistics;
 				break;
 		}
-		activeTab.enter(selectedMonth);
+		activeTab.enter();
 	};
+
+	function init (promiseResults)
+	{
+		choices.onChoose("active-tab", onTabChosen);
+		myx.expenses.loadFromFile().then(() =>
+		{
+			// choices.choose("active-tab", myx.statistics.moduleName);
+			choices.choose("active-tab", myx.expenses.moduleName);
+			myx.expenses.enter();
+		});
+	}
+
+	function onTabChosen (tabName, event)
+	{
+		if (tabName.endsWith("-editor"))
+		{
+			bottomMenu.classList.add("hidden");
+		}
+		else
+		{
+			bottomMenu.classList.remove("hidden");
+		}
+	}
 
 	function loadConfigFile (filename)
 	{

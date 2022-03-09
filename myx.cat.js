@@ -5,15 +5,14 @@ const myxCategories = function (myx)
 	let data = {};
 	let order = [];
 	let elements = getNames(document.getElementById(MODULE_NAME));
-	let modeHandler = clientModeHandler(MODULE_NAME, elements,
-		/*getter*/() => { return { items: data, order: order }; },
-		/*setter*/(modifiedData) => { data = modifiedData.items; order = modifiedData.order; });
-	modeHandler.onSave = save;
+	let modeHandler = new ModuleModeHandler(elements._self,
+		/*getData*/() => { return { items: data, order: order }; },
+		/*revertData*/(revertData) => { data = revertData.items; order = revertData.order; });
 
 	elements.addButton.onclick = () => promptEditor();
 	elements.searchButton.onclick = () => modeHandler.setMode("search");
 	elements.editButton.onclick = () => modeHandler.setMode("edit");
-	elements.applyEditsButton.onclick = () => modeHandler.setMode("default");
+	elements.applyEditsButton.onclick = () => applyEdits();
 	elements.cancelSearchButton.onclick = () => modeHandler.setMode("default");
 
 	/**
@@ -34,8 +33,8 @@ const myxCategories = function (myx)
 	}
 
 	/**
-	 * Saves categories to file on Google Drive.
-	 */
+	* Saves categories to file on Google Drive.
+	*/
 	async function save ()
 	{
 		myx.xhrBegin();
@@ -98,8 +97,9 @@ const myxCategories = function (myx)
 
 	/**
 	 * Puts a list of all categories to the "content"-element
+	 * @param {String} [mode] mode to set for the list
 	 */
-	function renderList ()
+	function renderList (mode = modeHandler.currentMode)
 	{
 		htmlBuilder.removeAllChildren(elements.content);
 		for (let id of order)
@@ -125,7 +125,7 @@ const myxCategories = function (myx)
 			);
 			elements.content.appendChild(div);
 		}
-		modeHandler.setMode(modeHandler.currentMode);
+		modeHandler.setMode(mode);
 	}
 
 	/**
@@ -209,13 +209,21 @@ const myxCategories = function (myx)
 
 	/**
 	 * Opens the IconEditor for modifing a category or creating a new one.
+	 * Changes are not saved until `applyEdits()` is called!
 	 * @param {String} [id] id of category to edit; if empty, a new category will be created
 	 * @param {String} [masterCategory] id of the categorys master category (if it's a subcategory)
 	 */
 	function promptEditor (id, masterCategory)
 	{
 		console.log(id, masterCategory);
-		let itemToEdit = (!!id) ? data[id] : { label: "New category" };
+		const ADD_NEW = 1;
+		const EDIT_EXISTING = 2;
+		let editorMode = (!!id) ? EDIT_EXISTING : ADD_NEW;
+		if (editorMode === ADD_NEW)
+		{
+			modeHandler.setMode("edit");
+		}
+		let itemToEdit = (editorMode === EDIT_EXISTING) ? data[id] : { label: "New category" };
 		if (masterCategory)
 		{
 			itemToEdit.color = getColor(masterCategory); // in case its a subcategory
@@ -224,7 +232,7 @@ const myxCategories = function (myx)
 		itemToEdit.meta = { type: "category", cssModifier: (!masterCategory) ? "mastercategory" : "", header: (!!id) ? "Edit category" : "New category", headline: (!!masterCategory) ? "Subcategory of " + data[masterCategory].label : "" };
 		myx.iconEditor.popup("cat", itemToEdit, (editedObj) =>
 		{
-			if (!id)
+			if (editorMode === ADD_NEW)
 			{
 				id = myx.newId();
 				data[id] = editedObj;
@@ -247,9 +255,18 @@ const myxCategories = function (myx)
 					data[id].color = editedObj.color;
 				}
 			}
-			choices.choose("active-tab", MODULE_NAME);
+			renderList();
 			elements.content.querySelector("[data-key='" + id + "']").scrollIntoView();
 		});
+	}
+
+	/**
+	 * Applies edits. Saves changes and returns to "default" mode.
+	 */
+	function applyEdits ()
+	{
+		save();
+		modeHandler.setMode("default");
 	}
 
 	/**
@@ -281,8 +298,8 @@ const myxCategories = function (myx)
 	return { // publish members
 		get moduleName () { return MODULE_NAME; },
 		init: init,
-		enter: renderList,
-		leave: modeHandler.leave,
+		enter: () => renderList("default"),
+		leave: () => modeHandler.setMode("default"),
 		get masterCategoryIds () { return order; },
 		getLabel: getLabel,
 		getColor: getColor,

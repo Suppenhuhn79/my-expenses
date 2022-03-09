@@ -15,15 +15,14 @@ const myxPaymentMethods = function (myx)
 		onEnd: () => order = sortable.toArray()
 	});
 
-	let modeHandler = clientModeHandler(MODULE_NAME, elements,
-		/*getter*/() => { return { items: data, order: order, defaultId: defaultId }; },
-		/*setter*/(modifiedData) => { data = modifiedData.items; order = modifiedData.order; defaultId = modifiedData.defaultId; });
-	modeHandler.onSave = save;
+	let modeHandler = new ModuleModeHandler(elements._self,
+		/*getData*/() => { return { items: data, order: order, defaultId: defaultId }; },
+		/*revertData*/(revertData) => { data = revertData.items; order = revertData.order; defaultId = revertData.defaultId; });
 
+	elements.addButton.onclick = () => promptEditor();
 	elements.editButton.onclick = () => modeHandler.setMode("edit");
 	elements.searchButton.onclick = () => modeHandler.setMode("search");
-	elements.addButton.onclick = () => promptEditor();
-	elements.applyEditsButton.onclick = () => modeHandler.setMode("default");
+	elements.applyEditsButton.onclick = () => applyEdits();
 	elements.cancelSearchButton.onclick = () => modeHandler.setMode("default");
 
 	/**
@@ -59,7 +58,7 @@ const myxPaymentMethods = function (myx)
 
 	/**
 	 * Provides the label of a payment method.
-	 * @param {String} id of the payment method
+	 * @param {String} id id of payment method to get label for
 	 * @returns {String} label of the payment method
 	 */
 	function getLabel (id)
@@ -106,9 +105,10 @@ const myxPaymentMethods = function (myx)
 	}
 
 	/**
-	 * Puts a list of all payment methods to the "content"-element
+	 * Puts a list of all payment methods to the "content"-element.
+	 * @param {String} [mode] mode to set for the list
 	 */
-	function renderList ()
+	function renderList (mode = modeHandler.currentMode)
 	{
 		htmlBuilder.removeAllChildren(elements.content);
 		for (let id of order)
@@ -127,11 +127,12 @@ const myxPaymentMethods = function (myx)
 			elements.content.appendChild(div);
 		}
 		elements.content.querySelector("[data-key='" + defaultId + "']").parentElement.classList.add("default-selected");
-		modeHandler.setMode(modeHandler.currentMode);
+		modeHandler.setMode(mode);
 	}
 
 	/**
 	 * Opens the IconEditor for modifing a payment method or creating a new one.
+	 * Changes are not saved until `applyEdits()` is called!
 	 * @param {String} [id] id of payment method to edit; if empty, a new payment method will be created
 	 */
 	function promptEditor (id)
@@ -166,9 +167,18 @@ const myxPaymentMethods = function (myx)
 			{
 				defaultId = id;
 			}
-			choices.choose("active-tab", MODULE_NAME);
+			renderList();
 			elements.content.querySelector("[data-key='" + id + "']").scrollIntoView();
 		});
+	}
+
+	/**
+	 * Applies edits. Saves changes and returns to "default" mode.
+	 */
+	function applyEdits ()
+	{
+		save();
+		modeHandler.setMode("default");
 	}
 
 	/**
@@ -186,7 +196,11 @@ const myxPaymentMethods = function (myx)
 				promptEditor(id);
 				break;
 			case "search":
-				myx.expenses.setFilter({ pmt: id, months: myx.expenses.availibleMonths });
+				myx.expenses.setFilter({
+					pmt: id,
+					months: myx.expenses.availibleMonths,
+					_origin: MODULE_NAME
+				});
 				choices.choose("active-tab", myx.expenses.moduleName);
 				break;
 			default:
@@ -196,8 +210,8 @@ const myxPaymentMethods = function (myx)
 	return { // publish members
 		get moduleName () { return MODULE_NAME; },
 		init: init,
-		enter: renderList,
-		leave: modeHandler.leave,
+		enter: () => renderList("default"),
+		leave: () => modeHandler.setMode("default"),
 		get defaultPmt () { return defaultId; },
 		getLabel: getLabel,
 		isExcluded: (id) => (data[id].exclude === true),
