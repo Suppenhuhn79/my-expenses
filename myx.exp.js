@@ -11,6 +11,16 @@ const myxExpenses = function (myx, paymentMethods, categories)
 
 	elements.cancelSearchButton.onclick = () => { choices.choose("active-tab", filter._origin); };
 
+	elements.navCurrent.onclick = (mouseEvent) =>
+	{
+		popupAvalibleMonthsMenu(mouseEvent, elements.navCurrent, (month) =>
+		{
+			myx.selectedMonth = month;
+			resetFilter();
+			renderList();
+		});
+	};
+
 	function loadFromFile (fileName = "data-1.csv")
 	{
 		return new Promise((resolve, reject) =>
@@ -280,6 +290,40 @@ const myxExpenses = function (myx, paymentMethods, categories)
 		});
 	}
 
+	/**
+	 * Pops up a `Menubox` to select a month from all availible months.
+	 * @param {Event} event Event that triggered the popup (required to stop propagation)
+	 * @param {HTMLElement} alignElement Element to align the menu to (centered below bottom)
+	 * @param {Function} callback `function(selectedMonth: String)` to call on month selection
+	 */
+	function popupAvalibleMonthsMenu (event, alignElement, callback)
+	{
+		let menuItems = [];
+		let currentYear = (new Date(availibleMonths[0])).getFullYear();
+		for (let month of availibleMonths)
+		{
+			let monthAsDate = new Date(month);
+			let monthYear = monthAsDate.getFullYear();
+			if (monthYear !== currentYear)
+			{
+				menuItems.push({ separator: {} });
+				currentYear = monthYear;
+			}
+			menuItems.push({
+				key: month,
+				label: monthNames[monthAsDate.getMonth()] + "\u00a0" + monthYear
+			});
+		}
+		let menubox = new Menubox("months-selection", { items: menuItems }, (event) =>
+		{
+			if (typeof callback === "function")
+			{
+				callback(event.itemKey);
+			}
+		});
+		menubox.popup(event, null, alignElement, "center, below bottom");
+	}
+
 	function onAddExpenseClick ()
 	{
 		let nowMonth = (new Date()).toIsoFormatText("YM");
@@ -317,6 +361,7 @@ const myxExpenses = function (myx, paymentMethods, categories)
 		leave: () => { resetFilter(); },
 		setFilter: setFilter,
 		exportAsCsv: getCsv,
-		edit: popupEditor
+		edit: popupEditor,
+		popupAvalibleMonthsMenu: popupAvalibleMonthsMenu
 	};
 };

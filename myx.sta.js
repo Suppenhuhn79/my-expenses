@@ -3,6 +3,15 @@ const myxStatistics = function (myx, expenses, categories, paymentMethods)
 	const MODULE_NAME = "statistics";
 	let elements = getNames(document.getElementById(MODULE_NAME));
 
+	elements.navCurrent.onclick = (mouseEvent) =>
+	{
+		expenses.popupAvalibleMonthsMenu(mouseEvent, elements.navCurrent, (month) =>
+		{
+			myx.selectedMonth = month;
+			renderList();
+		});
+	};
+
 	function calcAggs (...months)
 	{
 		function _sumUp (prev, curr)
