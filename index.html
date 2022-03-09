@@ -55,13 +55,13 @@
 				<div name="search-header" class="client-header for-mode search-mode">
 					<div class="flex-fill cutoff">
 						<i class="fas">&#xf002;<!--search--></i>
-						<span name="search-filter" class="cutoff">&#x0020;</span>
+						<span name="search-filter" class="cutoff">&#x00a0;</span>
 					</div>
 					<div name="cancel-button" class="click">
 						<span class="for-mode search-mode fas">&#xf00d;<!--times--></span>
 					</div>
 				</div>
-				<div name="content" class="content">&#x0020;</div>
+				<div name="content" class="content">&#x00a0;</div>
 				<div name="add-expense-button" class="for-mode default-mode hidden click">
 					<i class="fas">&#xf067;<!--plus--></i>
 				</div>
@@ -70,17 +70,17 @@
 			<div id="categories-list" data-choice-client="categories-list">
 				<div class="client-header">
 					<span class="flex-fill">categories</span>
-					<!-- <i name="search-button" class="click for-mode default-mode fas">&#xf002;search</i> -->
 					<i name="edit-button" class="click for-mode default-mode fas">&#xf304;<!--pen--></i>
+					<i name="search-button" class="click for-mode default-mode fas">&#xf002;<!--search--></i>
 					<i name="add-button" class="click for-mode default-mode fas">&#xf0fe;<!--plus-square--></i>
-					<i name="applyedits-button" class="click for-mode edit-mode fas">&#xf00c;<!--check--></i>
-					<i name="cancel-button" class="click for-mode search-mode fas">&#xf00d;<!--times--></i>
+					<i name="apply-edits-button" class="click for-mode edit-mode fas">&#xf00c;<!--check--></i>
+					<i name="cancel-search-button" class="click for-mode search-mode fas">&#xf00d;<!--times--></i>
 				</div>
 				<div class="content">
 					<div class="for-mode default-mode headline">Tap category to add expense</div>
 					<div class="for-mode edit-mode headline">Edit categories or add sub-categories</div>
 					<div class="for-mode search-mode headline">Tap category to search for expenses</div>
-					<div name="content">&#x0020;</div>
+					<div name="content">&#x00a0;</div>
 				</div>
 			</div>
 			<!-- client tab "PAYMENT METHODS" -->
@@ -88,10 +88,16 @@
 				<div class="client-header">
 					<span class="flex-fill">payment methods</span>
 					<i name="edit-button" class="click for-mode default-mode fas">&#xf304;<!--pen--></i>
+					<i name="search-button" class="click for-mode default-mode fas">&#xf002;<!--search--></i>
 					<i name="add-button" class="click for-mode default-mode fas">&#xf0fe;<!--plus-square--></i>
-					<i name="applyedits-button" class="click for-mode edit-mode fas">&#xf00c;<!--check--></i>
+					<i name="apply-edits-button" class="click for-mode edit-mode fas">&#xf00c;<!--check--></i>
+					<i name="cancel-search-button" class="click for-mode search-mode fas">&#xf00d;<!--times--></i>
 				</div>
-				<div name="content" class="content" data-choice-group="default-payment-method">&#x00a0;</div>
+				<div class="content" data-choice-group="default-payment-method">
+					<div class="for-mode default-mode edit-mode headline">&#x00a0;</div>
+					<div class="for-mode search-mode headline">Tap payment method to search for expenses</div>
+					<div name="content">&#x00a0;</div>
+				</div>
 			</div>
 			<!-- STATSISTICS -->
 			<!-- infinite: fas:f534 -->
