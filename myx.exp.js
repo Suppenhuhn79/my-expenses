@@ -9,7 +9,8 @@ const myxExpenses = function (myx, paymentMethods, categories)
 	let modeHandler = new ModuleModeHandler(elements._self);
 	let editor;
 
-	elements.cancelSearchButton.onclick = () => { choices.choose("active-tab", filter._origin); };
+	elements.backSearchButton.onclick = () => { choices.choose("active-tab", filter._origin); };
+	elements.cancelSearchButton.onclick = () => { resetFilter(); renderList(); };
 
 	elements.navCurrent.onclick = (mouseEvent) =>
 	{
