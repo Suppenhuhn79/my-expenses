@@ -9,11 +9,12 @@ const myxCategories = function (myx)
 		/*getData*/() => { return { items: data, order: order }; },
 		/*revertData*/(revertData) => { data = revertData.items; order = revertData.order; });
 
-	elements.addButton.onclick = () => promptEditor();
-	elements.searchButton.onclick = () => modeHandler.setMode("search");
 	elements.editButton.onclick = () => modeHandler.setMode("edit");
 	elements.applyEditsButton.onclick = () => applyEdits();
+	elements.cancelEditsButton.onclick = () => { modeHandler.setMode("default"); renderList(); };
+	elements.searchButton.onclick = () => modeHandler.setMode("search");
 	elements.cancelSearchButton.onclick = () => modeHandler.setMode("default");
+	elements.addButton.onclick = () => promptEditor();
 
 	/**
 	 * Initializes the module by loading categories from config file on Google Drive.

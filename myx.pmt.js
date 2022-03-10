@@ -19,11 +19,12 @@ const myxPaymentMethods = function (myx)
 		/*getData*/() => { return { items: data, order: order, defaultId: defaultId }; },
 		/*revertData*/(revertData) => { data = revertData.items; order = revertData.order; defaultId = revertData.defaultId; });
 
-	elements.addButton.onclick = () => promptEditor();
 	elements.editButton.onclick = () => modeHandler.setMode("edit");
-	elements.searchButton.onclick = () => modeHandler.setMode("search");
 	elements.applyEditsButton.onclick = () => applyEdits();
+	elements.cancelEditsButton.onclick = () => { modeHandler.setMode("default"); renderList(); };
+	elements.searchButton.onclick = () => modeHandler.setMode("search");
 	elements.cancelSearchButton.onclick = () => modeHandler.setMode("default");
+	elements.addButton.onclick = () => promptEditor();
 
 	/**
 	 * Initializes the module by loading payment methods from config file on Google Drive.
