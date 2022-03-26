@@ -236,7 +236,7 @@
 	animation: xhr-indicator-success linear 1s 1;
 }
 #xhr-indicator.error {
-	animation: xhr-indicator-error linear 2s infinite;
+	animation: xhr-indicator-error linear 1.2s infinite;
 }
 
 @keyframes xhr-indicator-active {
