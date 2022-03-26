@@ -54,7 +54,7 @@ const myx = function ()
 	{
 		return new Promise((resolve) =>
 		{
-			let cacheName = "myx_" + filename.replaceAll(/\./g, "_");
+			let cacheName = "myx_" + filename.substring(0, filename.lastIndexOf(".")).replaceAll(/[^\w\d]/g, "_"); //filename.replaceAll(/\./g, "_");
 			let cache = JSON.parse(localStorage.getItem(cacheName));
 			if ((!!cache) && !(new Date(cache.date) < googleappApi.files[filename].modifiedTime))
 			{
