@@ -145,14 +145,14 @@ const myxPaymentMethods = function (myx)
 		{
 			modeHandler.setMode("edit");
 		}
-		let itemToEdit = (editorMode === EDIT_EXISTING) ? data[id] : { label: "New payment method" };
+		let itemToEdit = (editorMode === EDIT_EXISTING) ? Object.assign({}, data[id]) : { label: "New payment method" };
 		itemToEdit.meta = {
 			type: "payment-method",
 			isDefault: (defaultId === id),
 			cssModifier: "paymentmethod",
 			header: (editorMode === EDIT_EXISTING) ? "Edit payment method" : "New payment method"
 		};
-		myx.iconEditor.popup("pmt", itemToEdit, (editedObj, isDefault) =>
+		myx.iconEditor.popup("pmt", itemToEdit, (editedObj, properties) =>
 		{
 			if (editorMode === ADD_NEW)
 			{
@@ -164,10 +164,11 @@ const myxPaymentMethods = function (myx)
 			{
 				data[id] = Object.assign({}, editedObj);
 			}
-			if (isDefault)
+			if (properties.includes("default"))
 			{
 				defaultId = id;
 			}
+			(properties.includes("exclude")) ? data[id].exclude = true : delete data[id].exclude;
 			renderList();
 			elements.content.querySelector("[data-key='" + id + "']").scrollIntoView();
 		});

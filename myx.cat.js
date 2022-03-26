@@ -220,7 +220,6 @@ const myxCategories = function (myx)
 	 */
 	function promptEditor (id, masterCategory)
 	{
-		console.log(id, masterCategory);
 		const ADD_NEW = 1;
 		const EDIT_EXISTING = 2;
 		let editorMode = (!!id) ? EDIT_EXISTING : ADD_NEW;
@@ -228,7 +227,7 @@ const myxCategories = function (myx)
 		{
 			modeHandler.setMode("edit");
 		}
-		let itemToEdit = (editorMode === EDIT_EXISTING) ? data[id] : { label: "New category" };
+		let itemToEdit = (editorMode === EDIT_EXISTING) ? Object.assign({}, data[id]) : { label: "New category" };
 		if (masterCategory)
 		{
 			itemToEdit.color = getColor(masterCategory); // in case its a subcategory
@@ -255,15 +254,12 @@ const myxCategories = function (myx)
 			{
 				data[id].label = editedObj.label;
 				data[id].icon = editedObj.icon;
-				if (!data[id].masterCategory)
-				{
-					data[id].color = editedObj.color;
-				}
 			}
+			(data[id].masterCategory === undefined) ? data[id].color = editedObj.color : delete data[id].color;
 			renderList();
 			elements.content.querySelector("[data-key='" + id + "']").scrollIntoView();
 		});
-	}
+	};
 
 	/**
 	 * Applies edits. Saves changes and returns to "default" mode.
@@ -308,7 +304,6 @@ const myxCategories = function (myx)
 	{
 		mouseEvent.stopPropagation();
 		let id = mouseEvent.target.dataset.key;
-		console.log([id].concat(getSubCategories(id)));
 		myx.expenses.setFilter({ cats: [id].concat(getSubCategories(id)) }, MODULE_NAME);
 		// choices.choose("active-tab", myx.expenses.moduleName);
 	}

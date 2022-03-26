@@ -83,13 +83,10 @@ const iconEditor = function (targetElement)
 		checks.setChecked(elements.checkExclude, (obj.exclude === true));
 		elements.ok.onclick = () =>
 		{
-			let checked = checks.getAllChecked(elements._self);
 			currentObject.label = elements.objectLabel.value || "?";
-			(checked.includes("exclude")) ? currentObject.exclude = true : delete currentObject.exclude;
 			delete currentObject.meta;
-			console.log("return", currentObject, checked.includes("default"));
+			callback(currentObject, checks.getAllChecked(elements._self));
 			choices.choose("active-tab", originTabName);
-			callback(currentObject, checked.includes("default"));
 		};
 		elements._self.classList = obj.meta.cssModifier;
 		elements.cancel.onclick = () => choices.choose("active-tab", originTabName);
