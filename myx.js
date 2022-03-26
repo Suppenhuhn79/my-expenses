@@ -145,9 +145,14 @@ const myx = function ()
 	myx.addExpense = myx.expenses.edit;
 	choices.choose("active-tab", myx.expenses.moduleName);
 
+	const AUTOSIGNIN_FLAG = "myx_autosignin";
 	googleappApi.init().then(
 		() =>
 		{ // successfully signed in
+			if (localStorage.getItem(AUTOSIGNIN_FLAG))
+			{
+				localStorage.removeItem(AUTOSIGNIN_FLAG);
+			}
 			console.table(googleappApi.files);
 			Promise.allSettled([
 				myx.categories.init(),
@@ -158,9 +163,17 @@ const myx = function ()
 		{ // operation failed
 			if (reason.status === 401) // "unauthorized"
 			{
-				document.getElementById("bottom-menu").classList.add("hidden");
-				document.getElementById("signin-button").onclick = googleappApi.signIn;
-				choices.choose("active-tab", "not-signed-in");
+				if (localStorage.getItem(AUTOSIGNIN_FLAG) !== true)
+				{
+					localStorage.setItem("myx_autosignin", true);
+					googleappApi.signIn();
+				}
+				else
+				{
+					document.getElementById("bottom-menu").classList.add("hidden");
+					document.getElementById("signin-button").onclick = googleappApi.signIn;
+					choices.choose("active-tab", "not-signed-in");
+				}
 			}
 		});
 
