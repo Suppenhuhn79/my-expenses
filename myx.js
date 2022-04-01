@@ -1,3 +1,17 @@
+/**
+ * String representing a month in format `yyyy-mm`.
+ * @typedef MonthString
+ * @type {String}
+ */
+/**
+ * Provides various reprensentations of a month.
+ * @typedef MonthObject
+ * @type {Object}
+ * @param {Date} asDate Month as JS date
+ * @param {MonthString} asIsoString `yyyy-mm` formatted string
+ * @param {String} asShortText `MMM yyyy` formatted string (month short name)
+ * @param {String} asText `mmmm yyyy` formatted string (month full name)
+ */
 const myx = function ()
 {
 	let activeTab = null;

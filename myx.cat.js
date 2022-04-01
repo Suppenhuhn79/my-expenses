@@ -1,8 +1,14 @@
+/**
+ * my-expenses "categories" module.
+ * @param {myx} myx 
+ * @returns 
+ */
 const myxCategories = function (myx)
 {
 	const MODULE_NAME = "categories-list";
 	const FILE_NAME = "cat.json";
 	let data = {};
+	/** @type {Array<String>} */
 	let order = [];
 	let elements = getNames(document.getElementById(MODULE_NAME));
 	let modeHandler = new ModuleModeHandler(elements._self,
@@ -18,7 +24,7 @@ const myxCategories = function (myx)
 
 	/**
 	 * Initializes the module by loading categories from config file on Google Drive.
-	 * @returns {Promise}
+	 * @returns {Promise<void>} Promise
 	 */
 	function init ()
 	{
@@ -34,7 +40,7 @@ const myxCategories = function (myx)
 	}
 
 	/**
-	* Saves categories to file on Google Drive.
+	* **(async)** Saves categories to file on Google Drive.
 	*/
 	async function save ()
 	{
@@ -47,7 +53,7 @@ const myxCategories = function (myx)
 
 	/**
 	 * Provides the color code of a category.
-	 * @param {String} id category id
+	 * @param {String} id Category id
 	 * @returns {String} RGB color code of the category
 	 */
 	function getColor (id)
@@ -57,9 +63,10 @@ const myxCategories = function (myx)
 
 	/**
 	 * Provides the label of a category.
-	 * @param {String} id category id
+	 * "Fully qualified" means that sub-categoies will be prefixed by their master category name.
+	 * @param {String} id Category id
 	 * @param {Boolean} [fullQualified=true] `true`: fully qualified name (default); `false`: simple name
-	 * @returns {String} label of the category
+	 * @returns {String} Label of the category
 	 */
 	function getLabel (id, fullQualified = true)
 	{
@@ -72,9 +79,9 @@ const myxCategories = function (myx)
 	}
 
 	/**
-	 * Provides the sub-category ids auf a master category.
-	 * @param {String} masterCategoryId id of the master category
-	 * @returns {String[]} String-Array of the sub-category ids; empty if there aren't any.
+	 * Provides the sub-category ids of a master category.
+	 * @param {String} masterCategoryId Id of the master category
+	 * @returns {Array<String>} Sub-category ids; empty aray if there aren't any
 	 */
 	function getSubCategories (masterCategoryId)
 	{
@@ -83,7 +90,7 @@ const myxCategories = function (myx)
 
 	/**
 	 * Provides a HTML element with the icon of a category.
-	 * @param {String} id category id
+	 * @param {String} id Category id
 	 * @returns {HTMLDivElement} HTML element with the category icon
 	 */
 	function renderIcon (id)
@@ -97,8 +104,9 @@ const myxCategories = function (myx)
 	}
 
 	/**
-	 * Puts a list of all categories to the "content"-element
-	 * @param {String} [mode] mode to set for the list
+	 * Puts a list of all categories to the "content"-element.
+	 * Item elements will contain all functionality for all modes.
+	 * @param {String} [mode] Mode to set for the list; default is the current mode
 	 */
 	function renderList (mode = modeHandler.currentMode)
 	{
@@ -135,15 +143,15 @@ const myxCategories = function (myx)
 
 	/**
 	 * Puts a category selection element on an existing document node.
-	 * @param {HTMLElement} toElement element to render the selection on
-	 * @param {String} actualCatId id of the actual selected category; `null` if none selected
+	 * @param {HTMLElement} toElement Element to render the selection on
+	 * @param {String} [currentCatId] Id of the currently selected category; `null` if none selected
 	 * @param {Function} callback `function(selectedCategoryId: String)` to call on category selection
 	 */
-	function renderSelection (toElement, actualCatId, callback)
+	function renderSelection (toElement, currentCatId, callback)
 	{
 		/**
 		 * Selects (highlights) a category within the selection.
-		 * @param {String} id category id to select
+		 * @param {String} id Category id to select
 		 */
 		function _highlightSelection (id)
 		{
@@ -161,7 +169,7 @@ const myxCategories = function (myx)
 		/**
 		 * Handles selecting a category (or the "back" button).
 		 * Calls the callback function.
-		 * @param {String} id id of the selected category
+		 * @param {String} id Id of the selected category
 		 */
 		function _onChoice (id)
 		{
@@ -172,7 +180,7 @@ const myxCategories = function (myx)
 			}
 			else
 			{
-				if (!actualCatId)
+				if (!currentCatId)
 				{
 					renderSelection(toElement, id, callback);
 				}
@@ -182,9 +190,9 @@ const myxCategories = function (myx)
 		}
 		htmlBuilder.removeAllChildren(toElement);
 		toElement.dataset.choiceGroup = "category-selection";
-		let headCat = (actualCatId) ? (data[actualCatId].masterCategory || actualCatId) : null;
-		let catSet = (actualCatId) ? [headCat].concat(data[headCat].subCategories || []) : order;
-		if (actualCatId)
+		let headCat = (currentCatId) ? (data[currentCatId].masterCategory || currentCatId) : null;
+		let catSet = (currentCatId) ? [headCat].concat(data[headCat].subCategories || []) : order;
+		if (currentCatId)
 		{
 			toElement.appendChild(htmlBuilder.newElement("div.item.labeled-icon.click",
 				htmlBuilder.newElement("div.cat-icon.back.fas",
@@ -193,7 +201,7 @@ const myxCategories = function (myx)
 		}
 		for (let key of catSet)
 		{
-			if ((actualCatId) || (!data[key].masterCategory))
+			if ((currentCatId) || (!data[key].masterCategory))
 			{
 				toElement.appendChild(htmlBuilder.newElement("div.item.labeled-icon.click",
 					{ 'data-choice': key },
@@ -201,9 +209,9 @@ const myxCategories = function (myx)
 					htmlBuilder.newElement("div.label", data[key].label)));
 			}
 		}
-		if (actualCatId)
+		if (currentCatId)
 		{
-			_highlightSelection(actualCatId);
+			_highlightSelection(currentCatId);
 		}
 		else
 		{
@@ -215,8 +223,8 @@ const myxCategories = function (myx)
 	/**
 	 * Opens the IconEditor for modifing a category or creating a new one.
 	 * Changes are not saved until `applyEdits()` is called!
-	 * @param {String} [id] id of category to edit; if empty, a new category will be created
-	 * @param {String} [masterCategory] id of the categorys master category (if it's a subcategory)
+	 * @param {String} [id] Id of category to edit; if empty, a new category will be created
+	 * @param {String} [masterCategory] Id of the categorys master category (if it's a subcategory)
 	 */
 	function promptEditor (id, masterCategory)
 	{
@@ -262,7 +270,7 @@ const myxCategories = function (myx)
 	};
 
 	/**
-	 * Applies edits. Saves changes and returns to "default" mode.
+	 * Applies edits to categories. Saves changes to file and returns to "default" mode.
 	 */
 	function applyEdits ()
 	{
@@ -275,7 +283,7 @@ const myxCategories = function (myx)
 	 * - "default": pops up the "add expense" page
 	 * - "edit": pops up the IconEditor to edit the payment method
 	 * - "search": sets the expenses filter to the category and switches to expenses
-	 * @param {MouseEvent} mouseEvent mouse event triggered by the click
+	 * @param {MouseEvent} mouseEvent Mouse event triggered by the click
 	 */
 	function onItemClick (mouseEvent)
 	{
@@ -297,8 +305,9 @@ const myxCategories = function (myx)
 	}
 
 	/**
-	 * Sets expenses filter to category and all sub-categories and switches to expenses tab.
-	 * @param {MouseEvent} mouseEvent click event on asterisk element
+	 * Handles clicks on master categoris asterisk in "search" mode.
+	 * Sets expenses filter to the master category and all sub-categories and switches to expenses tab.
+	 * @param {MouseEvent} mouseEvent Click event on asterisk element
 	 */
 	function onSearchAllClick (mouseEvent)
 	{

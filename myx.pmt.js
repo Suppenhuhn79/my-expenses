@@ -1,3 +1,8 @@
+/**
+ * my-expenses "categories" module.
+ * @param {myx} myx 
+ * @returns 
+ */
 const myxPaymentMethods = function (myx)
 {
 	const MODULE_NAME = "payment-methods";
@@ -28,7 +33,7 @@ const myxPaymentMethods = function (myx)
 
 	/**
 	 * Initializes the module by loading payment methods from config file on Google Drive.
-	 * @returns {Promise}
+	 * @returns {Promise<void>} Promise
 	 */
 	function init ()
 	{
@@ -45,7 +50,7 @@ const myxPaymentMethods = function (myx)
 	}
 
 	/**
-	 * Saves payment methods to file on Google Drive.
+	 * **(async)** Saves payment methods to file on Google Drive.
 	 */
 	async function save ()
 	{
@@ -55,12 +60,12 @@ const myxPaymentMethods = function (myx)
 			items: data,
 			'default': defaultId
 		}).then(myx.xhrSuccess, myx.xhrError);
-	};
+	}
 
 	/**
 	 * Provides the label of a payment method.
-	 * @param {String} id id of payment method to get label for
-	 * @returns {String} label of the payment method
+	 * @param {String} id Id of payment method to get label for
+	 * @returns {String} Label of the payment method
 	 */
 	function getLabel (id)
 	{
@@ -69,7 +74,7 @@ const myxPaymentMethods = function (myx)
 
 	/**
 	 * Pops up a menu to prompt for a payment method.
-	 * @param {HTMLElement} alignElement element to align the menu to
+	 * @param {HTMLElement} alignElement Element to align the menu to
 	 * @param {Function} callback `function(selectedPaymentMethod: String)` to call on selection
 	 */
 	function prompt (alignElement, callback)
@@ -92,9 +97,10 @@ const myxPaymentMethods = function (myx)
 		});
 		menubox.popup(null, null, alignElement, "end right, middle");
 	}
+
 	/**
 	 * Provides a HTML element with the icon of a payment method.
-	 * @param {String} id id of payment method to get the icon for
+	 * @param {String} id Id of payment method to get the icon for
 	 * @returns {HTMLDivElement} HTML element with the payment methods icon
 	 */
 	function renderIcon (id)
@@ -107,7 +113,8 @@ const myxPaymentMethods = function (myx)
 
 	/**
 	 * Puts a list of all payment methods to the "content"-element.
-	 * @param {String} [mode] mode to set for the list
+	 * Item elements will contain all functionality for all modes.
+	 * @param {String} [mode] Mode to set for the list; default is the current mode
 	 */
 	function renderList (mode = modeHandler.currentMode)
 	{
@@ -134,7 +141,7 @@ const myxPaymentMethods = function (myx)
 	/**
 	 * Opens the IconEditor for modifing a payment method or creating a new one.
 	 * Changes are not saved until `applyEdits()` is called!
-	 * @param {String} [id] id of payment method to edit; if empty, a new payment method will be created
+	 * @param {String} [id] Id of payment method to edit; if empty, a new payment method will be created
 	 */
 	function promptEditor (id)
 	{
@@ -175,7 +182,7 @@ const myxPaymentMethods = function (myx)
 	}
 
 	/**
-	 * Applies edits. Saves changes and returns to "default" mode.
+	 * Applies edits. Saves changes to file and returns to "default" mode.
 	 */
 	function applyEdits ()
 	{
@@ -187,7 +194,7 @@ const myxPaymentMethods = function (myx)
 	 * Handles clicks on items in the list depending on the current mode:
 	 * - "edit": pops up the IconEditor to edit the payment method.
 	 * - "search": sets the expenses filter to the payment method and switches to the expenses module
-	 * @param {MouseEvent} mouseEvent mouse event triggered by the click
+	 * @param {MouseEvent} mouseEvent Mouse event triggered by the click
 	 */
 	function onItemClick (mouseEvent)
 	{
@@ -210,8 +217,14 @@ const myxPaymentMethods = function (myx)
 		init: init,
 		enter: () => renderList("default"),
 		leave: () => modeHandler.setMode("default"),
+		/** @type {String} */
 		get defaultPmt () { return defaultId; },
 		getLabel: getLabel,
+		/**
+		 * Provides whether a payment method is set to be excluded.
+		 * @param {String} id Id of payment method
+		 * @returns {Boolean} `true` if the payment methods "exclude" flag is set, otherwise `false`
+		 */
 		isExcluded: (id) => (data[id].exclude === true),
 		renderIcon: renderIcon,
 		prompt: prompt

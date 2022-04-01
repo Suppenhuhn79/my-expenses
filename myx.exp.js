@@ -1,12 +1,30 @@
+/**
+ * my-expenses "expenses" module.
+ * @param {myx} myx 
+ * @param {myxPaymentMethods} paymentMethods 
+ * @param {myxCategories} categories 
+ * @returns 
+ */
 const myxExpenses = function (myx, paymentMethods, categories)
 {
-	/** @typedef ExpenseObject
+	/** 
+	 * Represents an expense.
+	 * @typedef ExpenseObject
 	 * @type {Object}
 	 * @property {Date} dat Expense date
 	 * @property {Number} amt Expense amount
 	 * @property {String} cat Expense category - id reference to categories
 	 * @property {String} pmt Used payment method - id referenc to payment methods
 	 * @property {String} [txt] Additional text 
+	 */
+	/**
+	 * Defines filter for listing expenses.
+	 * @typedef ExpenseFilterObject
+	 * @type {Object}
+	 * @property {String} [pmt] Payment method id
+	 * @property {String} [cat] Category id (if sole)
+	 * @property {Array<String>} [cats] Category ids (if many)
+	 * @property {Array<MonthString>} [months] Months; set to all availibe months if ommited
 	 */
 	const MODULE_NAME = "expenses-list";
 	let data = {};
@@ -15,6 +33,7 @@ const myxExpenses = function (myx, paymentMethods, categories)
 	let availibleMonths = [];
 	let elements = getNames(document.getElementById("expenses-list"));
 	let modeHandler = new ModuleModeHandler(elements._self);
+	/** @type {expenseEditor} */
 	let editor;
 
 	elements.backSearchButton.onclick = () => { choices.choose("active-tab", filter._origin); };
@@ -31,7 +50,7 @@ const myxExpenses = function (myx, paymentMethods, categories)
 	};
 
 	/**
-	 * Loads data from a file. Converts the CVS data to an object and adds it to `data`.
+	 * Loads data from a file. Converts the CSV data to an object and adds it to `data`.
 	 * @param {Number} fileIndex Index [1..x] of file to load
 	 * @returns {Promise<void>} Returns a Promise `resolve()`
 	 */
@@ -68,7 +87,7 @@ const myxExpenses = function (myx, paymentMethods, categories)
 
 	/**
 	 * Provides all expenses of a month as CSV.
-	 * @param {String} month Month to get data (`yyyy-mm`)
+	 * @param {MonthString} month Month to get data
 	 * @returns {String} All expenses in given month as CSV
 	 */
 	function getCsv (month)
@@ -82,8 +101,9 @@ const myxExpenses = function (myx, paymentMethods, categories)
 	}
 
 	/**
-	 * **async.** Saves expenses to a file. More exactly: saves expenses of all months, that are in the same files as the given months.
-	 * @param {String|Array<String>} months Months do save data. Must be given as `yyyy-mm`
+	 * **(async)** Saves expenses to a file.
+	 * More exactly: saves expenses of all months, that are in the same files as the given months.
+	 * @param {MonthString|Array<MonthString>} months Months to save data
 	 */
 	async function save (months)
 	{
@@ -122,8 +142,8 @@ const myxExpenses = function (myx, paymentMethods, categories)
 
 	/**
 	 * Adds an expense to `data`.
-	 * @param {ExpenseObject} obj Expense object
-	 * @param {Number} [fileIndex] Index [1..x] of file that contains the expense month. **Only use** when adding data on file load.
+	 * @param {ExpenseObject} obj Expense to add
+	 * @param {Number} [fileIndex] Index [1..x] of file that contains the expense month. **Use only** when adding data on file load.
 	 */
 	function add (obj, fileIndex = null)
 	{
@@ -140,7 +160,7 @@ const myxExpenses = function (myx, paymentMethods, categories)
 
 	/**
 	 * Sorts expenses of a month, descending by date.
-	 * @param {String} month Months as `yyyy-mm` to sort expenses
+	 * @param {MonthString} month Months to sort expenses
 	 */
 	function sortItems (month)
 	{
@@ -148,8 +168,9 @@ const myxExpenses = function (myx, paymentMethods, categories)
 	}
 
 	/**
-	 * @param {string} month check this month for data ("YYYY-MM")
-	 * @returns {boolean} wheter there is any data for the month or not
+	 * Checks whether there are expenses in a certain month or not.
+	 * @param {MonthString} month Month to check for data
+	 * @returns {Boolean} `true` if there is any data for the month, `false` if there is no data
 	 */
 	function hasAnyData (month)
 	{
@@ -157,9 +178,11 @@ const myxExpenses = function (myx, paymentMethods, categories)
 	}
 
 	/**
+	 * Sets the current filter and renders the list. Also the title will get a _seach hint_.
+	 * Mode will be set to `search` if there is at least a pmt or a cat filter. Otherwise the mode will be `default`.
 	 * 
-	 * @param {{pmt: {String=}}} filterObj foo
-	 * @param {String} originModuleName module name where the filter came from (where to return to)
+	 * @param {ExpenseFilterObject} filterObj Filters to set
+	 * @param {String} originModuleName Module name where the filter came from (where to return to)
 	 */
 	function setFilter (filterObj, originModuleName)
 	{
@@ -195,7 +218,7 @@ const myxExpenses = function (myx, paymentMethods, categories)
 	}
 
 	/**
-	 * Resets the filter. Only filter criteria is the currently selected month.
+	 * Resets the filter. Only filter criteria will be the currently selected month.
 	 * Calls `setFilter()`.
 	 */
 	function resetFilter ()
@@ -203,6 +226,12 @@ const myxExpenses = function (myx, paymentMethods, categories)
 		setFilter({ months: [myx.selectedMonth.asIsoString] });
 	}
 
+	/**
+	 * Updates a navigation element in the module's title.
+	 * If the current month has no data and the target month has no data, too, the element gets hidden.
+	 * @param {HTMLDivElement} navElement HTML element to update
+	 * @param {MonthObject} targetMonth Month to be represented by the nav element
+	 */
 	function _renderNavItem (navElement, targetMonth)
 	{
 		navElement.parentElement.onclick = () =>
@@ -216,9 +245,9 @@ const myxExpenses = function (myx, paymentMethods, categories)
 	}
 
 	/**
-	 * Provides a headline <div> for a date.
+	 * Provides a headline `<div>` element for a date.
 	 * @param {Date} date Date to render the headline for
-	 * @returns {HTMLDivElement} Headline <div> containing a nice date text
+	 * @returns {HTMLDivElement} Headline `<div>` containing a nice date text
 	 */
 	function renderHeadline (date)
 	{
@@ -230,9 +259,9 @@ const myxExpenses = function (myx, paymentMethods, categories)
 
 	/**
 	 * Provides a HTML element representing an expense.
-	 * @param {ExpenseObject} item Expense object
-	 * @param {Number} dataIndex array index [0..x] of the current month subset of `data`
-	 * @returns {HTMLDivElement} HTML element.
+	 * @param {ExpenseObject} item Expense to render
+	 * @param {Number} dataIndex Array index (`0..x`) of the current month subset of `data`
+	 * @returns {HTMLDivElement} `<div>` element
 	 */
 	function renderItem (item, dataIndex)
 	{
@@ -254,6 +283,11 @@ const myxExpenses = function (myx, paymentMethods, categories)
 	}
 
 	/**
+	 * Puts a list of all expenses matching the current filter to the "content"-element.
+	 * For each day with an expense there will be a _headline_ and an _item_ element fo each expense.
+	 * Item elements will contain all functionality for all modes.
+	 * 
+	 * Also navigation items will be updated.
 	 */
 	function renderList ()
 	{
@@ -318,10 +352,10 @@ const myxExpenses = function (myx, paymentMethods, categories)
 	}
 
 	/**
-	 * Pops up an `expenseeditor` to edit an expense. Renders the expenses list afterwards.
-	 * @param {ExpenseObject} item Expense object to edit
-	 * @param {String} [dataMonth] Month of the expense as `yyyy-mm`, required if editing existing data
-	 * @param {Number} [dataIndex] array index [0..x] of the current month subset of `data`, required if editing existing data
+	 * Pops up an ExpenseEditor to modify an expense or create a new one. Renders the expenses list afterwards.
+	 * @param {ExpenseObject} item Expense to edit
+	 * @param {MonthString} [dataMonth] Month of the expense; required if editing existing data, otherwise prohibited
+	 * @param {Number} [dataIndex] Array index (`0..x`) of the current month subset of `data`; required if editing existing data, otherwise prohibited
 	 */
 	function popupEditor (item, dataMonth, dataIndex)
 	{
@@ -397,7 +431,7 @@ const myxExpenses = function (myx, paymentMethods, categories)
 	}
 
 	/**
-	 * Handler for "add expense" button click. Pops up `expenseeditor` for new expense.
+	 * Handler for "add expense" button click. Pops up ExpenseEditor for new expense.
 	 */
 	function onAddExpenseClick ()
 	{
