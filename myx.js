@@ -27,15 +27,28 @@ const myx = function ()
 		activeTab.enter();
 	};
 
-	function init (promiseResults)
+	function init ()
 	{
 		choices.onChoose("active-tab", onTabChosen);
-		myx.expenses.loadFromFile().then(() =>
+		let latestFileIndex = null;
+		for (let fileIndex = Object.keys(googleappApi.files).length; fileIndex > 0; fileIndex -= 1)
 		{
-			// choices.choose("active-tab", myx.statistics.moduleName);
-			choices.choose("active-tab", myx.expenses.moduleName);
-			myx.expenses.enter();
-		});
+			let fileName = "data-" + fileIndex + ".csv";
+			if (googleappApi.files[fileName] !== undefined)
+			{
+				latestFileIndex ||= fileIndex;
+				console.debug("Loading file #", fileIndex);
+				myx.expenses.loadFromFile(fileIndex).then(() =>
+				{
+					console.log("done", fileIndex);
+					if (latestFileIndex === fileIndex)
+					{
+						choices.choose("active-tab", myx.expenses.moduleName);
+						myx.expenses.enter();
+					}
+				});
+			}
+		}
 	}
 
 	function onTabChosen (tabName, event)

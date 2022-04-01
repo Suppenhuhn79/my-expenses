@@ -1,9 +1,17 @@
 const myxExpenses = function (myx, paymentMethods, categories)
 {
+	/** @typedef ExpenseObject
+	 * @type {Object}
+	 * @property {Date} dat Expense date
+	 * @property {Number} amt Expense amount
+	 * @property {String} cat Expense category - id reference to categories
+	 * @property {String} pmt Used payment method - id referenc to payment methods
+	 * @property {String} [txt] Additional text 
+	 */
 	const MODULE_NAME = "expenses-list";
 	let data = {};
+	let dataIndex = myxDataindex();
 	let filter = {};
-	let fileMonthMap = {};
 	let availibleMonths = [];
 	let elements = getNames(document.getElementById("expenses-list"));
 	let modeHandler = new ModuleModeHandler(elements._self);
@@ -22,63 +30,102 @@ const myxExpenses = function (myx, paymentMethods, categories)
 		});
 	};
 
-	function loadFromFile (fileName = "data-1.csv")
+	/**
+	 * Loads data from a file. Converts the CVS data to an object and adds it to `data`.
+	 * @param {Number} fileIndex Index [1..x] of file to load
+	 * @returns {Promise<void>} Returns a Promise `resolve()`
+	 */
+	function loadFromFile (fileIndex = 1)
 	{
 		return new Promise((resolve, reject) =>
 		{
 			const KEYS = ["dat", "amt", "cat", "txt", "pmt"];
+			let fileName = "data-" + fileIndex.toString() + ".csv";
 			// xhr("GET", "http://christophpc:8800/projekte/my-expenses/~web-mock/" + fileName).then((result) =>
 			googleappApi.loadFile(fileName).then((result) =>
 			{
-				fileMonthMap[fileName] = [];
 				for (let line of result.split("\n"))
 				{
 					if (!!line)
 					{
 						let vals = line.split("\t");
+						let month = vals[0].substr(0, 7);
 						let obj = {};
-						let monthKey = vals[0].substr(0, 7);
-						if (!data[monthKey])
-						{
-							fileMonthMap[fileName].push(monthKey);
-							data[monthKey] = [];
-						}
+						dataIndex.register(month, fileIndex);
 						for (let c = 0, cc = KEYS.length; c < cc; c += 1)
 						{
 							obj[KEYS[c]] = (c === 0) ? new Date(vals[c]) : ((c === 1) ? Number(vals[c]) : vals[c]);
 						}
-						data[monthKey].push(obj);
+						add(obj, fileIndex);
 					}
 				}
 				elements.addExpenseButton.classList.remove("hidden");
 				elements.addExpenseButton.onclick = onAddExpenseClick;
-				availibleMonths = availibleMonths.concat(fileMonthMap[fileName]).sort((a, b) => (a.localeCompare(b) * -1));
-				console.log(fileMonthMap, availibleMonths);
 				resolve();
 			});
 		});
-	};
+	}
 
-	function getCsv ()
+	/**
+	 * Provides all expenses of a month as CSV.
+	 * @param {String} month Month to get data (`yyyy-mm`)
+	 * @returns {String} All expenses in given month as CSV
+	 */
+	function getCsv (month)
 	{
 		let text = "";
-		for (let month in data)
+		for (let item of data[month])
 		{
-			for (let item of data[month])
-			{
-				text += [item.dat.toIsoFormatText("YMD"), item.amt, item.cat, item.txt, item.pmt].join("\t") + "\n";
-			}
+			text += [item.dat.toIsoFormatText("YMD"), item.amt, item.cat, item.txt, item.pmt].join("\t") + "\n";
 		}
 		return text;
-	};
+	}
 
-	async function save ()
+	/**
+	 * **async.** Saves expenses to a file. More exactly: saves expenses of all months, that are in the same files as the given months.
+	 * @param {String|Array<String>} months Months do save data. Must be given as `yyyy-mm`
+	 */
+	async function save (months)
 	{
+		let fileIndexes = [];
+		let ops = [];
 		myx.xhrBegin();
-		googleappApi.saveToFile("data-1.csv", getCsv()).then(myx.xhrSuccess, myx.xhrError);
-	};
+		if (typeof months === "string")
+		{
+			months = [months];
+		}
+		months = [...new Set(months)].sort(); // remove all duplicates and sort
+		for (let month of months)
+		{
+			fileIndexes.push(dataIndex.fileindexOfMonth(month));
+		}
+		fileIndexes = [...new Set(fileIndexes)]; // remove all duplicates
+		for (let fileIndex of fileIndexes)
+		{
+			let csv = "";
+			for (let month of dataIndex.allMonthsInFile(fileIndex))
+			{
+				csv += getCsv(month);
+			}
+			ops.push(googleappApi.saveToFile("data-" + fileIndex + ".csv", csv));
+		}
+		Promise.allSettled(ops).then((results) =>
+		{
+			let allFulfilled = true;
+			for (let result of results)
+			{
+				allFulfilled &&= (result.status === "fulfilled");
+			}
+			(allFulfilled) ? myx.xhrSuccess() : myx.xhrError();
+		});
+	}
 
-	function add (obj)
+	/**
+	 * Adds an expense to `data`.
+	 * @param {ExpenseObject} obj Expense object
+	 * @param {Number} [fileIndex] Index [1..x] of file that contains the expense month. **Only use** when adding data on file load.
+	 */
+	function add (obj, fileIndex = null)
 	{
 		let month = obj.dat.toIsoFormatText("YM");
 		if (!hasAnyData(month))
@@ -86,13 +133,19 @@ const myxExpenses = function (myx, paymentMethods, categories)
 			data[month] = [];
 		}
 		data[month].push(Object.assign({}, obj));
+		dataIndex.register(month, fileIndex);
 		sortItems(month);
-	};
+		availibleMonths = dataIndex.allAvailibleMonths.sort((a, b) => (a.localeCompare(b) * -1));
+	}
 
+	/**
+	 * Sorts expenses of a month, descending by date.
+	 * @param {String} month Months as `yyyy-mm` to sort expenses
+	 */
 	function sortItems (month)
 	{
 		data[month].sort((a, b) => (a.dat - b.dat));
-	};
+	}
 
 	/**
 	 * @param {string} month check this month for data ("YYYY-MM")
@@ -101,7 +154,7 @@ const myxExpenses = function (myx, paymentMethods, categories)
 	function hasAnyData (month)
 	{
 		return ((!!data[month]) && (data[month].length > 0));
-	};
+	}
 
 	/**
 	 * 
@@ -114,7 +167,6 @@ const myxExpenses = function (myx, paymentMethods, categories)
 		filter.cats = filterObj.cats || ((!!filterObj.cat) ? [filterObj.cat] : []);
 		filter.months = filterObj.months || availibleMonths;
 		filter._origin = originModuleName;
-		console.log("filter set:", filter);
 		htmlBuilder.removeAllChildren(elements.searchHint);
 		if ((filter.cats.length > 0) || !!filter.pmt)
 		{
@@ -176,6 +228,12 @@ const myxExpenses = function (myx, paymentMethods, categories)
 		);
 	}
 
+	/**
+	 * Provides a HTML element representing an expense.
+	 * @param {ExpenseObject} item Expense object
+	 * @param {Number} dataIndex array index [0..x] of the current month subset of `data`
+	 * @returns {HTMLDivElement} HTML element.
+	 */
 	function renderItem (item, dataIndex)
 	{
 		let catLabel = categories.getLabel(item.cat);
@@ -193,7 +251,7 @@ const myxExpenses = function (myx, paymentMethods, categories)
 			div.classList.add("exclude");
 		}
 		return div;
-	};
+	}
 
 	/**
 	 */
@@ -205,7 +263,7 @@ const myxExpenses = function (myx, paymentMethods, categories)
 		htmlBuilder.removeAllChildren(elements.content);
 		let items = [];
 		elements.content.scrollTop = 0;
-		console.log("filter applied:", filter);
+		console.debug("filter applied:", filter);
 		for (let month of filter.months)
 		{
 			if (hasAnyData(month))
@@ -259,6 +317,12 @@ const myxExpenses = function (myx, paymentMethods, categories)
 		}
 	}
 
+	/**
+	 * Pops up an `expenseeditor` to edit an expense. Renders the expenses list afterwards.
+	 * @param {ExpenseObject} item Expense object to edit
+	 * @param {String} [dataMonth] Month of the expense as `yyyy-mm`, required if editing existing data
+	 * @param {Number} [dataIndex] array index [0..x] of the current month subset of `data`, required if editing existing data
+	 */
 	function popupEditor (item, dataMonth, dataIndex)
 	{
 		editor.popup(item, dataMonth, dataIndex, (mode, item, originalMonth, originalIndex) =>
@@ -289,7 +353,7 @@ const myxExpenses = function (myx, paymentMethods, categories)
 			}
 			if (mode !== "not_modified")
 			{
-				save();
+				save([originalMonth, itemMonth]);
 			}
 			choices.choose("active-tab", MODULE_NAME);
 			setFilter({ months: [itemMonth] });
@@ -332,6 +396,9 @@ const myxExpenses = function (myx, paymentMethods, categories)
 		menubox.popup(event, null, alignElement, "center, below bottom");
 	}
 
+	/**
+	 * Handler for "add expense" button click. Pops up `expenseeditor` for new expense.
+	 */
 	function onAddExpenseClick ()
 	{
 		let nowMonth = (new Date()).toIsoFormatText("YM");
@@ -349,7 +416,7 @@ const myxExpenses = function (myx, paymentMethods, categories)
 			itemDate = new Date();
 		}
 		popupEditor({ dat: itemDate });
-	};
+	}
 
 	/* **** INIT MODULE **** */
 	pageSnippets.import("snippets/expenseeditor.xml").then(() =>
@@ -360,15 +427,15 @@ const myxExpenses = function (myx, paymentMethods, categories)
 
 	return { // publish members
 		get moduleName () { return MODULE_NAME; },
-		get data () { return data; },
-		// get availibleMonths () { return availibleMonths; },
+		get data () { return data; }, // TODO: debug only
+		get index () { return dataIndex; }, // TODO: debug only
+		getCsv: getCsv, // TODO: debug only
+		save: save, // TODO: debug only
 		hasAnyData: hasAnyData,
 		loadFromFile: loadFromFile,
-		// saveToFile: save,
 		enter: () => { resetFilter(); renderList(); },
 		leave: () => { resetFilter(); },
 		setFilter: setFilter,
-		exportAsCsv: getCsv,
 		edit: popupEditor,
 		popupAvalibleMonthsMenu: popupAvalibleMonthsMenu
 	};
