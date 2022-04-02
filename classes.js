@@ -8,7 +8,7 @@ class ModuleModeHandler
 
 	/**
 	 * Creates a new instance of ModuleModeHandler.
-	 * @param {HTMLElement} element element that contains module items
+	 * @param {HTMLElement} element Element that contains module items
 	 * @param {Function} dataGetter `function(): Object` to get the current module data before switching to "edit" mode
 	 * @param {Function} dataSetter `function(data: Object)` to call to reset modified data when cancelling "edit" mode
 	 */
@@ -21,11 +21,11 @@ class ModuleModeHandler
 
 	/**
 	 * Sets the current mode for the module. Hides all elements that have the class "for-mode"
-	 * but not "<mode>-mode".
+	 * but not "\<mode\>-mode".
 	 * If switching from "default" to "edit" mode, a backup of the module data is taken via the `dataGetter()`.
 	 * If Switching from "edit" to "default" mode (which means the edit mode was cancelled), the module data
 	 * is restored to backup via `dataSetter()`.
-	 * @param {String} newMode new mode to set
+	 * @param {String} newMode Mew mode to set
 	 */
 	setMode (newMode)
 	{
