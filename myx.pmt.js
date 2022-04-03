@@ -1,9 +1,8 @@
 /**
  * my-expenses "categories" module.
- * @param {myx} myx 
  * @returns 
  */
-const myxPaymentMethods = function (myx)
+const myxPaymentMethods = function ()
 {
 	const MODULE_NAME = "payment-methods";
 	const FILE_NAME = "pmt.json";
@@ -47,19 +46,6 @@ const myxPaymentMethods = function (myx)
 				resolve();
 			});
 		});
-	}
-
-	/**
-	 * **(async)** Saves payment methods to file on Google Drive.
-	 */
-	async function save ()
-	{
-		myx.xhrBegin();
-		googleappApi.saveToFile(FILE_NAME, {
-			order: order,
-			items: data,
-			'default': defaultId
-		}).then(myx.xhrSuccess, myx.xhrError);
 	}
 
 	/**
@@ -182,12 +168,17 @@ const myxPaymentMethods = function (myx)
 	}
 
 	/**
-	 * Applies edits. Saves changes to file and returns to "default" mode.
+	 * (async) Saves changes to file and returns to "default" mode.
 	 */
-	function applyEdits ()
+	async function applyEdits ()
 	{
 		modeHandler.setMode("__saving__"); // intermediate state 'cause going from "edit" to "default" mode triggers a data rollback
-		save();
+		myx.xhrBegin();
+		googleappApi.saveToFile(FILE_NAME, {
+			order: order,
+			items: data,
+			'default': defaultId
+		}).then(myx.xhrSuccess, myx.xhrError);
 		modeHandler.setMode("default");
 	}
 

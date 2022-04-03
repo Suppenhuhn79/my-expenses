@@ -32,7 +32,7 @@
 			<h1>my expenses</h1>
 		</div>
 		<div id="client" style="overflow: scroll">
-			<div id="not-signed-in" class="fullscreen-client" style="height: auto; display: none;">
+			<div id="not-signed-in" class="fullscreen-client" style="height: auto; display: none">
 				<div class="fullscreen-msg">
 					<div class="icon far">&#xf119;</div>
 					<div class="label">Your sign in attempt was not successful.</div>
@@ -48,9 +48,7 @@
 			let hash = window.location;
 			let home = window.location.origin + window.location.pathname.substr(0, window.location.pathname.lastIndexOf("/") + 1);
 
-			if (/[#&?]scope=[^&]*https:\/\/www\.googleapis\.com\/auth\/drive\.appdata/.test(hash) === true)
-			// if (true)
-			{
+			if (/[#&?]scope=[^&]*https:\/\/www\.googleapis\.com\/auth\/drive\.appdata/.test(hash) === true) {
 				/* get auth info from Google API */
 				gapi.load("client:auth2", () => {
 					gapi.client
@@ -64,16 +62,13 @@
 							let token = authInstance.currentUser.get().getAuthResponse().access_token;
 							let expiresInSeconds = authInstance.currentUser.get().getAuthResponse().expires_in;
 							let expirationDate = new Date();
-							console.log(token);
 							expirationDate.setTime(expirationDate.getTime() + parseInt(expiresInSeconds) * 1000);
 							googleappApi.tokenCookie.set(token, expirationDate);
 							/* continue */
 							window.location.replace(home);
 						});
 				});
-			}
-			else
-			{
+			} else {
 				let rex = /[#&?]([^=]+)=([^&]+)/g;
 				let rem = rex.exec(hash);
 				let tableElement = document.getElementById("table");

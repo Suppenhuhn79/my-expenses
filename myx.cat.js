@@ -1,9 +1,8 @@
 /**
  * my-expenses "categories" module.
- * @param {myx} myx 
  * @returns 
  */
-const myxCategories = function (myx)
+const myxCategories = function ()
 {
 	const MODULE_NAME = "categories-list";
 	const FILE_NAME = "cat.json";
@@ -37,18 +36,6 @@ const myxCategories = function (myx)
 				resolve();
 			});
 		});
-	}
-
-	/**
-	* **(async)** Saves categories to file on Google Drive.
-	*/
-	async function save ()
-	{
-		myx.xhrBegin();
-		googleappApi.saveToFile(FILE_NAME, {
-			order: order,
-			items: data
-		}).then(myx.xhrSuccess, myx.xhrError);
 	}
 
 	/**
@@ -270,12 +257,16 @@ const myxCategories = function (myx)
 	}
 
 	/**
-	 * Applies edits to categories. Saves changes to file and returns to "default" mode.
+	 * (async) Saves changes to file and returns to "default" mode.
 	 */
 	function applyEdits ()
 	{
 		modeHandler.setMode("__saving__"); // intermediate state 'cause going from "edit" to "default" mode triggers a data rollback
-		save();
+		myx.xhrBegin();
+		googleappApi.saveToFile(FILE_NAME, {
+			order: order,
+			items: data
+		}).then(myx.xhrSuccess, myx.xhrError);
 		modeHandler.setMode("default");
 	}
 

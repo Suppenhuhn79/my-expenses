@@ -44,10 +44,13 @@ class ModuleModeHandler
 			}
 		}
 		this.currentMode = newMode || "default";
-		let modeCssClass = this.currentMode + "-mode";
-		for (let element of this.#element.querySelectorAll(".for-mode"))
+		if (newMode.startsWith("__") === false) // a mode with "__" prefix is an intermediate mode and we don't need to update the ui
 		{
-			(element.classList.contains(modeCssClass)) ? element.classList.remove("hidden") : element.classList.add("hidden");
+			let modeCssClass = this.currentMode + "-mode";
+			for (let element of this.#element.querySelectorAll(".for-mode"))
+			{
+				(element.classList.contains(modeCssClass)) ? element.classList.remove("hidden") : element.classList.add("hidden");
+			}
 		}
 	}
 }

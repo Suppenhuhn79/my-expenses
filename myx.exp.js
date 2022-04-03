@@ -1,11 +1,10 @@
 /**
  * my-expenses "expenses" module.
- * @param {myx} myx 
  * @param {myxPaymentMethods} paymentMethods 
  * @param {myxCategories} categories 
  * @returns 
  */
-const myxExpenses = function (myx, paymentMethods, categories)
+const myxExpenses = function (paymentMethods, categories)
 {
 	/** 
 	 * Represents an expense.
@@ -35,6 +34,8 @@ const myxExpenses = function (myx, paymentMethods, categories)
 	let modeHandler = new ModuleModeHandler(elements._self);
 	/** @type {expenseEditor} */
 	let editor;
+	/** @type {Date} */
+	let selectedMonth = (new Date());
 
 	elements.backSearchButton.onclick = () => { choices.choose("active-tab", filter._origin); };
 	elements.cancelSearchButton.onclick = () => { resetFilter(); renderList(); };
@@ -43,7 +44,7 @@ const myxExpenses = function (myx, paymentMethods, categories)
 	{
 		popupAvalibleMonthsMenu(mouseEvent, elements.navCurrent, (month) =>
 		{
-			myx.selectedMonth = month;
+			selectedMonth = month;
 			resetFilter();
 			renderList();
 		});
@@ -51,7 +52,7 @@ const myxExpenses = function (myx, paymentMethods, categories)
 
 	/**
 	 * Loads data from a file. Converts the CSV data to an object and adds it to `data`.
-	 * @param {Number} fileIndex Index [1..x] of file to load
+	 * @param {Number} fileIndex Index (`1..x`) of file to load
 	 * @returns {Promise<void>} Returns a Promise `resolve()`
 	 */
 	function loadFromFile (fileIndex = 1)
@@ -143,7 +144,7 @@ const myxExpenses = function (myx, paymentMethods, categories)
 	/**
 	 * Adds an expense to `data`.
 	 * @param {ExpenseObject} obj Expense to add
-	 * @param {Number} [fileIndex] Index [1..x] of file that contains the expense month. **Use only** when adding data on file load.
+	 * @param {Number} [fileIndex] Index (`1..x`) of file that contains the expense month. **Use only** when adding data on file load.
 	 */
 	function add (obj, fileIndex = null)
 	{
@@ -223,25 +224,26 @@ const myxExpenses = function (myx, paymentMethods, categories)
 	 */
 	function resetFilter ()
 	{
-		setFilter({ months: [myx.selectedMonth.asIsoString] });
+		setFilter({ months: [selectedMonth.asIsoString] });
 	}
 
 	/**
 	 * Updates a navigation element in the module's title.
 	 * If the current month has no data and the target month has no data, too, the element gets hidden.
 	 * @param {HTMLDivElement} navElement HTML element to update
-	 * @param {MonthObject} targetMonth Month to be represented by the nav element
+	 * @param {Date} targetMonth Month to be represented by the nav element
 	 */
 	function _renderNavItem (navElement, targetMonth)
 	{
 		navElement.parentElement.onclick = () =>
 		{
-			myx.selectedMonth = targetMonth.isoString;
-			setFilter({ months: [myx.selectedMonth.asIsoString] });
+			selectedMonth = targetMonth.date;
+			console.log(targetMonth, selectedMonth);
+			setFilter({ months: [selectedMonth.asIsoString] });
 			renderList();
 		};
 		navElement.innerText = targetMonth.shortName;
-		navElement.parentElement.style.visibility = (hasAnyData(myx.selectedMonth.asIsoString) || hasAnyData(targetMonth.isoString)) ? "visible" : "hidden";
+		navElement.parentElement.style.visibility = (hasAnyData(selectedMonth.asIsoString) || hasAnyData(targetMonth.isoString)) ? "visible" : "hidden";
 	}
 
 	/**
@@ -291,13 +293,12 @@ const myxExpenses = function (myx, paymentMethods, categories)
 	 */
 	function renderList ()
 	{
-		elements.navCurrent.innerText = myx.selectedMonth.asText;
-		_renderNavItem(elements.navPrevious, calcRelativeMonth(myx.selectedMonth.asIsoString, -1));
-		_renderNavItem(elements.navNext, calcRelativeMonth(myx.selectedMonth.asIsoString, +1));
+		elements.navCurrent.innerText = selectedMonth.asText;
+		_renderNavItem(elements.navPrevious, calcRelativeMonth(selectedMonth, -1));
+		_renderNavItem(elements.navNext, calcRelativeMonth(selectedMonth, +1));
 		htmlBuilder.removeAllChildren(elements.content);
 		let items = [];
 		elements.content.scrollTop = 0;
-		console.debug("filter applied:", filter);
 		for (let month of filter.months)
 		{
 			if (hasAnyData(month))
@@ -361,7 +362,6 @@ const myxExpenses = function (myx, paymentMethods, categories)
 	{
 		editor.popup(item, dataMonth, dataIndex, (mode, item, originalMonth, originalIndex) =>
 		{
-			console.log("onItemEdited", mode, item, originalMonth, originalIndex);
 			let itemDate = item.dat.toIsoFormatText("YMD");
 			let itemMonth = itemDate.substr(0, 7);
 			switch (mode)
@@ -400,7 +400,7 @@ const myxExpenses = function (myx, paymentMethods, categories)
 	 * Pops up a `Menubox` to select a month from all availible months.
 	 * @param {Event} event Event that triggered the popup (required to stop propagation)
 	 * @param {HTMLElement} alignElement Element to align the menu to (centered below bottom)
-	 * @param {Function} callback `function(selectedMonth: String)` to call on month selection
+	 * @param {Function} callback `function(selectedMonth: Date)` to call on month selection
 	 */
 	function popupAvalibleMonthsMenu (event, alignElement, callback)
 	{
@@ -424,7 +424,7 @@ const myxExpenses = function (myx, paymentMethods, categories)
 		{
 			if (typeof callback === "function")
 			{
-				callback(event.itemKey);
+				callback(new Date(event.itemKey));
 			}
 		});
 		menubox.popup(event, null, alignElement, "center, below bottom");
@@ -437,13 +437,13 @@ const myxExpenses = function (myx, paymentMethods, categories)
 	{
 		let nowMonth = (new Date()).toIsoFormatText("YM");
 		let itemDate;
-		if (myx.selectedMonth.asIsoString > nowMonth)
+		if (selectedMonth.asIsoString > nowMonth)
 		{
-			itemDate = new Date(myx.selectedMonth.asDate.getFullYear(), myx.selectedMonth.asDate.getMonth(), 1);
+			itemDate = new Date(selectedMonth.asDate.getFullYear(), selectedMonth.asDate.getMonth(), 1);
 		}
-		else if (myx.selectedMonth.asIsoString < nowMonth)
+		else if (selectedMonth.asIsoString < nowMonth)
 		{
-			itemDate = new Date(myx.selectedMonth.asDate.getFullYear(), myx.selectedMonth.asDate.getMonth() + 1, 0);
+			itemDate = new Date(selectedMonth.asDate.getFullYear(), selectedMonth.asDate.getMonth() + 1, 0);
 		}
 		else
 		{
@@ -465,6 +465,8 @@ const myxExpenses = function (myx, paymentMethods, categories)
 		get index () { return dataIndex; }, // TODO: debug only
 		getCsv: getCsv, // TODO: debug only
 		save: save, // TODO: debug only
+		get selectedMonth () { return selectedMonth; },
+		set selectedMonth (value) { selectedMonth = value; },
 		hasAnyData: hasAnyData,
 		loadFromFile: loadFromFile,
 		enter: () => { resetFilter(); renderList(); },

@@ -1,4 +1,11 @@
-const myxStatistics = function (myx, expenses, categories, paymentMethods)
+/**
+ * my-expenses "expenses" module.
+ * @param {myxExpenses} expenses
+ * @param {myxPaymentMethods} paymentMethods 
+ * @param {myxCategories} categories 
+ * @returns 
+ */
+const myxStatistics = function (expenses, categories, paymentMethods)
 {
 	const MODULE_NAME = "statistics";
 	let elements = getNames(document.getElementById(MODULE_NAME));
@@ -7,7 +14,7 @@ const myxStatistics = function (myx, expenses, categories, paymentMethods)
 	{
 		expenses.popupAvalibleMonthsMenu(mouseEvent, elements.navCurrent, (month) =>
 		{
-			myx.selectedMonth = month;
+			expenses.selectedMonth = month;
 			renderList();
 		});
 	};
@@ -65,11 +72,11 @@ const myxStatistics = function (myx, expenses, categories, paymentMethods)
 	}
 
 	/**
-	 * 
-	 * @param {string} baseClass css class name for percent bar element
-	 * @param {number} percentRatio 
-	 * @param {css-color-string} color color for percentage
-	 * @returns {HTMLDIVElement}
+	 * Provides a HTML element that draws a progress bar.
+	 * @param {String} baseClass CSS class name for percent bar element
+	 * @param {Number} percentRatio Percentage (`0<n<1`) filled on the bar
+	 * @param {String} color CSS color value for percentage
+	 * @returns {HTMLDivElement}
 	 */
 	function renderPercentBar (baseClass, percentRatio, color)
 	{
@@ -95,21 +102,21 @@ const myxStatistics = function (myx, expenses, categories, paymentMethods)
 		let id = mouseEvent.target.closest("[data-cat]").dataset.cat;
 		expenses.setFilter({
 			cat: id,
-			months: [myx.selectedMonth.asIsoString]
+			months: [expenses.selectedMonth.asIsoString]
 		}, MODULE_NAME);
-		choices.choose("active-tab", myx.expenses.moduleName);
+		choices.choose("active-tab", expenses.moduleName);
 	}
 
 	function _renderNavItem (navElement, targetMonth)
 	{
 		navElement.parentElement.onclick = () =>
 		{
-			myx.selectedMonth = targetMonth.isoString;
-			expenses.setFilter({ months: [myx.selectedMonth.asIsoString] });
+			expenses.selectedMonth = targetMonth.date;
+			expenses.setFilter({ months: [expenses.selectedMonth.asIsoString] });
 			renderList();
 		};
 		navElement.innerText = targetMonth.shortName;
-		navElement.parentElement.style.visibility = expenses.hasAnyData(myx.selectedMonth.asIsoString) || expenses.hasAnyData(targetMonth.isoString) ? "visible" : "hidden";
+		navElement.parentElement.style.visibility = expenses.hasAnyData(expenses.selectedMonth.asIsoString) || expenses.hasAnyData(targetMonth.isoString) ? "visible" : "hidden";
 	}
 
 	/**
@@ -120,17 +127,17 @@ const myxStatistics = function (myx, expenses, categories, paymentMethods)
 	{
 		// myx.selectedMonth = month;
 		// let monthAsDate = new Date(month);
-		elements.navCurrent.innerText = myx.selectedMonth.asText;
-		_renderNavItem(elements.navPrevious, calcRelativeMonth(myx.selectedMonth.asIsoString, -1));
-		_renderNavItem(elements.navNext, calcRelativeMonth(myx.selectedMonth.asIsoString, +1));
-		if (expenses.hasAnyData(myx.selectedMonth.asIsoString))
+		elements.navCurrent.innerText = expenses.selectedMonth.asText;
+		_renderNavItem(elements.navPrevious, calcRelativeMonth(expenses.selectedMonth, -1));
+		_renderNavItem(elements.navNext, calcRelativeMonth(expenses.selectedMonth, +1));
+		if (expenses.hasAnyData(expenses.selectedMonth.asIsoString))
 		{
 			htmlBuilder.removeAllChildren(elements.content);
 			elements.content.appendChild(htmlBuilder.newElement("div.headline", "Total expenses per month"));
-			let stats = calcAggs(myx.selectedMonth.asIsoString);
+			let stats = calcAggs(expenses.selectedMonth.asIsoString);
 			stats.aggs.sort((a, b) => (b.total_sum || 0) - (a.total_sum || 0));
 			console.log(stats);
-			elements.content.appendChild(htmlBuilder.newElement("div.item", htmlBuilder.newElement("div.flex-fill.big.bold", myx.selectedMonth.asText + " total"), htmlBuilder.newElement("div.amt.big.bold", myx.formatAmountLocale(stats.totals.sum))));
+			elements.content.appendChild(htmlBuilder.newElement("div.item", htmlBuilder.newElement("div.flex-fill.big.bold", expenses.selectedMonth.asText + " total"), htmlBuilder.newElement("div.amt.big.bold", myx.formatAmountLocale(stats.totals.sum))));
 			for (let item of stats.aggs)
 			{
 				if (item.total_sum !== undefined)

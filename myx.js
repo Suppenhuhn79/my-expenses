@@ -3,20 +3,10 @@
  * @typedef MonthString
  * @type {String}
  */
-/**
- * Provides various reprensentations of a month.
- * @typedef MonthObject
- * @type {Object}
- * @param {Date} asDate Month as JS date
- * @param {MonthString} asIsoString `yyyy-mm` formatted string
- * @param {String} asShortText `MMM yyyy` formatted string (month short name)
- * @param {String} asText `mmmm yyyy` formatted string (month full name)
- */
 const myx = function ()
 {
 	let activeTab = null;
 	let currencySymbol = "€";
-	let selectedMonth = (new Date()).toIsoFormatText("YM");
 	let bottomMenu = document.getElementById("bottom-menu");
 	let xhrActivityIndicator = document.getElementById("xhr-indicator");
 
@@ -51,10 +41,8 @@ const myx = function ()
 			if (googleappApi.files[fileName] !== undefined)
 			{
 				latestFileIndex ||= fileIndex;
-				console.debug("Loading file #", fileIndex);
 				myx.expenses.loadFromFile(fileIndex).then(() =>
 				{
-					console.log("done", fileIndex);
 					if (latestFileIndex === fileIndex)
 					{
 						choices.choose("active-tab", myx.expenses.moduleName);
@@ -137,19 +125,6 @@ const myx = function ()
 	const myx = { // publish members
 		client: document.getElementById("client"),
 		get currencySymbol () { return currencySymbol; },
-		get selectedMonth ()
-		{
-			let asDate = new Date(selectedMonth);
-			let month = asDate.getMonth();
-			let year = asDate.getFullYear();
-			return {
-				asDate: asDate,
-				asIsoString: selectedMonth,
-				asShortText: monthNames[month].substring(0, 3) + "\u00a0" + year,
-				asText: monthNames[month] + "\u00a0" + year
-			};
-		},
-		set selectedMonth (value) { selectedMonth = value; },
 		init: init,
 		getIconAttributes: getIconAttributes,
 		loadConfigFile: loadConfigFile,
@@ -165,10 +140,10 @@ const myx = function ()
 		myx.iconEditor = iconEditor(myx.client);
 	});
 
-	myx.paymentMethods = myxPaymentMethods(myx);
-	myx.categories = myxCategories(myx);
-	myx.expenses = myxExpenses(myx, myx.paymentMethods, myx.categories);
-	myx.statistics = myxStatistics(myx, myx.expenses, myx.categories, myx.paymentMethods);
+	myx.paymentMethods = myxPaymentMethods();
+	myx.categories = myxCategories();
+	myx.expenses = myxExpenses(myx.paymentMethods, myx.categories);
+	myx.statistics = myxStatistics(myx.expenses, myx.categories, myx.paymentMethods);
 	myx.addExpense = myx.expenses.edit;
 	choices.choose("active-tab", myx.expenses.moduleName);
 
@@ -206,3 +181,14 @@ const myx = function ()
 
 	return myx;
 }();
+
+// inject some getters we find useful to Data class.
+Object.defineProperty(Date.prototype, "asIsoString", {
+	get () { return this.toIsoFormatText("YM"); }
+});
+Object.defineProperty(Date.prototype, "asShortText", {
+	get () { return monthNames[this.getMonth()].substring(0, 3) + "\u00a0" + this.getFullYear(); }
+});
+Object.defineProperty(Date.prototype, "asText", {
+	get () { return monthNames[this.getMonth()] + "\u00a0" + this.getFullYear(); }
+});
