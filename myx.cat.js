@@ -29,7 +29,7 @@ const myxCategories = function ()
 	{
 		return new Promise((resolve) =>
 		{
-			myx.loadConfigFile(FILE_NAME).then((obj) =>
+			googleappApi.loadFileEx(FILE_NAME).then((obj) =>
 			{
 				data = obj.items;
 				order = obj.order;

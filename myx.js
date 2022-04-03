@@ -65,69 +65,46 @@ const myx = function ()
 		}
 	}
 
-	function loadConfigFile (filename)
-	{
-		return new Promise((resolve) =>
-		{
-			let cacheName = "myx_" + filename.substring(0, filename.lastIndexOf(".")).replaceAll(/[^\w\d]/g, "_"); //filename.replaceAll(/\./g, "_");
-			let cache = JSON.parse(localStorage.getItem(cacheName));
-			if ((!!cache) && !(new Date(cache.date) < googleappApi.files[filename].modifiedTime))
-			{
-				console.info("Loading " + filename + " from cache");
-				resolve(cache);
-			}
-			else
-			{
-				googleappApi.loadFile(filename).then((payload) =>
-				{
-					localStorage.setItem(cacheName, JSON.stringify(Object.assign({}, payload, { date: googleappApi.files[filename].modifiedTime })));
-					resolve(payload);
-				});
-			}
-		});
-	};
-
 	function getIconAttributes (iconCode)
 	{
 		return {
 			faScope: iconCode.substr(0, 3),
 			htmlEntity: "&#x" + iconCode.substr(4) + ";"
 		};
-	};
+	}
 
 	function newId ()
 	{
 		return (Math.floor((Math.random() * 1e12))).toString(16).substring(0, 8);
-	};
+	}
 
 	function formatAmountLocale (num)
 	{
 		let numAsString = Math.round(num).toString();
 		let integers = formatIntegersLocale(numAsString);
 		return integers + "&#x00a0;" + currencySymbol;
-	};
+	}
 
 	function xhrOnBegin ()
 	{
 		xhrActivityIndicator.classList = ["active"];
-	};
+	}
 
 	function xhrOnSuccess ()
 	{
 		xhrActivityIndicator.classList = ["success"];
-	};
+	}
 
 	function xhrOnError ()
 	{
 		xhrActivityIndicator.classList = ["error"];
-	};
+	}
 
 	const myx = { // publish members
 		client: document.getElementById("client"),
 		get currencySymbol () { return currencySymbol; },
 		init: init,
 		getIconAttributes: getIconAttributes,
-		loadConfigFile: loadConfigFile,
 		newId: newId,
 		formatAmountLocale: formatAmountLocale,
 		xhrBegin: xhrOnBegin,
@@ -192,3 +169,31 @@ Object.defineProperty(Date.prototype, "asShortText", {
 Object.defineProperty(Date.prototype, "asText", {
 	get () { return monthNames[this.getMonth()] + "\u00a0" + this.getFullYear(); }
 });
+
+// inject caching mehtod into googleappApi
+/**
+ * Loads a file from Google Drive but previously checks if the file is cached in LocalStorage.
+ * @param {String} name File name to load
+ * @returns {Promise<any>}
+ */
+googleappApi.loadFileEx = function (name)
+{
+	return new Promise((resolve) =>
+	{
+		let cacheName = "myx_" + name.substring(0, name.lastIndexOf(".")).replaceAll(/[^\w\d]/g, "_"); //filename.replaceAll(/\./g, "_");
+		let cache = JSON.parse(localStorage.getItem(cacheName));
+		if ((!!cache) && !!cache.data && !(new Date(cache.date) < googleappApi.files[name].modifiedTime))
+		{
+			console.info("Loading " + name + " from cache");
+			resolve(cache.data);
+		}
+		else
+		{
+			googleappApi.loadFile(name).then((payload) =>
+			{
+				localStorage.setItem(cacheName, JSON.stringify({ data: payload, date: googleappApi.files[name].modifiedTime }));
+				resolve(payload);
+			});
+		}
+	});
+};

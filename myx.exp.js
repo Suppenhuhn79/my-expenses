@@ -57,12 +57,11 @@ const myxExpenses = function (paymentMethods, categories)
 	 */
 	function loadFromFile (fileIndex = 1)
 	{
-		return new Promise((resolve, reject) =>
+		return new Promise((resolve) =>
 		{
 			const KEYS = ["dat", "amt", "cat", "txt", "pmt"];
 			let fileName = "data-" + fileIndex.toString() + ".csv";
-			// xhr("GET", "http://christophpc:8800/projekte/my-expenses/~web-mock/" + fileName).then((result) =>
-			googleappApi.loadFile(fileName).then((result) =>
+			googleappApi.loadFileEx(fileName).then((result) =>
 			{
 				for (let line of result.split("\n"))
 				{
