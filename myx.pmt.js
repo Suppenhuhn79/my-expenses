@@ -186,6 +186,7 @@ const myxPaymentMethods = function (myx)
 	 */
 	function applyEdits ()
 	{
+		modeHandler.setMode("__saving__"); // intermediate state 'cause going from "edit" to "default" mode triggers a data rollback
 		save();
 		modeHandler.setMode("default");
 	}

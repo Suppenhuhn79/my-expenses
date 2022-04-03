@@ -267,13 +267,14 @@ const myxCategories = function (myx)
 			renderList();
 			elements.content.querySelector("[data-key='" + id + "']").scrollIntoView();
 		});
-	};
+	}
 
 	/**
 	 * Applies edits to categories. Saves changes to file and returns to "default" mode.
 	 */
 	function applyEdits ()
 	{
+		modeHandler.setMode("__saving__"); // intermediate state 'cause going from "edit" to "default" mode triggers a data rollback
 		save();
 		modeHandler.setMode("default");
 	}
