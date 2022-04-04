@@ -168,7 +168,8 @@ let myxPaymentMethods = function ()
 	}
 
 	/**
-	 * (async) Saves changes to file and returns to "default" mode.
+	 * Saves changes to file and returns to "default" mode.
+	 * @async
 	 */
 	async function applyEdits ()
 	{

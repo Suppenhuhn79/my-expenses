@@ -79,7 +79,7 @@ let myxCategories = function ()
 	/**
 	 * Provides the sub-category ids of a master category.
 	 * @param {String} masterCategoryId Id of the master category
-	 * @returns {Array<String>} Sub-category ids; empty aray if there aren't any
+	 * @returns {Array<String>} Sub-category ids; empty array if there aren't any
 	 */
 	function getSubCategories (masterCategoryId)
 	{
@@ -276,9 +276,10 @@ let myxCategories = function ()
 	}
 
 	/**
-	 * (async) Saves changes to file and returns to "default" mode.
+	 * Saves changes to file and returns to "default" mode.
+	 * @async
 	 */
-	function applyEdits ()
+	async function applyEdits ()
 	{
 		modeHandler.setMode("__saving__"); // intermediate state 'cause going from "edit" to "default" mode triggers a data rollback
 		myx.xhrBegin();
