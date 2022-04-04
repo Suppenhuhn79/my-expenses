@@ -1,6 +1,6 @@
 /**
- * my-expenses "categories" module.
- * @returns 
+ * my-expenses "payment methods" module.
+ * @namespace myxPaymentMethods
  */
 const myxPaymentMethods = function ()
 {

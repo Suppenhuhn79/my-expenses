@@ -10,22 +10,27 @@ const myx = function ()
 	let bottomMenu = document.getElementById("bottom-menu");
 	let xhrActivityIndicator = document.getElementById("xhr-indicator");
 
+	let paymentMethods = myxPaymentMethods();
+	let categories = myxCategories();
+	let expenses = myxExpenses(paymentMethods, categories);
+	let statistics = myxStatistics(expenses, categories, paymentMethods);
+
 	document.getElementById("bottom-menu").onclick = (mouseEvent) =>
 	{
 		activeTab?.leave?.();
 		switch (mouseEvent.target.closest("[data-choice]").dataset.choice)
 		{
-			case myx.paymentMethods.moduleName:
-				activeTab = myx.paymentMethods;
+			case paymentMethods.moduleName:
+				activeTab = paymentMethods;
 				break;
-			case myx.categories.moduleName:
-				activeTab = myx.categories;
+			case categories.moduleName:
+				activeTab = categories;
 				break;
-			case myx.expenses.moduleName:
-				activeTab = myx.expenses;
+			case expenses.moduleName:
+				activeTab = expenses;
 				break;
-			case myx.statistics.moduleName:
-				activeTab = myx.statistics;
+			case statistics.moduleName:
+				activeTab = statistics;
 				break;
 		}
 		activeTab.enter();
@@ -41,12 +46,12 @@ const myx = function ()
 			if (googleappApi.files[fileName] !== undefined)
 			{
 				latestFileIndex ||= fileIndex;
-				myx.expenses.loadFromFile(fileIndex).then(() =>
+				expenses.loadFromFile(fileIndex).then(() =>
 				{
 					if (latestFileIndex === fileIndex)
 					{
-						choices.choose("active-tab", myx.expenses.moduleName);
-						myx.expenses.enter();
+						choices.choose("active-tab", expenses.moduleName);
+						expenses.enter();
 					}
 				});
 			}
@@ -102,6 +107,8 @@ const myx = function ()
 
 	const myx = { // publish members
 		client: document.getElementById("client"),
+		categories: categories, // TODO: debug only
+		paymentMethods: paymentMethods, // TODO: debug only
 		get currencySymbol () { return currencySymbol; },
 		init: init,
 		getIconAttributes: getIconAttributes,
@@ -117,12 +124,7 @@ const myx = function ()
 		myx.iconEditor = iconEditor(myx.client);
 	});
 
-	myx.paymentMethods = myxPaymentMethods();
-	myx.categories = myxCategories();
-	myx.expenses = myxExpenses(myx.paymentMethods, myx.categories);
-	myx.statistics = myxStatistics(myx.expenses, myx.categories, myx.paymentMethods);
-	myx.addExpense = myx.expenses.edit;
-	choices.choose("active-tab", myx.expenses.moduleName);
+	choices.choose("active-tab", expenses.moduleName);
 
 	const AUTOSIGNIN_FLAG = "myx_autosignin";
 	googleappApi.init().then(
@@ -134,8 +136,8 @@ const myx = function ()
 			}
 			console.table(googleappApi.files);
 			Promise.allSettled([
-				myx.categories.init(),
-				myx.paymentMethods.init()
+				categories.init(),
+				paymentMethods.init()
 			]).then(init);
 		},
 		(reason) =>
@@ -154,7 +156,8 @@ const myx = function ()
 					choices.choose("active-tab", "not-signed-in");
 				}
 			}
-		});
+		}
+	);
 
 	return myx;
 }();
@@ -173,6 +176,8 @@ Object.defineProperty(Date.prototype, "asText", {
 // inject caching mehtod into googleappApi
 /**
  * Loads a file from Google Drive but previously checks if the file is cached in LocalStorage.
+ * @memberof googleappApi
+ * @static
  * @param {String} name File name to load
  * @returns {Promise<any>}
  */

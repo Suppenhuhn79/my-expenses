@@ -1,8 +1,8 @@
 /**
  * my-expenses "expenses" module.
+ * @namespace myxExpenses
  * @param {myxPaymentMethods} paymentMethods 
  * @param {myxCategories} categories 
- * @returns 
  */
 const myxExpenses = function (paymentMethods, categories)
 {
@@ -35,7 +35,7 @@ const myxExpenses = function (paymentMethods, categories)
 	/** @type {expenseEditor} */
 	let editor;
 	/** @type {Date} */
-	let selectedMonth = (new Date());
+	let selectedMonth = new Date();
 
 	elements.backSearchButton.onclick = () => { choices.choose("active-tab", filter._origin); };
 	elements.cancelSearchButton.onclick = () => { resetFilter(); renderList(); };
@@ -391,7 +391,7 @@ const myxExpenses = function (paymentMethods, categories)
 			choices.choose("active-tab", MODULE_NAME);
 			setFilter({ months: [itemMonth] });
 			renderList();
-			elements.content.querySelector("[data-date='" + itemDate + "']").scrollIntoView({ block: "start", behavior: "smooth" });
+			elements.content.querySelector("[data-date='" + itemDate + "']")?.scrollIntoView({ block: "start", behavior: "smooth" });
 		});
 	}
 
@@ -466,6 +466,7 @@ const myxExpenses = function (paymentMethods, categories)
 		save: save, // TODO: debug only
 		get selectedMonth () { return selectedMonth; },
 		set selectedMonth (value) { selectedMonth = value; },
+		get availibleMonths () { return availibleMonths; },
 		hasAnyData: hasAnyData,
 		loadFromFile: loadFromFile,
 		enter: () => { resetFilter(); renderList(); },
