@@ -2,7 +2,7 @@
  * my-expenses "payment methods" module.
  * @namespace myxPaymentMethods
  */
-const myxPaymentMethods = function ()
+let myxPaymentMethods = function ()
 {
 	const MODULE_NAME = "payment-methods";
 	const FILE_NAME = "pmt.json";
@@ -145,7 +145,7 @@ const myxPaymentMethods = function ()
 			cssModifier: "paymentmethod",
 			header: (editorMode === EDIT_EXISTING) ? "Edit payment method" : "New payment method"
 		};
-		myx.iconEditor.popup("pmt", itemToEdit, (editedObj, properties) =>
+		window.iconEditor.popup("pmt", itemToEdit, (editedObj, properties) =>
 		{
 			if (editorMode === ADD_NEW)
 			{
@@ -197,8 +197,7 @@ const myxPaymentMethods = function ()
 				promptEditor(id);
 				break;
 			case "search":
-				myx.expenses.setFilter({ pmt: id }, MODULE_NAME);
-				// choices.choose("active-tab", myx.expenses.moduleName);
+				myx.setExpenseFilter({ pmt: id }, MODULE_NAME);
 				break;
 			default:
 		}

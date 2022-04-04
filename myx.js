@@ -3,10 +3,11 @@
  * @typedef MonthString
  * @type {String}
  */
-const myx = function ()
+let myx = function ()
 {
 	let activeTab = null;
 	let currencySymbol = "€";
+	// let client= document.getElementById("client");
 	let bottomMenu = document.getElementById("bottom-menu");
 	let xhrActivityIndicator = document.getElementById("xhr-indicator");
 
@@ -105,26 +106,10 @@ const myx = function ()
 		xhrActivityIndicator.classList = ["error"];
 	}
 
-	const myx = { // publish members
-		client: document.getElementById("client"),
-		categories: categories, // TODO: debug only
-		paymentMethods: paymentMethods, // TODO: debug only
-		get currencySymbol () { return currencySymbol; },
-		init: init,
-		getIconAttributes: getIconAttributes,
-		newId: newId,
-		formatAmountLocale: formatAmountLocale,
-		xhrBegin: xhrOnBegin,
-		xhrSuccess: xhrOnSuccess,
-		xhrError: xhrOnError
-	};
-
 	pageSnippets.import("snippets/iconeditor.xml").then(() =>
 	{
-		myx.iconEditor = iconEditor(myx.client);
+		window.iconEditor = iconEditor(document.getElementById("client"));
 	});
-
-	choices.choose("active-tab", expenses.moduleName);
 
 	const AUTOSIGNIN_FLAG = "myx_autosignin";
 	googleappApi.init().then(
@@ -159,7 +144,19 @@ const myx = function ()
 		}
 	);
 
-	return myx;
+	return { // publish members
+		categories: categories, // TODO: debug only
+		paymentMethods: paymentMethods, // TODO: debug only
+		get currencySymbol () { return currencySymbol; },
+		getIconAttributes: getIconAttributes,
+		addExpense: expenses.edit,
+		setExpenseFilter: expenses.setFilter,
+		newId: newId,
+		formatAmountLocale: formatAmountLocale,
+		xhrBegin: xhrOnBegin,
+		xhrSuccess: xhrOnSuccess,
+		xhrError: xhrOnError
+	};
 }();
 
 // inject some getters we find useful to Data class.

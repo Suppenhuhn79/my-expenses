@@ -4,7 +4,7 @@
  * @param {myxPaymentMethods} paymentMethods 
  * @param {myxCategories} categories 
  */
-const myxExpenses = function (paymentMethods, categories)
+let myxExpenses = function (paymentMethods, categories)
 {
 	/** 
 	 * Represents an expense.
@@ -454,7 +454,7 @@ const myxExpenses = function (paymentMethods, categories)
 	/* **** INIT MODULE **** */
 	pageSnippets.import("snippets/expenseeditor.xml").then(() =>
 	{
-		editor = expenseEditor(paymentMethods, categories, myx.client);
+		editor = expenseEditor(paymentMethods, categories, document.getElementById("client"));
 	});
 	resetFilter();
 

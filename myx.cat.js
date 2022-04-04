@@ -2,7 +2,7 @@
  * my-expenses "categories" module.
  * @namespace myxCategories
  */
-const myxCategories = function ()
+let myxCategories = function ()
 {
 	const MODULE_NAME = "categories-list";
 	const FILE_NAME = "cat.json";
@@ -248,7 +248,7 @@ const myxCategories = function ()
 			itemToEdit.masterCategory = masterCategory;
 		}
 		itemToEdit.meta = { type: "category", cssModifier: (!masterCategory) ? "mastercategory" : "", header: (!!id) ? "Edit category" : "New category", headline: (!!masterCategory) ? "Subcategory of " + data[masterCategory].label : "" };
-		myx.iconEditor.popup("cat", itemToEdit, (editedObj) =>
+		window.iconEditor.popup("cat", itemToEdit, (editedObj) =>
 		{
 			if (editorMode === ADD_NEW)
 			{
@@ -353,8 +353,7 @@ const myxCategories = function ()
 				promptEditor(id, mouseEvent.target.dataset.masterKey);
 				break;
 			case "search":
-				myx.expenses.setFilter({ cat: id }, MODULE_NAME);
-				choices.choose("active-tab", myx.expenses.moduleName);
+				myx.setExpenseFilter({ cat: id }, MODULE_NAME);
 				break;
 			default:
 		}
@@ -369,8 +368,7 @@ const myxCategories = function ()
 	{
 		mouseEvent.stopPropagation();
 		let id = mouseEvent.target.dataset.key;
-		myx.expenses.setFilter({ cats: [id].concat(getSubCategories(id)) }, MODULE_NAME);
-		// choices.choose("active-tab", myx.expenses.moduleName);
+		myx.setExpenseFilter({ cats: [id].concat(getSubCategories(id)) }, MODULE_NAME);
 	}
 
 	return { // publish members
