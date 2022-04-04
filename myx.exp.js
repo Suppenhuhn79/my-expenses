@@ -208,7 +208,7 @@ const myxExpenses = function (paymentMethods, categories)
 				elements.searchHint.appendChild(htmlBuilder.newElement("div", "\u00a0", "in " + getShortMonthText(filter.months[0])));
 			}
 			modeHandler.setMode("search");
-			choices.choose("active-tab", myx.expenses.moduleName);
+			choices.choose("active-tab", MODULE_NAME);
 			renderList();
 		}
 		else
