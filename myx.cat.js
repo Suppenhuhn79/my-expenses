@@ -1,6 +1,6 @@
 /**
  * my-expenses "categories" module.
- * @returns 
+ * @namespace myxCategories
  */
 const myxCategories = function ()
 {
@@ -13,6 +13,17 @@ const myxCategories = function ()
 	let modeHandler = new ModuleModeHandler(elements._self,
 		/*getData*/() => { return { items: data, order: order }; },
 		/*revertData*/(revertData) => { data = revertData.items; order = revertData.order; });
+
+	new Sortable(elements.content, {
+		draggable: ".item",
+		handle: ".dragger-ns",
+		dataIdAttr: "data-id",
+		animation: 350,
+		group: "nested",
+		fallbackOnBody: true,
+		swapThreshold: 0.65,
+		onEnd: onSortEnd
+	});
 
 	elements.editButton.onclick = () => modeHandler.setMode("edit");
 	elements.applyEditsButton.onclick = () => applyEdits();
@@ -116,13 +127,21 @@ const myxCategories = function ()
 				));
 			}
 			subCatDiv.appendChild(htmlBuilder.newElement("div.subcat",
-				htmlBuilder.newElement("div.for-mode.edit-mode.fas", "&#xf0fe;", { 'data-master-key': id, onclick: onItemClick })));
+				htmlBuilder.newElement("div.for-mode.edit-mode.no-sort.fas", "&#xf0fe;", { 'data-master-key': id, onclick: onItemClick })));
 			labelElement.appendChild(subCatDiv);
 			let div = htmlBuilder.newElement("div.item",
 				renderIcon(id),
 				labelElement,
-				htmlBuilder.newElement("div.for-mode.edit-mode.fas", "&#xf0dc;")
+				htmlBuilder.newElement("div.for-mode.edit-mode.dragger-ns.fas", "&#xf0dc;")
 			);
+			new Sortable(subCatDiv, {
+				group: "nested",
+				filter: ".no-sort",
+				animation: 150,
+				fallbackOnBody: true,
+				swapThreshold: 0.65,
+				onEnd: onSortEnd
+			});
 			elements.content.appendChild(div);
 		}
 		modeHandler.setMode(mode);
@@ -268,6 +287,51 @@ const myxCategories = function ()
 			items: data
 		}).then(myx.xhrSuccess, myx.xhrError);
 		modeHandler.setMode("default");
+	}
+
+	/**
+	 * Handles end of sorting.
+	 */
+	function onSortEnd ()
+	{
+		order = [];
+		for (let masterElement of elements.content.children)
+		{
+			let masterKey = masterElement.querySelector("[data-key]").dataset.key;
+			let subsKeys = [];
+			if (masterElement.querySelector("div.item")) // former master category became a subcategory
+			{
+				let exMasterKey = masterElement.querySelector("div.item div.item [data-key]").dataset.key;
+				data[exMasterKey].masterCategory = masterKey;
+				delete data[exMasterKey].color;
+				delete data[exMasterKey].subCategories;
+				subsKeys.push(exMasterKey);
+			}
+			for (let subElement of masterElement.querySelectorAll(".subcat [data-key]"))
+			{
+				let subKey = subElement.dataset.key;
+				if (subKey !== masterKey) // if the subElement key is on the top level, this subcategory became a master category
+				{
+					subsKeys.push(subKey);
+					data[subKey].masterCategory = masterKey;
+				}
+				else
+				{
+					data[subKey].color = getColor(subKey);
+					delete data[subKey].masterCategory;
+				}
+			}
+			if (subsKeys.length > 0)
+			{
+				data[masterKey].subCategories = subsKeys;
+			}
+			else
+			{
+				delete data[masterKey].subCategories;
+			}
+			order.push(masterKey);
+		}
+		renderList();
 	}
 
 	/**
