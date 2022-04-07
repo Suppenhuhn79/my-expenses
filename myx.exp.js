@@ -1,3 +1,23 @@
+/** 
+ * Represents an expense.
+ * @typedef Expense
+ * @type {Object}
+ * @property {Date} dat Expense date
+ * @property {Number} amt Expense amount
+ * @property {String} cat Expense category - id reference to categories
+ * @property {String} pmt Used payment method - id referenc to payment methods
+ * @property {String} [txt] Additional text 
+ */
+/**
+ * Defines filter for listing expenses.
+ * @typedef ExpensesFilter
+ * @type {Object}
+ * @property {String} [pmt] Payment method id
+ * @property {String} [cat] Category id (if sole)
+ * @property {Array<String>} [cats] Category ids (if many)
+ * @property {Array<MonthString>} [months] Months; set to all availibe months if ommited
+ */
+
 /**
  * my-expenses "expenses" module.
  * @namespace myxExpenses
@@ -6,25 +26,6 @@
  */
 let myxExpenses = function (paymentMethods, categories)
 {
-	/** 
-	 * Represents an expense.
-	 * @typedef ExpenseObject
-	 * @type {Object}
-	 * @property {Date} dat Expense date
-	 * @property {Number} amt Expense amount
-	 * @property {String} cat Expense category - id reference to categories
-	 * @property {String} pmt Used payment method - id referenc to payment methods
-	 * @property {String} [txt] Additional text 
-	 */
-	/**
-	 * Defines filter for listing expenses.
-	 * @typedef ExpenseFilterObject
-	 * @type {Object}
-	 * @property {String} [pmt] Payment method id
-	 * @property {String} [cat] Category id (if sole)
-	 * @property {Array<String>} [cats] Category ids (if many)
-	 * @property {Array<MonthString>} [months] Months; set to all availibe months if ommited
-	 */
 	const MODULE_NAME = "expenses-list";
 	let data = {};
 	let dataIndex = myxDataindex();
@@ -101,9 +102,10 @@ let myxExpenses = function (paymentMethods, categories)
 	}
 
 	/**
-	 * **(async)** Saves expenses to a file.
+	 * Saves expenses to a file.
 	 * More exactly: saves expenses of all months, that are in the same files as the given months.
 	 * @param {MonthString|Array<MonthString>} months Months to save data
+	 * @async
 	 */
 	async function save (months)
 	{
@@ -142,7 +144,7 @@ let myxExpenses = function (paymentMethods, categories)
 
 	/**
 	 * Adds an expense to `data`.
-	 * @param {ExpenseObject} obj Expense to add
+	 * @param {Expense} obj Expense to add
 	 * @param {Number} [fileIndex] Index (`1..x`) of file that contains the expense month. **Use only** when adding data on file load.
 	 */
 	function add (obj, fileIndex = null)
@@ -181,7 +183,7 @@ let myxExpenses = function (paymentMethods, categories)
 	 * Sets the current filter and renders the list. Also the title will get a _seach hint_.
 	 * Mode will be set to `search` if there is at least a pmt or a cat filter. Otherwise the mode will be `default`.
 	 * 
-	 * @param {ExpenseFilterObject} filterObj Filters to set
+	 * @param {ExpensesFilter} filterObj Filters to set
 	 * @param {String} originModuleName Module name where the filter came from (where to return to)
 	 */
 	function setFilter (filterObj, originModuleName)
@@ -260,7 +262,7 @@ let myxExpenses = function (paymentMethods, categories)
 
 	/**
 	 * Provides a HTML element representing an expense.
-	 * @param {ExpenseObject} item Expense to render
+	 * @param {Expense} item Expense to render
 	 * @param {Number} dataIndex Array index (`0..x`) of the current month subset of `data`
 	 * @returns {HTMLDivElement} `<div>` element
 	 */
@@ -345,7 +347,7 @@ let myxExpenses = function (paymentMethods, categories)
 		else
 		{
 			elements.content.appendChild(htmlBuilder.newElement("div.fullscreen-msg",
-				htmlBuilder.newElement("div.icon.far", "&#xf11a;"),
+				htmlBuilder.newElement("div.icon.far", fa.smiley_meh),
 				htmlBuilder.newElement("div.label", "Nothing here.")
 			));
 		}
@@ -353,7 +355,7 @@ let myxExpenses = function (paymentMethods, categories)
 
 	/**
 	 * Pops up an ExpenseEditor to modify an expense or create a new one. Renders the expenses list afterwards.
-	 * @param {ExpenseObject} item Expense to edit
+	 * @param {Expense} item Expense to edit
 	 * @param {MonthString} [dataMonth] Month of the expense; required if editing existing data, otherwise prohibited
 	 * @param {Number} [dataIndex] Array index (`0..x`) of the current month subset of `data`; required if editing existing data, otherwise prohibited
 	 */
