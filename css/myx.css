@@ -307,6 +307,13 @@
 	padding: 0 1em;
 	opacity: 1;
 }
+.dragger-ew {
+	transform: rotate(90deg);
+	cursor: ew-resize;
+	padding: 0;
+	margin-right: 1em;
+	opacity: 1;
+}
 .sortable-chosen {
 	box-shadow: 0 0 10px 5px #00000080;
 	background-color: #eee !important;

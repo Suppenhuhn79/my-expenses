@@ -123,7 +123,10 @@ let myxCategories = function ()
 			{
 				subCatDiv.appendChild(htmlBuilder.newElement("div.subcat",
 					renderIcon(key),
-					htmlBuilder.newElement("span.grey.click", data[key].label, { 'data-key': key, 'data-master-key': id, onclick: onItemClick })
+					htmlBuilder.newElement("span.grey.click",
+						{ 'data-key': key, 'data-master-key': id, onclick: onItemClick },
+						data[key].label),
+					htmlBuilder.newElement("div.for-mode.edit-mode.dragger-ew.fas", "&#xf0dc;")
 				));
 			}
 			subCatDiv.appendChild(htmlBuilder.newElement("div.subcat",
@@ -137,6 +140,7 @@ let myxCategories = function ()
 			new Sortable(subCatDiv, {
 				group: "nested",
 				filter: ".no-sort",
+				handle: ".dragger-ew",
 				animation: 150,
 				fallbackOnBody: true,
 				swapThreshold: 0.65,
