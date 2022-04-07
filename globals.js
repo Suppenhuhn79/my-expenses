@@ -4,8 +4,8 @@
 
 /**
  * Provides the hash value of a string.
- * @param {String} string input string
- * @returns {String} hash value of the string
+ * @param {String} string Input string
+ * @returns {String} Hash value of the string
  */
 function stringHash (string)
 {
@@ -22,8 +22,8 @@ function stringHash (string)
 
 /**
  * Collects all named children of an element into an object.
- * @param {HTMLElement} element get named children of this element
- * @returns {{camelCaseElementName: HTMLElement}} object with all named elements
+ * @param {HTMLElement} element Eet named children of this element
+ * @returns {{camelCaseElementName: HTMLElement}} Object with all named elements
  */
 function getNames (element)
 {
@@ -39,8 +39,8 @@ function getNames (element)
 
 /**
  * Provides a number formatted with current locales thousands separators.
- * @param {String} numStr input number as string
- * @returns {String} integer part of a number formatted with thousands separators
+ * @param {String} numStr Input number as string
+ * @returns {String} Integer part of a number formatted with thousands separators
  */
 function formatIntegersLocale (numStr)
 {
@@ -57,8 +57,8 @@ function formatIntegersLocale (numStr)
 
 /**
  * Provides date (month) data relative to a given date.
- * @param {Date|String} month base date (or string that can be converted to a date)
- * @param {Number} relative count of months to be added/subtracted
+ * @param {Date|String} month Base date (or string that can be converted to a date)
+ * @param {Number} relative Count of months to be added/subtracted
  * @returns {{date: Date, shortName: String, isoString: String}} Object where `shortName` is the three-letter abbreviation of the month name and `isoString` is "YYYY-MM"
  */
 function calcRelativeMonth (month, relative)
@@ -74,8 +74,8 @@ function calcRelativeMonth (month, relative)
 
 /**
  * Provides a short text (month name abbreviated to three letters + year) for a date.
- * @param {any} month any value that can be converted to a date
- * @returns {String} short month text ("MMM YYYY")
+ * @param {any} month Any value that can be converted to a date
+ * @returns {String} Short month text ("MMM YYYY")
  */
 function getShortMonthText (month)
 {
@@ -85,7 +85,7 @@ function getShortMonthText (month)
 
 /**
  * Converts a kebab-case string to a camelCase string.
- * @param {string} s string to be converted to camelCase
+ * @param {string} s String to be converted to camelCase
  * @returns {string}
  */
 function camelCase (s)
@@ -95,6 +95,7 @@ function camelCase (s)
 
 const localeSeparator = (function ()
 {
+	/** @type {String} */
 	let separators = (1234.5).toLocaleString().replaceAll(/\d/g, "");
 	return {
 		thousand: separators[0],
@@ -104,3 +105,13 @@ const localeSeparator = (function ()
 
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const weekdayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+const fa = {
+	arrow_left: "&#xf060;",
+	asterisk: "&#xf069;",
+	plus_square: "&#xf0fe;",
+	smiley_meh: "&#xf11a;",
+	sort: "&#xf0dc;",
+	space: "&#x00a0;",
+	star: "&#xf005;"
+};

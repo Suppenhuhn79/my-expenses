@@ -117,7 +117,7 @@ let myxCategories = function ()
 					{ 'data-key': id, onclick: onItemClick },
 					htmlBuilder.newElement("span.for-mode.search-mode.fas",
 						{ style: "color:" + getColor(id), 'data-key': id, onclick: onSearchAllClick },
-						"&#x00a0;&#xf069;")));
+						fa.space + fa.asterisk)));
 			let subCatDiv = htmlBuilder.newElement("div.subcats");
 			for (let key of category.subCategories || [])
 			{
@@ -126,16 +126,16 @@ let myxCategories = function ()
 					htmlBuilder.newElement("span.grey.click",
 						{ 'data-key': key, 'data-master-key': id, onclick: onItemClick },
 						data[key].label),
-					htmlBuilder.newElement("div.for-mode.edit-mode.dragger-ew.fas", "&#xf0dc;")
+					htmlBuilder.newElement("div.for-mode.edit-mode.dragger-ew.fas", fa.sort)
 				));
 			}
 			subCatDiv.appendChild(htmlBuilder.newElement("div.subcat",
-				htmlBuilder.newElement("div.for-mode.edit-mode.no-sort.fas", "&#xf0fe;", { 'data-master-key': id, onclick: onItemClick })));
+				htmlBuilder.newElement("div.for-mode.edit-mode.no-sort.fas", fa.plus_square, { 'data-master-key': id, onclick: onItemClick })));
 			labelElement.appendChild(subCatDiv);
 			let div = htmlBuilder.newElement("div.item",
 				renderIcon(id),
 				labelElement,
-				htmlBuilder.newElement("div.for-mode.edit-mode.dragger-ns.fas", "&#xf0dc;")
+				htmlBuilder.newElement("div.for-mode.edit-mode.dragger-ns.fas", fa.sort)
 			);
 			new Sortable(subCatDiv, {
 				group: "nested",
@@ -207,7 +207,7 @@ let myxCategories = function ()
 			toElement.appendChild(htmlBuilder.newElement("div.item.labeled-icon.click",
 				htmlBuilder.newElement("div.cat-icon.back.fas",
 					{ 'data-choice': "__back__" },
-					"&#xf060;")));
+					fa.arrow_left)));
 		}
 		for (let key of catSet)
 		{

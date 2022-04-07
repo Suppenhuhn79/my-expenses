@@ -111,8 +111,8 @@ let myxPaymentMethods = function ()
 				{ 'data-id': id },
 				renderIcon(id),
 				htmlBuilder.newElement("div.flex-fill.big", data[id].label, { 'data-key': id, onclick: onItemClick }),
-				htmlBuilder.newElement("div.for-mode.default-mode.pmt-def-flag.fas", (defaultId === id) ? "&#xf005;" : ""),
-				htmlBuilder.newElement("div.for-mode.edit-mode.dragger-ns.fas", "&#xf0dc;")
+				htmlBuilder.newElement("div.for-mode.default-mode.pmt-def-flag.fas", (defaultId === id) ? fa.star : ""),
+				htmlBuilder.newElement("div.for-mode.edit-mode.dragger-ns.fas", fa.sort)
 			);
 			if (data[id].exclude)
 			{

@@ -88,7 +88,7 @@ let myx = function ()
 	{
 		let numAsString = Math.round(num).toString();
 		let integers = formatIntegersLocale(numAsString);
-		return integers + "&#x00a0;" + currencySymbol;
+		return integers + fa.space + currencySymbol;
 	}
 
 	function xhrOnBegin ()
@@ -147,6 +147,8 @@ let myx = function ()
 	return { // publish members
 		categories: categories, // TODO: debug only
 		paymentMethods: paymentMethods, // TODO: debug only
+		statistics: statistics, // TODO: debug only
+		expenses: expenses, // TODO: debug only
 		get currencySymbol () { return currencySymbol; },
 		getIconAttributes: getIconAttributes,
 		addExpense: expenses.edit,
