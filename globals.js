@@ -56,31 +56,23 @@ function formatIntegersLocale (numStr)
 }
 
 /**
- * Provides date (month) data relative to a given date.
- * @param {Date|String} month Base date (or string that can be converted to a date)
- * @param {Number} relative Count of months to be added/subtracted
- * @returns {{date: Date, shortName: String, isoString: String}} Object where `shortName` is the three-letter abbreviation of the month name and `isoString` is "YYYY-MM"
+ * Provides a short text (month name abbreviated to three letters + year) for a date.
+ * @param {Date} date Date
+ * @returns {String} Short month text ("MMM YYYY")
  */
-function calcRelativeMonth (month, relative)
+function getShortMonthText (date)
 {
-	let tDate = new Date(month);
-	tDate.setMonth(tDate.getMonth() + relative);
-	return {
-		date: tDate,
-		shortName: monthNames[tDate.getMonth()].substring(0, 3),
-		isoString: tDate.toIsoFormatText("YM"),
-	};
+	return monthNames[date.getMonth()].substring(0, 3) + "\u00a0" + date.getFullYear();
 }
 
 /**
- * Provides a short text (month name abbreviated to three letters + year) for a date.
- * @param {any} month Any value that can be converted to a date
- * @returns {String} Short month text ("MMM YYYY")
+ * Provides a text (month full name + year) for a date.
+ * @param {Date} date Date
+ * @returns {String} Full length month text ("MMMMMM YYYY")
  */
-function getShortMonthText (month)
+function getFullMonthText (date)
 {
-	let date = new Date(month);
-	return monthNames[date.getMonth()].substring(0, 3) + "\u00a0" + date.getFullYear();
+	return monthNames[date.getMonth()] + "\u00a0" + date.getFullYear();
 }
 
 /**
@@ -103,12 +95,28 @@ const localeSeparator = (function ()
 	};
 })();
 
+// Expand Date class with useful capatibilities 
+Date.prototype.toMonthString = function ()
+{
+	return this.toIsoFormatText("YM");
+};
+
+// Expand Array class with useful capatibilities 
+Array.prototype.removeDuplicates = function ()
+{
+	this.splice(0, this.length, ...new Set(this));
+	return this;
+};
+
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const weekdayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 const fa = {
 	arrow_left: "&#xf060;",
 	asterisk: "&#xf069;",
+	bars: "&#xf0c9;",
+	calendar_alt: "&#xf073;",
+	calendar_day: "&#xf783;",
 	plus_square: "&#xf0fe;",
 	smiley_meh: "&#xf11a;",
 	sort: "&#xf0dc;",

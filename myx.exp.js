@@ -116,12 +116,12 @@ let myxExpenses = function (paymentMethods, categories)
 		{
 			months = [months];
 		}
-		months = [...new Set(months)].sort(); // remove all duplicates and sort
+		months.removeDuplicates().sort();
 		for (let month of months)
 		{
 			fileIndexes.push(dataIndex.fileindexOfMonth(month));
 		}
-		fileIndexes = [...new Set(fileIndexes)]; // remove all duplicates
+		fileIndexes.removeDuplicates();
 		for (let fileIndex of fileIndexes)
 		{
 			let csv = "";
@@ -207,7 +207,7 @@ let myxExpenses = function (paymentMethods, categories)
 			elements.searchHint.appendChild(htmlBuilder.newElement("div.cutoff", "\u00a0", searchHint));
 			if (filter.months.length === 1)
 			{
-				elements.searchHint.appendChild(htmlBuilder.newElement("div", "\u00a0", "in " + getShortMonthText(filter.months[0])));
+				elements.searchHint.appendChild(htmlBuilder.newElement("div", "\u00a0", "in " + getShortMonthText(new Date(filter.months[0]))));
 			}
 			modeHandler.setMode("search");
 			choices.choose("active-tab", MODULE_NAME);
@@ -225,7 +225,7 @@ let myxExpenses = function (paymentMethods, categories)
 	 */
 	function resetFilter ()
 	{
-		setFilter({ months: [selectedMonth.asIsoString] });
+		setFilter({ months: [selectedMonth.toMonthString()] });
 	}
 
 	/**
@@ -238,13 +238,12 @@ let myxExpenses = function (paymentMethods, categories)
 	{
 		navElement.parentElement.onclick = () =>
 		{
-			selectedMonth = targetMonth.date;
-			console.log(targetMonth, selectedMonth);
-			setFilter({ months: [selectedMonth.asIsoString] });
+			selectedMonth = targetMonth;
+			setFilter({ months: [selectedMonth.toMonthString()] });
 			renderList();
 		};
-		navElement.innerText = targetMonth.shortName;
-		navElement.parentElement.style.visibility = (hasAnyData(selectedMonth.asIsoString) || hasAnyData(targetMonth.isoString)) ? "visible" : "hidden";
+		navElement.innerText = getShortMonthText(targetMonth);
+		navElement.parentElement.style.visibility = (hasAnyData(selectedMonth.toMonthString()) || hasAnyData(targetMonth.toMonthString())) ? "visible" : "hidden";
 	}
 
 	/**
@@ -270,7 +269,7 @@ let myxExpenses = function (paymentMethods, categories)
 	{
 		let catLabel = categories.getLabel(item.cat);
 		let div = htmlBuilder.newElement("div.item.click",
-			{ onclick: () => popupEditor(item, calcRelativeMonth(item.dat, 0).isoString, dataIndex) },
+			{ onclick: () => popupEditor(item, item.dat.toMonthString(), dataIndex) },
 			categories.renderIcon(item.cat),
 			htmlBuilder.newElement("div.flex-fill.cutoff",
 				htmlBuilder.newElement("div.cutoff.big", item.txt || catLabel),
@@ -294,9 +293,9 @@ let myxExpenses = function (paymentMethods, categories)
 	 */
 	function renderList ()
 	{
-		elements.navCurrent.innerText = selectedMonth.asText;
-		_renderNavItem(elements.navPrevious, calcRelativeMonth(selectedMonth, -1));
-		_renderNavItem(elements.navNext, calcRelativeMonth(selectedMonth, +1));
+		elements.navCurrent.innerText = getFullMonthText(selectedMonth);
+		_renderNavItem(elements.navPrevious, selectedMonth.addMonths(-1));
+		_renderNavItem(elements.navNext, selectedMonth.addMonths(+1));
 		htmlBuilder.removeAllChildren(elements.content);
 		let items = [];
 		elements.content.scrollTop = 0;
@@ -333,7 +332,7 @@ let myxExpenses = function (paymentMethods, categories)
 			{
 				elements.content.appendChild(item);
 			}
-			if (((filter.cats.length > 0) || (!!filter.pmt)) && (filter.months.length === 1))
+			if (((filter.cats.length > 0) || (!!filter.pmt)) && (filter.months.length < availibleMonths.length))
 			{
 				elements.content.appendChild(htmlBuilder.newElement("button",
 					"Find more",
@@ -438,11 +437,11 @@ let myxExpenses = function (paymentMethods, categories)
 	{
 		let nowMonth = (new Date()).toIsoFormatText("YM");
 		let itemDate;
-		if (selectedMonth.asIsoString > nowMonth)
+		if (selectedMonth.toMonthString() > nowMonth)
 		{
 			itemDate = new Date(selectedMonth.asDate.getFullYear(), selectedMonth.asDate.getMonth(), 1);
 		}
-		else if (selectedMonth.asIsoString < nowMonth)
+		else if (selectedMonth.toMonthString() < nowMonth)
 		{
 			itemDate = new Date(selectedMonth.asDate.getFullYear(), selectedMonth.asDate.getMonth() + 1, 0);
 		}
@@ -462,7 +461,7 @@ let myxExpenses = function (paymentMethods, categories)
 
 	return { // publish members
 		get moduleName () { return MODULE_NAME; },
-		get data () { return data; }, // TODO: debug only
+		get data () { return data; },
 		get index () { return dataIndex; }, // TODO: debug only
 		getCsv: getCsv, // TODO: debug only
 		save: save, // TODO: debug only

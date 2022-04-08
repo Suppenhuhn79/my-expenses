@@ -11,6 +11,16 @@
 	white-space: nowrap;
 }
 
+.menubox .menuitem .icon {
+	display: flex;
+	width: 2em;
+	min-width: 2em;
+	height: 2em;
+	/* color: #fff; */
+	align-items: center;
+	justify-content: center;
+}
+
 .menubox .separator {
 	border-top: 1px solid #ccc;
 	margin: 0.2em 1em;
@@ -35,15 +45,18 @@
 	color: #666;
 }
 
-[data-menubox="months-selection"] .menuitem {
+[data-menubox="months-selection"] .menuitem,
+[data-menubox="years-selection"] .menuitem {
 	text-align: center;
 	padding: 1em 3em;
 	display: block;
 }
 
+[data-menubox="statistics-type"] .menuitem + .menuitem,
 [data-menubox="payment-methods"] .menuitem + .menuitem {
 	border-top: 1px solid #eee;
 }
+[data-menubox="istics-t"] .menuitem,
 [data-menubox="payment-methods"] .menuitem {
 	padding: 0.5em 3em 0.5em 1em;
 }

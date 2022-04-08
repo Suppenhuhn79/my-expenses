@@ -161,17 +161,6 @@ let myx = function ()
 	};
 }();
 
-// inject some getters we find useful to Data class.
-Object.defineProperty(Date.prototype, "asIsoString", {
-	get () { return this.toIsoFormatText("YM"); }
-});
-Object.defineProperty(Date.prototype, "asShortText", {
-	get () { return monthNames[this.getMonth()].substring(0, 3) + "\u00a0" + this.getFullYear(); }
-});
-Object.defineProperty(Date.prototype, "asText", {
-	get () { return monthNames[this.getMonth()] + "\u00a0" + this.getFullYear(); }
-});
-
 // inject caching mehtod into googleappApi
 /**
  * Loads a file from Google Drive but previously checks if the file is cached in LocalStorage.

@@ -1,28 +1,5 @@
 /**
- * @typedef AggregateAtom
- * @type {Object}
- * @property {Number} sum
- * @property {Number} count
- */
-/**
- * @typedef MonthAggregate
- * @type {Object}
- * @property {MonthString} month
- * @property {Number} sum
- * @property {Number} count
- */
-/**
- * @typedef CategoryAggregate
- * @type {Object}
- * @property {String} id
- * @property {Number} sum
- * @property {Number} count
- * @property {Array<MonthAggregate>} month
- * @property {Array<CategoryAggregate>} [subCats]
- */
-
-/**
- * my-expenses "expenses" module.
+ * my-expenses "statistics" module.
  * @param {myxExpenses} expenses
  * @param {myxPaymentMethods} paymentMethods 
  * @param {myxCategories} categories 
@@ -31,107 +8,158 @@
 const myxStatistics = function (expenses, categories, paymentMethods)
 {
 	const MODULE_NAME = "statistics";
+	const MODE = {
+		sumPerMonth: "sumPerMonth",
+		sumPerYear: "sumPerYear",
+		avg: "avg"
+	};
+	let aggregates = myxStatisticAggregator(expenses, categories, paymentMethods);
 	let elements = getNames(document.getElementById(MODULE_NAME));
+	/** 
+	 * Represents the current statistics mode. Must be a value of `MODE`.
+	 * @type {String} */
+	let mode;
+
+	/**
+	 * Handles the currently selected time range, whicht is either
+	 * - a single month
+	 * - all months in a year or
+	 * - all time data.
+	 */
+	let selectedTime = function ()
+	{
+		/** @type {"yyyy-mm"|"yyyy"|"*"} */
+		let selectedTime;
+		/** @type {Array<MonthString>} */
+		let selectedMonths;
+		/**
+		 * @param {"yyyy-mm"|"yyyy"|"*"} value 
+		 */
+		function set (value)
+		{
+			console.log("set selectedTime", value);
+			selectedTime = value;
+			/** @type {Array<MonthString>} */
+			if (value === "*")
+			{
+				selectedMonths = aggregates.availibleMonths;
+			}
+			else if ((/^\d{4}$/.test(value) === true) || (mode === MODE.sumPerYear))
+			{
+				selectedMonths = [];
+				selectedTime = value.substring(0, 4);
+				for (let month of aggregates.availibleMonths)
+				{
+					if (month.substring(0, 4) === selectedTime)
+					{
+						selectedMonths.push(month);
+					}
+				}
+			}
+			else if (/^\d{4}-(0[1-9]|1[0-2])$/.test(value))
+			{
+				expenses.selectedMonth = new Date(value);
+				selectedMonths = [value];
+			}
+			renderList();
+		}
+		return {
+			set: set,
+			get value () { return selectedTime; },
+			get months () { return selectedMonths; }
+		};
+	}();
+
+	let statisticsModeMenu = new Menubox("statistics-type", {
+		items: [
+			{
+				key: MODE.sumPerMonth,
+				iconHtml: htmlBuilder.newElement("i.fas.icon", fa.calendar_day),
+				label: "Total expenses per month"
+			},
+			{
+				key: MODE.sumPerYear,
+				iconHtml: htmlBuilder.newElement("i.fas.icon", fa.calendar_alt),
+				label: "Total expenses per year",
+			}
+			/*,{
+				key: MODE.avg,
+				label: "Monthly averages"
+			}*/
+		]
+	}, (menuboxEvent) => setMode(menuboxEvent.itemKey));
 
 	elements.navCurrent.onclick = (mouseEvent) =>
 	{
-		expenses.popupAvalibleMonthsMenu(mouseEvent, elements.navCurrent, (month) =>
+		switch (mode)
 		{
-			expenses.selectedMonth = month;
-			renderList();
-		});
+			case MODE.sumPerMonth:
+				expenses.popupAvalibleMonthsMenu(mouseEvent, elements.navCurrent, (month) =>
+				{
+					selectedTime.set(month.toMonthString());
+				});
+				break;
+			case MODE.sumPerYear:
+				popupAvailibleYearsMenu(mouseEvent, elements.navCurrent, (year) =>
+				{
+					selectedTime.set(year);
+				});
+				break;
+		}
+	};
+	elements.headline.onclick = (mouseEvent) =>
+	{
+		statisticsModeMenu.popup(mouseEvent, null, mouseEvent.target.closest(".headline"), "below bottom, start left");
 	};
 
-	function _sortBySum (a, b)
+	/**
+	 * Pops up a menu with all availible years (and an "all time" item).
+	 * @param {Event} event Event that triggered the menu request
+	 * @param {HTMLElement} alignElement Element to align the menu to (alignment is "start left, below bottom")
+	 * @param {Function} callback `function(year: String)` to call on selection
+	 */
+	function popupAvailibleYearsMenu (event, alignElement, callback)
 	{
-		return (b.sum || 0) - (a.sum || 0);
+		let menuItems = [];
+		for (let year of aggregates.availibleYears.sort().reverse())
+		{
+			menuItems.push({ key: year });
+		}
+		menuItems.push(
+			{ separator: {} },
+			{ key: "*", label: "All time" }
+		);
+		let menubox = new Menubox("years-selection", { items: menuItems }, (event) =>
+		{
+			callback(event.itemKey);
+		});
+		menubox.popup(event, null, alignElement, "center, below bottom");
 	}
 
 	/**
-	 * Adds values (sum and count) of two aggregate atoms.
-	 * @param {AggregateAtom} target Target object to add the values to; this will be modified
-	 * @param {AggregateAtom} valueObject Object to add to target
+	 * Sets the statistics mode. Automatically selects time range and renders client.
+	 * @param {MODE} newMode New mode to set
 	 */
-	function add (target, valueObject)
+	function setMode (newMode)
 	{
-		target.sum += valueObject.sum;
-		target.count += valueObject.count;
-	}
-
-	/**
-	 * Sums up all expenses of given months. Provides sum and count per category and month.
-	 * @param {MonthString|Array<MonthString>} months Months to aggregate
-	 * @returns {{total: AggregateAtom, cats: Array<CategoryAggregate>}}
-	 */
-	function calcAggs (months)
-	{
-		if (typeof months === "string")
+		if (newMode !== mode)
 		{
-			months = [months];
-		}
-		// first of all, build an temporary object that can take all data; aggs_ := { <cat>: { <month>: { sum, count } } }
-		let aggs_ = {};
-		let aggs = {
-			total: {
-				sum: 0,
-				count: 0
-			},
-			cats: []
-		};
-		for (let masterCat of categories.masterCategoryIds)
-		{
-			for (let subCat of [masterCat].concat(categories.getSubCategories(masterCat)))
+			mode = newMode;
+			htmlBuilder.replaceContent(elements.headline, htmlBuilder.newElement("div.click",
+				htmlBuilder.newElement("span.fas", fa.bars),
+				htmlBuilder.newElement("span", fa.space + statisticsModeMenu.items[newMode].label)
+			));
+			console.log("mode:", mode);
+			switch (mode)
 			{
-				aggs_[subCat] = {};
-				for (let month of months)
-				{
-					aggs_[subCat][month] = {
-						sum: 0,
-						count: 0
-					};
-				}
+				case MODE.sumPerMonth:
+					selectedTime.set((/^\d{4}-(0[1-9]|1[0-2])$/.test(selectedTime.value)) ? selectedTime.value : expenses.selectedMonth.toMonthString());
+					break;
+				case MODE.sumPerYear:
+					selectedTime.set(selectedTime.value.substring(0, 4));
+					break;
 			}
 		}
-		// fill the temporary object with values
-		for (let month of months)
-		{
-			for (let item of expenses.data[month])
-			{
-				if (paymentMethods.isExcluded(item.pmt) === false)
-				{
-					add(aggs_[item.cat][month], { sum: item.amt, count: 1 });
-				}
-			}
-		}
-		// reformat
-		for (let masterCat of categories.masterCategoryIds)
-		{
-			let masterCatItem = {
-				id: masterCat,
-				sum: 0,
-				count: 0,
-				months: [],
-				subCats: []
-			};
-			let catMonthly_ = {};
-			for (let subCat of [masterCat].concat(categories.getSubCategories(masterCat)))
-			{
-				let subCatTotal = { id: subCat, sum: 0, count: 0, months: [] };
-				for (let month of months)
-				{
-					catMonthly_[month] ||= { month: month, sum: 0, count: 0 };
-					subCatTotal.months.push(Object.assign({ month: month }, aggs_[subCat][month]));
-					add(subCatTotal, aggs_[subCat][month]);
-					add(catMonthly_[month], aggs_[subCat][month]);
-				}
-				add(masterCatItem, subCatTotal);
-				masterCatItem.subCats.push(subCatTotal);
-			}
-			masterCatItem.months = Object.values(catMonthly_);
-			aggs.cats.push(masterCatItem);
-			add(aggs.total, masterCatItem);
-		}
-		return (aggs);
 	}
 
 	/**
@@ -154,62 +182,82 @@ const myxStatistics = function (expenses, categories, paymentMethods)
 		);
 	}
 
-	function toggleDetails (catId)
-	{
-		elements._self.querySelector("[data-cat='" + catId + "']").classList.toggle("hidden");
-	};
-
-	function onSubcatClick (mouseEvent)
-	{
-		mouseEvent.stopPropagation();
-		let id = mouseEvent.target.closest("[data-cat]").dataset.cat;
-		myx.setExpenseFilter({
-			cat: id,
-			months: [expenses.selectedMonth.asIsoString]
-		}, MODULE_NAME);
-	}
-
-	function _renderNavItem (navElement, targetMonth)
+	function _renderNavItem (navElement, targetSelection)
 	{
 		navElement.parentElement.onclick = () =>
 		{
-			expenses.selectedMonth = targetMonth.date;
-			expenses.setFilter({ months: [expenses.selectedMonth.asIsoString] });
-			renderList();
+			selectedTime.set(targetSelection);
 		};
-		navElement.innerText = targetMonth.shortName;
-		navElement.parentElement.style.visibility = expenses.hasAnyData(targetMonth.isoString) ? "visible" : "hidden";
+		navElement.innerText = (mode === MODE.sumPerMonth) ? getShortMonthText(new Date(targetSelection)) : targetSelection;
+		navElement.parentElement.style.visibility = ((mode === MODE.sumPerMonth) ? aggregates.availibleMonths.includes(targetSelection) : aggregates.availibleYears.includes(targetSelection)) ? "visible" : "hidden";
 	}
 
-	/**
-	 * 
-	 * @param {iso-string} month
-	 */
+	function _renderNavBar ()
+	{
+		console.log("_renderNavBar()", mode, selectedTime.value, selectedTime.months);
+		if (mode === MODE.sumPerMonth)
+		{
+			elements.navCurrent.innerText = getFullMonthText(expenses.selectedMonth);
+			_renderNavItem(elements.navPrevious, expenses.selectedMonth.addMonths(-1).toMonthString());
+			_renderNavItem(elements.navNext, expenses.selectedMonth.addMonths(+1).toMonthString());
+		}
+		else
+		{
+			if (selectedTime.value === "*")
+			{
+				elements.navCurrent.innerText = "Entire time";
+				elements.navPrevious.parentElement.style.visibility = "hidden";
+				elements.navNext.parentElement.style.visibility = "hidden";
+			}
+			else
+			{
+				elements.navCurrent.innerText = selectedTime.value;
+				_renderNavItem(elements.navPrevious, (Number(selectedTime.value) - 1).toString());
+				_renderNavItem(elements.navNext, (Number(selectedTime.value) + 1).toString());
+			}
+		}
+	}
+
 	function renderList ()
 	{
-		elements.navCurrent.innerText = expenses.selectedMonth.asText;
-		_renderNavItem(elements.navPrevious, calcRelativeMonth(expenses.selectedMonth, -1));
-		_renderNavItem(elements.navNext, calcRelativeMonth(expenses.selectedMonth, +1));
-		if (expenses.hasAnyData(expenses.selectedMonth.asIsoString))
+		_renderNavBar();
+		if (expenses.hasAnyData(expenses.selectedMonth.toMonthString()))
 		{
 			htmlBuilder.removeAllChildren(elements.content);
-			elements.content.appendChild(htmlBuilder.newElement("div.headline", "Total expenses per month"));
-			let stats = calcAggs(expenses.selectedMonth.asIsoString);
-			stats.cats.sort(_sortBySum);
-			console.log(stats);
-			elements.content.appendChild(htmlBuilder.newElement("div.item", htmlBuilder.newElement("div.flex-fill.big.bold", expenses.selectedMonth.asText + " total"), htmlBuilder.newElement("div.amt.big.bold", myx.formatAmountLocale(stats.total.sum))));
-			for (let catAggr of stats.cats)
+			console.log(selectedTime.months, mode);
+			let data = aggregates.calc(selectedTime.months);
+
+			let title = "";
+			if (mode === MODE.sumPerMonth)
+			{
+				title = getFullMonthText(expenses.selectedMonth) + " total";
+			}
+			else if (mode === MODE.sumPerYear)
+			{
+				if (selectedTime.value === "*")
+				{
+					title = "All logged expenses";
+				}
+				else
+				{
+					title = "Total expenses in " + selectedTime.value;
+				}
+			}
+			elements.content.appendChild(htmlBuilder.newElement("div.item",
+				htmlBuilder.newElement("div.flex-fill.big.bold", title),
+				htmlBuilder.newElement("div.amt.big.bold", myx.formatAmountLocale(data.total.sum)))
+			);
+			for (let catAggr of data.cats)
 			{
 				let subCatDiv = htmlBuilder.newElement("div.hidden", { 'data-cat': catAggr.id });
 				if (catAggr.sum > 0)
 				{
-					catAggr.subCats.sort(_sortBySum);
 					for (let subCat of catAggr.subCats)
 					{
 						if ((subCat.id !== catAggr.id) || (subCat.sum > 0))
 						{
 							subCatDiv.appendChild(htmlBuilder.newElement("div.subcat.wide-flex" + ".grey" + (subCat.sum === 0 ? ".zero-sum" : ""),
-								{ 'data-cat': subCat.id, onclick: onSubcatClick },
+								{ 'data-cat': subCat.id, onclick: onSubcategoryClick },
 								categories.renderIcon(subCat.id),
 								htmlBuilder.newElement("div.flex-fill.click",
 									categories.getLabel(subCat.id, false)),
@@ -220,7 +268,7 @@ const myxStatistics = function (expenses, categories, paymentMethods)
 				}
 				let div = htmlBuilder.newElement(
 					"div.item.click" + (catAggr.sum === 0 ? ".zero-sum" : ""),
-					{ onclick: () => toggleDetails(catAggr.id) },
+					{ onclick: () => toggleSubcategoryVisibility(catAggr.id) },
 					categories.renderIcon(catAggr.id),
 					htmlBuilder.newElement(
 						"div.flex-fill.high-flex",
@@ -229,7 +277,7 @@ const myxStatistics = function (expenses, categories, paymentMethods)
 							htmlBuilder.newElement("div.flex-fill.cutoff.big", categories.getLabel(catAggr.id)),
 							htmlBuilder.newElement("div.amount.right.big", myx.formatAmountLocale(catAggr.sum))
 						),
-						renderPercentBar("percentbar", catAggr.sum / stats.total.sum, categories.getColor(catAggr.id)),
+						renderPercentBar("percentbar", catAggr.sum / data.total.sum, categories.getColor(catAggr.id)),
 						subCatDiv
 					)
 				);
@@ -245,9 +293,48 @@ const myxStatistics = function (expenses, categories, paymentMethods)
 		}
 	}
 
+	function enter ()
+	{
+		console.clear();
+		console.log("stats init");
+		aggregates.init().then(() =>
+		{
+			selectedTime.set(expenses.selectedMonth.toMonthString());
+			if (mode === undefined)
+			{
+				setMode(MODE.sumPerMonth);
+			}
+		});
+	}
+
+	/**
+	 * Toggles visibility of subcategories on a master category.
+	 * @param {String} catId Master category id to show/hide subcategories
+	 */
+	function toggleSubcategoryVisibility (catId)
+	{
+		elements._self.querySelector("[data-cat='" + catId + "']").classList.toggle("hidden");
+	};
+
+	/**
+	 * Handles clicks on subcategory items in the list.
+	 * - default: sets the expenses filter to the category and selected time range and switches to expenses
+	 * @param {MouseEvent} mouseEvent Mouse event triggered by the click
+	 */
+	function onSubcategoryClick (mouseEvent)
+	{
+		mouseEvent.stopPropagation();
+		let id = mouseEvent.target.closest("[data-cat]").dataset.cat;
+		myx.setExpenseFilter({
+			cat: id,
+			months: selectedTime.months
+		}, MODULE_NAME);
+	}
+
 	return { // publish members
 		get moduleName () { return MODULE_NAME; },
-		calc: calcAggs, // TODO: debug only
-		enter: renderList,
+		get aggregates () { return aggregates; }, // TODO: debug only
+		get selectedTime () { return selectedTime; }, //TODO: debug only
+		enter: enter
 	};
 };
