@@ -242,7 +242,7 @@ let myxExpenses = function (paymentMethods, categories)
 			setFilter({ months: [selectedMonth.toMonthString()] });
 			renderList();
 		};
-		navElement.innerText = getShortMonthText(targetMonth);
+		navElement.innerText = monthNames[targetMonth.getMonth() + 1].substring(0, 3);
 		navElement.parentElement.style.visibility = (hasAnyData(selectedMonth.toMonthString()) || hasAnyData(targetMonth.toMonthString())) ? "visible" : "hidden";
 	}
 

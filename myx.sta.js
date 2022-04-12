@@ -205,7 +205,7 @@ const myxStatistics = function (expenses, categories, paymentMethods)
 		{
 			if (selectedTime.value === "*")
 			{
-				elements.navCurrent.innerText = "Entire time";
+				elements.navCurrent.innerText = "All time";
 				elements.navPrevious.parentElement.style.visibility = "hidden";
 				elements.navNext.parentElement.style.visibility = "hidden";
 			}
@@ -336,5 +336,45 @@ const myxStatistics = function (expenses, categories, paymentMethods)
 		get aggregates () { return aggregates; }, // TODO: debug only
 		get selectedTime () { return selectedTime; }, //TODO: debug only
 		enter: enter
+
+		,
+		getApexchartData: (months) =>
+		{
+			let apexSeries = [];
+			let monthlyTranspose = {};
+			for (let cat of categories.masterCategoryIds)
+			{
+				monthlyTranspose[cat] = [];
+			}
+			for (let month of months)
+			{
+				let aggs = aggregates.calc([month]);
+				{
+					for (let cat of aggs.cats)
+					{
+						monthlyTranspose[cat.id].push(Math.ceil(cat.sum));
+					}
+				}
+			}
+			console.log(monthlyTranspose);
+			for (let cat in monthlyTranspose)
+			{
+				apexSeries.push({ name: categories.getLabel(cat), id: cat, data: monthlyTranspose[cat] });
+			}
+			return apexSeries;
+		},
+		getApexchartDountData: (months) =>
+		{
+			let apexSeries = [];
+			console.log(months);
+			let aggs = aggregates.calc(months);
+			{
+				for (let cat of aggs.cats)
+				{
+					apexSeries.push(Math.ceil(cat.sum));
+				}
+			}
+			return apexSeries;
+		}
 	};
 };
