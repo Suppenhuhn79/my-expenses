@@ -299,7 +299,7 @@ let myxExpenses = function (paymentMethods, categories)
 		htmlBuilder.removeAllChildren(elements.content);
 		let items = [];
 		elements.content.scrollTop = 0;
-		for (let month of filter.months)
+		for (let month of filter.months.sort().reverse())
 		{
 			if (hasAnyData(month))
 			{
