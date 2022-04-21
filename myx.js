@@ -40,6 +40,7 @@ let myx = function ()
 	function init ()
 	{
 		choices.onChoose("active-tab", onTabChosen);
+		choices.choose("active-tab", expenses.moduleName);
 		let latestFileIndex = null;
 		for (let fileIndex = Object.keys(googleappApi.files).length; fileIndex > 0; fileIndex -= 1)
 		{
@@ -51,7 +52,6 @@ let myx = function ()
 				{
 					if (latestFileIndex === fileIndex)
 					{
-						choices.choose("active-tab", expenses.moduleName);
 						expenses.enter();
 					}
 				});
