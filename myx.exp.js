@@ -406,7 +406,7 @@ let myxExpenses = function (paymentMethods, categories)
 	{
 		let menuItems = [];
 		let currentYear = (new Date(availibleMonths[0])).getFullYear();
-		for (let month of availibleMonths)
+		for (let month of availibleMonths.sort().reverse())
 		{
 			let monthAsDate = new Date(month);
 			let monthYear = monthAsDate.getFullYear();
