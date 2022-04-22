@@ -439,11 +439,11 @@ let myxExpenses = function (paymentMethods, categories)
 		let itemDate;
 		if (selectedMonth.toMonthString() > nowMonth)
 		{
-			itemDate = new Date(selectedMonth.asDate.getFullYear(), selectedMonth.asDate.getMonth(), 1);
+			itemDate = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), 1);
 		}
 		else if (selectedMonth.toMonthString() < nowMonth)
 		{
-			itemDate = new Date(selectedMonth.asDate.getFullYear(), selectedMonth.asDate.getMonth() + 1, 0);
+			itemDate = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1, 0);
 		}
 		else
 		{
