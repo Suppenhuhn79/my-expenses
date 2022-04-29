@@ -138,12 +138,13 @@ let myxPaymentMethods = function ()
 		{
 			modeHandler.setMode("edit");
 		}
-		let itemToEdit = (editorMode === EDIT_EXISTING) ? Object.assign({}, data[id]) : { label: "New payment method" };
+		let itemToEdit = (editorMode === EDIT_EXISTING) ? Object.assign({}, data[id]) : {};
 		itemToEdit.meta = {
 			type: "payment-method",
 			isDefault: (defaultId === id),
 			cssModifier: "paymentmethod",
-			header: (editorMode === EDIT_EXISTING) ? "Edit payment method" : "New payment method"
+			header: (editorMode === EDIT_EXISTING) ? "Edit payment method" : "New payment method",
+			defaultlabel: "New payment method"
 		};
 		window.iconEditor.popup("pmt", itemToEdit, (editedObj, properties) =>
 		{

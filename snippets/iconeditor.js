@@ -78,7 +78,9 @@ const iconEditor = function (targetElement)
 			color: DEFAULT_COLOR
 		}, obj);
 		console.log(obj);
-		elements.objectLabel.value = obj.label;
+		elements.objectLabel.dataset.defaultvalue = obj.meta.defaultlabel;
+		elements.objectLabel.dataset.initialvalue = obj.label || obj.meta.defaultlabel;
+		elements.objectLabel.value = elements.objectLabel.dataset.initialvalue;
 		checks.setChecked(elements.checkDefault, obj.meta.isDefault);
 		checks.setChecked(elements.checkExclude, (obj.exclude === true));
 		elements.ok.onclick = () =>
@@ -115,7 +117,20 @@ const iconEditor = function (targetElement)
 	targetElement.appendChild(elements._self);
 	choices.onChoose("iconeditor-icon", setIconData);
 	choices.onChoose("iconeditor-color", setIconColor);
-
+	elements.objectLabel.onfocus = () =>
+	{
+		if (elements.objectLabel.value === elements.objectLabel.dataset.defaultvalue)
+		{
+			elements.objectLabel.value = "";
+		}
+	};
+	elements.objectLabel.onblur = () =>
+	{
+		if (elements.objectLabel.value.trim() === "")
+		{
+			elements.objectLabel.value = elements.objectLabel.dataset.initialvalue;
+		}
+	};
 	return { // public interface
 		popup: popup
 	};

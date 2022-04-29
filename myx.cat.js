@@ -245,13 +245,19 @@ let myxCategories = function ()
 		{
 			modeHandler.setMode("edit");
 		}
-		let itemToEdit = (editorMode === EDIT_EXISTING) ? Object.assign({}, data[id]) : { label: "New category" };
+		let itemToEdit = (editorMode === EDIT_EXISTING) ? Object.assign({}, data[id]) : {};
 		if (masterCategory)
 		{
 			itemToEdit.color = getColor(masterCategory); // in case its a subcategory
 			itemToEdit.masterCategory = masterCategory;
 		}
-		itemToEdit.meta = { type: "category", cssModifier: (!masterCategory) ? "mastercategory" : "", header: (!!id) ? "Edit category" : "New category", headline: (!!masterCategory) ? "Subcategory of " + data[masterCategory].label : "" };
+		itemToEdit.meta = {
+			type: "category",
+			cssModifier: (!masterCategory) ? "mastercategory" : "",
+			header: (!!id) ? "Edit category" : "New category",
+			headline: (!!masterCategory) ? "Subcategory of " + data[masterCategory].label : "",
+			defaultlabel: "New category"
+		};
 		window.iconEditor.popup("cat", itemToEdit, (editedObj) =>
 		{
 			if (editorMode === ADD_NEW)
