@@ -34,7 +34,6 @@ const iconEditor = function (targetElement)
 	{
 		elements.faScope.value = iconCode.substring(0, 3);
 		elements.unicodeCodepoint.value = iconCode.substring(4);
-		elements.knownIconsList.querySelector("[data-choice='" + iconCode + "']")?.scrollIntoView({ block: "center" });
 		renderCustomIcon();
 	};
 
@@ -98,6 +97,7 @@ const iconEditor = function (targetElement)
 		choices.choose("iconeditor-icon", currentObject.icon);
 		choices.choose("iconeditor-color", currentObject.color);
 		choices.choose("iconeditor-tab", "icon-selection");
+		elements.knownIconsList.querySelector("[data-choice='" + currentObject.icon + "']")?.scrollIntoView({ block: "center" });
 	};
 
 	/* =========== constructor =========== */
