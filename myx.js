@@ -5,6 +5,7 @@
  */
 let myx = function ()
 {
+	const AUTOSIGNIN_FLAG = "myx_autosignin";
 	let activeTab = null;
 	let currencySymbol = "€";
 	// let client= document.getElementById("client");
@@ -39,6 +40,10 @@ let myx = function ()
 
 	function init ()
 	{
+		if (localStorage.getItem(AUTOSIGNIN_FLAG))
+		{
+			localStorage.removeItem(AUTOSIGNIN_FLAG);
+		}
 		if (typeof choices.chosen.activeTab === "undefined")
 		{
 			choices.onChoose("active-tab", onTabChosen);
@@ -98,14 +103,9 @@ let myx = function ()
 	{
 		console.clear();
 		console.debug("window focused");
-		const AUTOSIGNIN_FLAG = "myx_autosignin";
 		googleappApi.init().then(
 			() =>
 			{ // successfully signed in
-				if (localStorage.getItem(AUTOSIGNIN_FLAG))
-				{
-					localStorage.removeItem(AUTOSIGNIN_FLAG);
-				}
 				console.table(googleappApi.files);
 				Promise.allSettled([
 					categories.init(),
@@ -114,19 +114,17 @@ let myx = function ()
 			},
 			(reason) =>
 			{ // operation failed
-				if (reason.status === 401) // "unauthorized"
+				googleappApi.tokenCookie.clear();
+				if ((reason?.status === 401 /* "unauthorized" */) && (localStorage.getItem(AUTOSIGNIN_FLAG) !== true))
 				{
-					if (localStorage.getItem(AUTOSIGNIN_FLAG) !== true)
-					{
-						localStorage.setItem(AUTOSIGNIN_FLAG, true);
-						googleappApi.signIn();
-					}
-					else
-					{
-						document.getElementById("bottom-menu").classList.add("hidden");
-						document.getElementById("signin-button").onclick = googleappApi.signIn;
-						choices.choose("active-tab", "not-signed-in");
-					}
+					localStorage.setItem(AUTOSIGNIN_FLAG, true);
+					googleappApi.signIn();
+				}
+				else
+				{
+					document.getElementById("bottom-menu").classList.add("hidden");
+					document.getElementById("signin-button").onclick = googleappApi.signIn;
+					choices.choose("active-tab", "not-signed-in");
 				}
 			}
 		);
