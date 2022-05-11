@@ -71,6 +71,12 @@ let myxExpenses = function (paymentMethods, categories)
 				{
 					data[monthInFile] = [];
 				};
+				if (dataIndex.allMonthsInFile(fileIndex).includes(selectedMonth.toMonthString()))
+				{
+					htmlBuilder.replaceContent(elements.navPrevious, htmlBuilder.newElement("span.dummy.w2"));
+					htmlBuilder.replaceContent(elements.navNext, htmlBuilder.newElement("span.dummy.w2"));
+					htmlBuilder.replaceContent(elements.navCurrent, htmlBuilder.newElement("span.dummy.w9"));
+				};
 				googleappApi.loadFileEx(fileName).then((result) =>
 				{
 					for (let line of result.split("\n"))
@@ -490,6 +496,13 @@ let myxExpenses = function (paymentMethods, categories)
 		leave: () => { resetFilter(); },
 		setFilter: setFilter,
 		edit: popupEditor,
+
+		testDummy: () =>
+		{
+			htmlBuilder.replaceContent(elements.navPrevious, htmlBuilder.newElement("span.dummy.w2"));
+			htmlBuilder.replaceContent(elements.navNext, htmlBuilder.newElement("span.dummy.w2"));
+			htmlBuilder.replaceContent(elements.navCurrent, htmlBuilder.newElement("span.dummy.w9"));
+		},
 		popupAvalibleMonthsMenu: popupAvalibleMonthsMenu
 	};
 };
