@@ -492,7 +492,7 @@ let myxExpenses = function (paymentMethods, categories)
 		get availibleMonths () { return availibleMonths; },
 		hasAnyData: hasAnyData,
 		loadFromFile: loadFromFile,
-		enter: () => { resetFilter(); renderList(); },
+		enter: () => { renderList(); },
 		leave: () => { resetFilter(); },
 		setFilter: setFilter,
 		edit: popupEditor,
