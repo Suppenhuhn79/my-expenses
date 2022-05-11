@@ -6,6 +6,8 @@ let myxCategories = function ()
 {
 	const MODULE_NAME = "categories-list";
 	const FILE_NAME = "cat.json";
+	/** @type {Date} */
+	let lastLoaded = null;
 	let data = {};
 	/** @type {Array<String>} */
 	let order = [];
@@ -40,12 +42,22 @@ let myxCategories = function ()
 	{
 		return new Promise((resolve) =>
 		{
-			googleappApi.loadFileEx(FILE_NAME).then((obj) =>
+			let lastModified = googleappApi.files[FILE_NAME].modifiedTime;
+			if (lastLoaded < lastModified)
 			{
-				data = obj.items;
-				order = obj.order;
+				googleappApi.loadFileEx(FILE_NAME).then((obj) =>
+				{
+					data = obj.items;
+					order = obj.order;
+					lastLoaded = lastModified;
+					resolve();
+				});
+			}
+			else
+			{
+				console.debug(FILE_NAME, "not modified");
 				resolve();
-			});
+			}
 		});
 	}
 

@@ -6,8 +6,12 @@ let myxPaymentMethods = function ()
 {
 	const MODULE_NAME = "payment-methods";
 	const FILE_NAME = "pmt.json";
+	/** @type {Date} */
+	let lastLoaded = null;
 	let data = {};
+	/** @type {Array<String>} */
 	let order = [];
+	/** @type {String} */
 	let defaultId;
 	let elements = getNames(document.getElementById(MODULE_NAME));
 
@@ -38,13 +42,23 @@ let myxPaymentMethods = function ()
 	{
 		return new Promise((resolve) =>
 		{
-			googleappApi.loadFileEx(FILE_NAME).then((obj) =>
+			let lastModified = googleappApi.files[FILE_NAME].modifiedTime;
+			if (lastLoaded < lastModified)
 			{
-				data = obj.items;
-				order = obj.order;
-				defaultId = obj['default'] || Object.keys(obj.items)[0];
+				googleappApi.loadFileEx(FILE_NAME).then((obj) =>
+				{
+					data = obj.items;
+					order = obj.order;
+					defaultId = obj['default'] || Object.keys(obj.items)[0];
+					lastLoaded = lastModified;
+					resolve();
+				});
+			}
+			else
+			{
+				console.debug(FILE_NAME, "not modified");
 				resolve();
-			});
+			}
 		});
 	}
 

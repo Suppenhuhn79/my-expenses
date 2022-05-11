@@ -39,8 +39,11 @@ let myx = function ()
 
 	function init ()
 	{
-		choices.onChoose("active-tab", onTabChosen);
-		choices.choose("active-tab", expenses.moduleName);
+		if (typeof choices.chosen.activeTab === "undefined")
+		{
+			choices.onChoose("active-tab", onTabChosen);
+			choices.choose("active-tab", expenses.moduleName);
+		}
 		let latestFileIndex = null;
 		for (let fileIndex = Object.keys(googleappApi.files).length; fileIndex > 0; fileIndex -= 1)
 		{
@@ -91,6 +94,44 @@ let myx = function ()
 		return integers + fa.space + currencySymbol;
 	}
 
+	function onWindowFocus ()
+	{
+		console.clear();
+		console.debug("window focused");
+		const AUTOSIGNIN_FLAG = "myx_autosignin";
+		googleappApi.init().then(
+			() =>
+			{ // successfully signed in
+				if (localStorage.getItem(AUTOSIGNIN_FLAG))
+				{
+					localStorage.removeItem(AUTOSIGNIN_FLAG);
+				}
+				console.table(googleappApi.files);
+				Promise.allSettled([
+					categories.init(),
+					paymentMethods.init()
+				]).then(init);
+			},
+			(reason) =>
+			{ // operation failed
+				if (reason.status === 401) // "unauthorized"
+				{
+					if (localStorage.getItem(AUTOSIGNIN_FLAG) !== true)
+					{
+						localStorage.setItem(AUTOSIGNIN_FLAG, true);
+						googleappApi.signIn();
+					}
+					else
+					{
+						document.getElementById("bottom-menu").classList.add("hidden");
+						document.getElementById("signin-button").onclick = googleappApi.signIn;
+						choices.choose("active-tab", "not-signed-in");
+					}
+				}
+			}
+		);
+	};
+
 	function xhrOnBegin ()
 	{
 		xhrActivityIndicator.classList = ["active"];
@@ -110,39 +151,8 @@ let myx = function ()
 	{
 		window.iconEditor = iconEditor(document.getElementById("client"));
 	});
-
-	const AUTOSIGNIN_FLAG = "myx_autosignin";
-	googleappApi.init().then(
-		() =>
-		{ // successfully signed in
-			if (localStorage.getItem(AUTOSIGNIN_FLAG))
-			{
-				localStorage.removeItem(AUTOSIGNIN_FLAG);
-			}
-			console.table(googleappApi.files);
-			Promise.allSettled([
-				categories.init(),
-				paymentMethods.init()
-			]).then(init);
-		},
-		(reason) =>
-		{ // operation failed
-			if (reason.status === 401) // "unauthorized"
-			{
-				if (localStorage.getItem(AUTOSIGNIN_FLAG) !== true)
-				{
-					localStorage.setItem("myx_autosignin", true);
-					googleappApi.signIn();
-				}
-				else
-				{
-					document.getElementById("bottom-menu").classList.add("hidden");
-					document.getElementById("signin-button").onclick = googleappApi.signIn;
-					choices.choose("active-tab", "not-signed-in");
-				}
-			}
-		}
-	);
+	window.addEventListener("focus", onWindowFocus, false);
+	onWindowFocus();
 
 	return { // publish members
 		categories: categories, // TODO: debug only
@@ -161,7 +171,7 @@ let myx = function ()
 	};
 }();
 
-// inject caching mehtod into googleappApi
+// inject caching method into googleappApi
 /**
  * Loads a file from Google Drive but previously checks if the file is cached in LocalStorage.
  * @memberof googleappApi

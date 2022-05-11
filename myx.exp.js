@@ -27,6 +27,8 @@
 let myxExpenses = function (paymentMethods, categories)
 {
 	const MODULE_NAME = "expenses-list";
+	/** @type {Object{n, {Date}}} */
+	let lastLoaded = {};
 	let data = {};
 	let dataIndex = myxDataindex();
 	let filter = {};
@@ -62,27 +64,41 @@ let myxExpenses = function (paymentMethods, categories)
 		{
 			const KEYS = ["dat", "amt", "cat", "txt", "pmt"];
 			let fileName = "data-" + fileIndex.toString() + ".csv";
-			googleappApi.loadFileEx(fileName).then((result) =>
+			let lastModified = googleappApi.files[fileName].modifiedTime;
+			if ((typeof lastLoaded[fileIndex] === "undefined") || (lastLoaded[fileIndex] < lastModified))
 			{
-				for (let line of result.split("\n"))
+				for (let monthInFile of dataIndex.allMonthsInFile(fileIndex))
 				{
-					if (!!line)
+					data[monthInFile] = [];
+				};
+				googleappApi.loadFileEx(fileName).then((result) =>
+				{
+					for (let line of result.split("\n"))
 					{
-						let vals = line.split("\t");
-						let month = vals[0].substr(0, 7);
-						let obj = {};
-						dataIndex.register(month, fileIndex);
-						for (let c = 0, cc = KEYS.length; c < cc; c += 1)
+						if (!!line)
 						{
-							obj[KEYS[c]] = (c === 0) ? new Date(vals[c]) : ((c === 1) ? Number(vals[c]) : vals[c]);
+							let vals = line.split("\t");
+							let month = vals[0].substr(0, 7);
+							let obj = {};
+							dataIndex.register(month, fileIndex);
+							for (let c = 0, cc = KEYS.length; c < cc; c += 1)
+							{
+								obj[KEYS[c]] = (c === 0) ? new Date(vals[c]) : ((c === 1) ? Number(vals[c]) : vals[c]);
+							}
+							add(obj, fileIndex);
 						}
-						add(obj, fileIndex);
 					}
-				}
-				elements.addExpenseButton.classList.remove("hidden");
-				elements.addExpenseButton.onclick = onAddExpenseClick;
+					elements.addExpenseButton.classList.remove("hidden");
+					elements.addExpenseButton.onclick = onAddExpenseClick;
+					lastLoaded[fileIndex] = lastModified;
+					resolve();
+				});
+			}
+			else
+			{
+				console.debug(fileName, "not modified");
 				resolve();
-			});
+			}
 		});
 	}
 
