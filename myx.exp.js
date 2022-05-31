@@ -316,8 +316,8 @@ let myxExpenses = function (paymentMethods, categories)
 	function renderList ()
 	{
 		elements.navCurrent.innerText = getFullMonthText(selectedMonth);
-		_renderNavItem(elements.navPrevious, selectedMonth.addMonths(-1));
-		_renderNavItem(elements.navNext, selectedMonth.addMonths(+1));
+		_renderNavItem(elements.navPrevious, selectedMonth.truncMonth(-1));
+		_renderNavItem(elements.navNext, selectedMonth.truncMonth(+1));
 		htmlBuilder.removeAllChildren(elements.content);
 		let items = [];
 		elements.content.scrollTop = 0;
