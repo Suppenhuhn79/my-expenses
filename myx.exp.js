@@ -91,11 +91,16 @@ let myxExpenses = function (paymentMethods, categories)
 							{
 								obj[KEYS[c]] = (c === 0) ? new Date(vals[c]) : ((c === 1) ? Number(vals[c]) : vals[c]);
 							}
-							add(obj, fileIndex);
+							dataIndex.register(obj.dat.toMonthString(), fileIndex);
+							add(obj, true);
 						}
 					}
 					elements.addExpenseButton.classList.remove("hidden");
 					elements.addExpenseButton.onclick = onAddExpenseClick;
+					for (let month of dataIndex.allMonthsInFile(fileIndex))
+					{
+						sortItems(month);
+					}
 					lastLoaded[fileIndex] = lastModified;
 					resolve();
 				});
@@ -166,19 +171,21 @@ let myxExpenses = function (paymentMethods, categories)
 
 	/**
 	 * Adds an expense to `data`.
-	 * @param {Expense} obj Expense to add
-	 * @param {Number} [fileIndex] Index (`1..x`) of file that contains the expense month. **Use only** when adding data on file load.
+	 * @param {Expense} expense Expense to add
+	 * @param {Boolean} [bulk] Whether this call is part of a bulk operation, or not. If bulk, then **you must** call sortItems() at the end of the bulk operation. Default `false`
 	 */
-	function add (obj, fileIndex = null)
+	function add (expense, bulk = false)
 	{
-		let month = obj.dat.toIsoFormatText("YM");
+		let month = expense.dat.toIsoFormatText("YM");
 		if (!hasAnyData(month))
 		{
 			data[month] = [];
 		}
-		data[month].push(Object.assign({}, obj));
-		dataIndex.register(month, fileIndex);
-		sortItems(month);
+		data[month].push(Object.assign({}, expense));
+		if (bulk === false)
+		{
+			sortItems(month);
+		}
 		availibleMonths = dataIndex.allAvailibleMonths.sort((a, b) => (a.localeCompare(b) * -1));
 	}
 
