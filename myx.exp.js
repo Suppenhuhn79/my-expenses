@@ -40,6 +40,10 @@ let myxExpenses = function (paymentMethods, categories)
 	let editor;
 	/** @type {Date} */
 	let selectedMonth = new Date();
+	/**
+	 * Memorizing currently loading file, so so file is loaded twice.
+	 * @type {Map<Number,Boolan>} */
+	let currentlyLoadingFiles = new Map();
 
 	elements.backSearchButton.onclick = () => { choices.choose("active-tab", filter._origin); };
 	elements.cancelSearchButton.onclick = () => { resetFilter(); renderList(); };
@@ -66,8 +70,10 @@ let myxExpenses = function (paymentMethods, categories)
 			const KEYS = ["dat", "amt", "cat", "txt", "pmt"];
 			let fileName = "data-" + fileIndex.toString() + ".csv";
 			let lastModified = googleappApi.files[fileName].modifiedTime;
-			if ((typeof lastLoaded[fileIndex] === "undefined") || (lastLoaded[fileIndex] < lastModified))
+			console.log(fileIndex, currentlyLoadingFiles.get(fileIndex), currentlyLoadingFiles);
+			if ((currentlyLoadingFiles.get(fileIndex) !== true) && ((typeof lastLoaded[fileIndex] === "undefined") || (lastLoaded[fileIndex] < lastModified)))
 			{
+				currentlyLoadingFiles.set(fileIndex, true);
 				for (let monthInFile of dataIndex.allMonthsInFile(fileIndex))
 				{
 					data[monthInFile] = [];
@@ -103,6 +109,7 @@ let myxExpenses = function (paymentMethods, categories)
 						sortItems(month);
 					}
 					lastLoaded[fileIndex] = lastModified;
+					currentlyLoadingFiles.set(fileIndex, false);
 					resolve();
 				});
 			}
