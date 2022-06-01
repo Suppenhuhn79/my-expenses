@@ -27,11 +27,12 @@
 let myxExpenses = function (paymentMethods, categories)
 {
 	const MODULE_NAME = "expenses-list";
-	/** @type {Object{n, {Date}}} */
+	/** @type {Object{{Number}, {Date}}} */
 	let lastLoaded = {};
 	let data = {};
 	let dataIndex = myxDataindex();
 	let filter = {};
+	/** @type {Array<MonthString>} */
 	let availibleMonths = [];
 	let elements = getNames(document.getElementById("expenses-list"));
 	let modeHandler = new ModuleModeHandler(elements._self);
@@ -434,11 +435,12 @@ let myxExpenses = function (paymentMethods, categories)
 	function popupAvalibleMonthsMenu (event, alignElement, callback)
 	{
 		let menuItems = [];
-		let currentYear = (new Date(availibleMonths[0])).getFullYear();
+		let currentYear = null;
 		for (let month of availibleMonths.sort().reverse())
 		{
 			let monthAsDate = new Date(month);
 			let monthYear = monthAsDate.getFullYear();
+			currentYear ||= (new Date(availibleMonths[0])).getFullYear();
 			if (monthYear !== currentYear)
 			{
 				menuItems.push({ separator: {} });
