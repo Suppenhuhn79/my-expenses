@@ -27,6 +27,11 @@ const expenseEditor = function (paymentMethods, categories, targetElement)
 	{
 		choices.choose("active-tab", originTabName);
 	};
+	elements.dat.onchange = (event) =>
+	{
+		event.stopPropagation();
+		currentItem.dat = new Date(elements.dat.value);
+	};
 	elements.pmt.onclick = (event) =>
 	{
 		event.stopPropagation();
