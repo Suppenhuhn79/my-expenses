@@ -10,6 +10,7 @@
 }
 
 #client {
+	--item-border: 2px solid #eee;
 	flex: 1;
 	overflow: hidden;
 }
@@ -66,7 +67,7 @@
 	background-color: white;
 }
 #client .content .item + .item {
-	border-top: 2px solid #eee;
+	border-top: var(--item-border);
 }
 #client .content .item:last-of-type {
 	border-bottom: 2px solid #aaa;
@@ -215,6 +216,13 @@
 	margin: 0 0.5em;
 }
 
+#statistics .dateitem {
+	padding: 0.5em 0.8em;
+	border: 1px solid #ccc;
+	border-radius: 0.5em;
+	margin-right: 0.5em;
+}
+
 #not-signed-in {
 	padding-bottom: 10vh;
 }
@@ -323,4 +331,28 @@
 }
 .sortable-drag {
 	opacity: 0 !important;
+}
+
+#statistics div.titleitem {
+	/* flex-direction: column; */
+	background-color: #fff;
+	border-bottom: var(--item-border);
+}
+
+div.time_wrapper {
+	width: 100%;
+	overflow: scroll;
+}
+div.times {
+	border: 1px solid blue;
+	border-radius: 0.3em;
+	margin: 0.5em;
+	width: max-content;
+}
+div.times.chosen {
+	background-color: blue;
+}
+
+div.times div {
+	padding: 0.3em;
 }
