@@ -3,14 +3,14 @@
 	<ps:script src="expenseeditor.js"/>
 	<ps:stylesheet src="expenseeditor.css"/>
 	<ps:snippet name="expenseEditor">
-			<div id="expense-editor" data-choice-client="expense-editor">
-				<div class="client-header">
-					<span name="title">add expense</span>
+		<div id="expense-editor" data-choice-client="expense-editor">
+			<div class="client-header">
+				<span name="title">add expense</span>
+			</div>
+			<div class="wrapper sticky-bottom">
+				<div name="category-selector">
 				</div>
-				<div class="wrapper sticky-bottom">
-					<div name="category-selector">
-					</div>
-					<div>
+				<div>
 					<table name="inputs">
 						<thead>
 							<tr>
@@ -35,7 +35,8 @@
 								<td data-keycode="9">9</td>
 								<td data-keycode="__backspace__" class="fas">&#xf55a;<!-- backspace --></td>
 							</tr><tr>
-								<td class="disabled fas">&#xf01e;</td>
+								<!-- <td class="disabled fas">&#xf021;sync</td> -->
+								<td class="disabled fas">&#xf01e;<!-- redo --></td>
 								<td data-keycode="4">4</td>
 								<td data-keycode="5">5</td>
 								<td data-keycode="6">6</td>
@@ -55,8 +56,8 @@
 							</tr>
 						</tbody>
 					</table>
-					</div>
 				</div>
 			</div>
+		</div>
 	</ps:snippet>
 </ps:pagesnippets>
