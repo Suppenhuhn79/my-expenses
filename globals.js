@@ -112,14 +112,28 @@ const monthNames = ["January", "February", "March", "April", "May", "June", "Jul
 const weekdayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 const fa = {
+	angle_left: "&#xf104;",
+	angle_right: "&#xf105;",
 	arrow_left: "&#xf060;",
 	asterisk: "&#xf069;",
+	ban: "&#xf05e;",
 	bars: "&#xf0c9;",
+	boxes: "&#xf468;",
 	calendar_alt: "&#xf073;",
 	calendar_day: "&#xf783;",
+	calculator: "6#xf1ec;",
+	chart_area: "&#xf1fe;",
+	chart_line: "&#xf201;",
+	chart_pie: "&#xf200;",
+	divide: "&#xf529;",
+	filter: "&#xf0b0;",
+	infinite: "&#xf534;",
+	micoscope: "&#xf610;",
+	plus: "&#xf067;",
 	plus_square: "&#xf0fe;",
 	smiley_meh: "&#xf11a;",
 	sort: "&#xf0dc;",
 	space: "&#x00a0;",
-	star: "&#xf005;"
+	star: "&#xf005;",
+	wallet: "&#xf555;"
 };
