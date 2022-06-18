@@ -133,13 +133,15 @@ input[name="unicode-codepoint"] {
 [data-check].checked span {
 	color: #666;
 }
-[data-check="default"].checked i {
-	font-weight: 900;
-	color: gold;
-}
-[data-check="exclude"].checked i {
+[data-check].checked i {
 	font-weight: 900;
 	color: #888;
+}
+[data-check="default"].checked i {
+	color: gold;
+}
+[data-check="disable"].checked i {
+	color: #e00;
 }
 
 .autowrap-grid {

@@ -19,14 +19,16 @@
 					</div>
 					<div class="item-options conditional on-paymentmethod">
 						<div name="check-default" class="wide-flex click" data-check="default">
-							<i class="">&#xf005;</i>
-							<!--star-->
+							<i class="" data-fa-name="star">&#xf005;</i>
 							<span class="nowrap">Set als default</span>
 						</div>
 						<div name="check-exclude" class="wide-flex click" data-check="exclude">
-							<i class="">&#xf070;</i>
-							<!--eye-slash-->
+							<i class="" data-fa-name="eye-slash">&#xf070;</i>
 							<span class="nowrap">Exclude from statistics</span>
+						</div>
+						<div name="check-disabled" class="wide-flex click" data-check="disable">
+							<i class="" data-fa-name="times-circle">&#xf057;</i>
+							<span class="nowrap">Disable payment method</span>
 						</div>
 					</div>
 				</div>

@@ -11,12 +11,14 @@ let myxPaymentMethods = function ()
 	let data = {};
 	/** @type {Array<String>} */
 	let order = [];
+	/** @type {Array<String>} */
+	let disabledItems = [];
 	/** @type {String} */
 	let defaultId;
 	let elements = getNames(document.getElementById(MODULE_NAME));
 
 	let sortable = new Sortable(elements.content, {
-		draggable: ".item",
+		draggable: ".sortable",
 		handle: ".dragger-ns",
 		dataIdAttr: "data-id",
 		animation: 350,
@@ -24,8 +26,8 @@ let myxPaymentMethods = function ()
 	});
 
 	let modeHandler = new ModuleModeHandler(elements._self,
-		/*getData*/() => { return { items: data, order: order, defaultId: defaultId }; },
-		/*revertData*/(revertData) => { data = revertData.items; order = revertData.order; defaultId = revertData.defaultId; });
+		/*getData*/() => { return { items: data, order: order, disabledItems: disabledItems, defaultId: defaultId }; },
+		/*revertData*/(revertData) => { data = revertData.items; order = revertData.order; disabledItems = revertData.disabledItems, defaultId = revertData.defaultId; });
 
 	elements.editButton.onclick = () => modeHandler.setMode("edit");
 	elements.applyEditsButton.onclick = () => applyEdits();
@@ -49,6 +51,7 @@ let myxPaymentMethods = function ()
 				{
 					data = obj.items;
 					order = obj.order;
+					disabledItems = obj.disabled || [];
 					defaultId = obj['default'] || Object.keys(obj.items)[0];
 					lastLoaded = lastModified;
 					resolve();
@@ -118,21 +121,39 @@ let myxPaymentMethods = function ()
 	 */
 	function renderList (mode = modeHandler.currentMode)
 	{
-		htmlBuilder.removeAllChildren(elements.content);
-		for (let id of order)
+		/**
+		 * Actually does render the list items.
+		 * @param {Array<String>} itemKeys Array that hold the pmt-ids to render
+		 * @param {Boolean} canSort Whether the items should have a sorting capatibility (active pmts) o not (disabled pmts)
+		 */
+		function _renderList (itemKeys, canSort)
 		{
-			let div = htmlBuilder.newElement("div.item",
-				{ 'data-id': id },
-				renderIcon(id),
-				htmlBuilder.newElement("div.flex-fill.big", data[id].label, { 'data-key': id, onclick: onItemClick }),
-				htmlBuilder.newElement("div.for-mode.default-mode.pmt-def-flag.fas", (defaultId === id) ? fa.star : ""),
-				htmlBuilder.newElement("div.for-mode.edit-mode.dragger-ns.fas", fa.sort)
-			);
-			if (data[id].exclude)
+			for (let id of itemKeys)
 			{
-				div.classList.add("exclude");
+				let div = htmlBuilder.newElement("div.item" + ((canSort) ? ".sortable" : ""),
+					{ 'data-id': id },
+					renderIcon(id),
+					htmlBuilder.newElement("div.flex-fill.big", data[id].label, { 'data-key': id, onclick: onItemClick }),
+					htmlBuilder.newElement("div.for-mode.default-mode.pmt-def-flag.fas", (defaultId === id) ? fa.star : "")
+				);
+				if (canSort)
+				{
+					div.appendChild(htmlBuilder.newElement("div.for-mode.edit-mode.dragger-ns.fas", fa.sort));
+				}
+				if (data[id].exclude)
+				{
+					div.classList.add("exclude");
+				}
+				elements.content.appendChild(div);
 			}
-			elements.content.appendChild(div);
+		}
+		htmlBuilder.removeAllChildren(elements.content);
+		console.log(order, disabledItems);
+		_renderList(order, true);
+		if (disabledItems.length > 0)
+		{
+			elements.content.appendChild(htmlBuilder.newElement("div.headline", "Disabled payment methods"));
+			_renderList(disabledItems, false);
 		}
 		elements.content.querySelector("[data-key='" + defaultId + "']").parentElement.classList.add("default-selected");
 		modeHandler.setMode(mode);
@@ -156,6 +177,7 @@ let myxPaymentMethods = function ()
 		itemToEdit.meta = {
 			type: "payment-method",
 			isDefault: (defaultId === id),
+			isDisabled: (disabledItems.indexOf(id) > -1),
 			cssModifier: "paymentmethod",
 			header: (editorMode === EDIT_EXISTING) ? "Edit payment method" : "New payment method",
 			defaultlabel: "New payment method"
@@ -177,6 +199,19 @@ let myxPaymentMethods = function ()
 				defaultId = id;
 			}
 			(properties.includes("exclude")) ? data[id].exclude = true : delete data[id].exclude;
+			if (properties.includes("disable"))
+			{
+				order.splice(order.indexOf(id), 1);
+				disabledItems.splice(0, 0, id);
+				// disabledItems.push(id);
+				// disabledItems.sort((a, b) => data[a].label.localeCompare(data[b].label));
+			}
+			else if (!!data.disabled)
+			{
+				disabledItems.splice(disabledItems.indexOf(id), 1);
+				order.push(id);
+			}
+			delete data[id].disable;
 			renderList();
 			elements.content.querySelector("[data-key='" + id + "']").scrollIntoView();
 		});
@@ -193,6 +228,7 @@ let myxPaymentMethods = function ()
 		googleappApi.saveToFile(FILE_NAME, {
 			order: order,
 			items: data,
+			disabled: disabledItems,
 			'default': defaultId
 		}).then(myx.xhrSuccess, myx.xhrError);
 		modeHandler.setMode("default");

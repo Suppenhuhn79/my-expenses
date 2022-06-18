@@ -82,6 +82,7 @@ const iconEditor = function (targetElement)
 		elements.objectLabel.value = elements.objectLabel.dataset.initialvalue;
 		checks.setChecked(elements.checkDefault, obj.meta.isDefault);
 		checks.setChecked(elements.checkExclude, (obj.exclude === true));
+		checks.setChecked(elements.checkDisabled, obj.meta.isDisabled);
 		elements.ok.onclick = () =>
 		{
 			currentObject.label = elements.objectLabel.value || "?";
