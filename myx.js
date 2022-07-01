@@ -156,6 +156,8 @@ let myx = function ()
 		xhrActivityIndicator.classList = ["error"];
 	}
 
+	doFontAwesome(document.body);
+
 	pageSnippets.import("snippets/iconeditor.xml").then(() =>
 	{
 		window.iconEditor = iconEditor(document.getElementById("client"));

@@ -12,6 +12,7 @@
 		<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet" />
 
 		<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
 		<script src="https://suppenhuhn79.github.io/on-screen-console/onscreenconsole.js"></script>
 		<script src="https://suppenhuhn79.github.io/pagesnippets/pagesnippets.js"></script>
@@ -34,7 +35,7 @@
 		<div id="client">
 			<div id="not-signed-in" class="fullscreen-client" data-choice-client="not-signed-in">
 				<div class="fullscreen-msg">
-					<div class="icon far">&#xf11a;</div>
+					<div class="icon far" data-icon="smiley_meh"></div>
 					<div class="label">You are not sigend in.</div>
 					<div id="signin-button" class="click">Click here to sign in.</div>
 				</div>
@@ -44,40 +45,40 @@
 				<div name="month-navigator" class="client-header for-mode default-mode">
 					<div class="click">
 						<span name="nav-previous"><span class="dummy w2"></span></span>
-						<i class="fas">&#xf104;<!--angle-left--></i>
+						<i class="fas" data-icon="angle_left"></i>
 					</div>
 					<div class="center flex-fill click">
-						<i class="far">&#xf133;<!--calendar--></i>
+						<i class="far" data-icon="calendar"></i>
 						<span name="nav-current"><span class="dummy w9"></span></span>
 					</div>
 					<div class="click">
-						<i class="fas">&#xf105;<!--angle-right--></i>
+						<i class="fas" data-icon="angle_right"></i>
 						<span name="nav-next"><span class="dummy w2"></span></span>
 					</div>
 				</div>
 				<div name="search-header" class="client-header for-mode search-mode">
 					<div class="wide-flex flex-fill cutoff">
-						<i class="fas">&#xf002;<!--search--></i>
+						<i class="fas" data-icon="search"></i>
 						<div name="search-hint" class="wide-flex cutoff">&#x00a0;</div>
 					</div>
-					<i name="back-search-button" class="click for-mode search-mode fas">&#xf04a;<!--backward--></i>
-					<i name="cancel-search-button" class="click for-mode search-mode fas">&#xf00d;<!--times--></i>
+					<i name="back-search-button" class="click for-mode search-mode fas" data-icon="backward"></i>
+					<i name="cancel-search-button" class="click for-mode search-mode fas" data-icon="times"></i>
 				</div>
 				<div name="content" class="content">&#x00a0;</div>
 				<div name="add-expense-button" class="for-mode default-mode hidden click">
-					<i class="fas">&#xf067;<!--plus--></i>
+					<i class="fas" data-icon="plus"></i>
 				</div>
 			</div>
 			<!-- client tab "CATEGORIES" -->
 			<div id="categories-list" data-choice-client="categories-list">
 				<div class="client-header">
 					<span class="flex-fill">categories</span>
-					<i name="edit-button" class="click for-mode default-mode fas">&#xf304;<!--pen--></i>
-					<i name="search-button" class="click for-mode default-mode fas">&#xf002;<!--search--></i>
-					<i name="cancel-search-button" class="click for-mode search-mode fas">&#xf00d;<!--times--></i>
-					<i name="add-button" class="click for-mode default-mode fas">&#xf0fe;<!--plus-square--></i>
-					<i name="apply-edits-button" class="click for-mode edit-mode fas">&#xf00c;<!--check--></i>
-					<i name="cancel-edits-button" class="click for-mode edit-mode fas">&#xf00d;<!--times--></i>
+					<i name="edit-button" class="click for-mode default-mode fas" data-icon="pen"></i>
+					<i name="search-button" class="click for-mode default-mode fas" data-icon="search"></i>
+					<i name="cancel-search-button" class="click for-mode search-mode fas" data-icon="times"></i>
+					<i name="add-button" class="click for-mode default-mode fas" data-icon="plus_square"></i>
+					<i name="apply-edits-button" class="click for-mode edit-mode fas" data-icon="check"></i>
+					<i name="cancel-edits-button" class="click for-mode edit-mode fas" data-icon="times"></i>
 				</div>
 				<div class="content">
 					<div class="for-mode default-mode headline">Tap category to add expense</div>
@@ -90,15 +91,15 @@
 			<div id="payment-methods" data-choice-client="payment-methods">
 				<div class="client-header">
 					<span class="flex-fill">payment methods</span>
-					<i name="edit-button" class="click for-mode default-mode fas">&#xf304;<!--pen--></i>
-					<i name="search-button" class="click for-mode default-mode fas">&#xf002;<!--search--></i>
-					<i name="cancel-search-button" class="click for-mode search-mode fas">&#xf00d;<!--times--></i>
-					<i name="add-button" class="click for-mode default-mode fas">&#xf0fe;<!--plus-square--></i>
-					<i name="apply-edits-button" class="click for-mode edit-mode fas">&#xf00c;<!--check--></i>
-					<i name="cancel-edits-button" class="click for-mode edit-mode fas">&#xf00d;<!--times--></i>
+					<i name="edit-button" class="click for-mode default-mode fas" data-icon="pen"></i>
+					<i name="search-button" class="click for-mode default-mode fas" data-icon="search"></i>
+					<i name="cancel-search-button" class="click for-mode search-mode fas" data-icon="times"></i>
+					<i name="add-button" class="click for-mode default-mode fas" data-icon="plus_square"></i>
+					<i name="apply-edits-button" class="click for-mode edit-mode fas" data-icon="check"></i>
+					<i name="cancel-edits-button" class="click for-mode edit-mode fas" data-icon="times"></i>
 				</div>
 				<div class="content" data-choice-group="default-payment-method">
-					<div class="for-mode default-mode edit-mode headline">&#x00a0;</div>
+					<div class="for-mode default-mode edit-mode headline">Active payment methods</div>
 					<div class="for-mode search-mode headline">Tap payment method to search for expenses</div>
 					<div name="content">&#x00a0;</div>
 				</div>
@@ -107,22 +108,32 @@
 			<!-- infinite: fas:f534 -->
 			<!-- year: far:f073 -->
 			<div id="statistics" data-choice-client="statistics">
-				<div name="month-navigator" class="client-header">
-					<div class="click">
-						<span name="nav-previous"><span class="dummy w2"></span></span>
-						<i class="fas">&#xf104;<!--angle-left--></i>
-					</div>
-					<div class="center flex-fill click">
-						<i class="far">&#xf080;<!--chart-bar--></i>
-						<span name="nav-current"><span class="dummy w9"></span></span>
-					</div>
-					<div class="click">
-						<i class="fas">&#xf105;<!--angle-right--></i>
-						<span name="nav-next"><span class="dummy w2"></span></span>
-					</div>
+				<div class="client-header">
+					<span class="flex-fill">Statistics</span>
+					<i name="time-select-button" class="click far" data-icon="calendar"></i>
+					<i name="mode-select-button" class="click fas" data-icon="calculator"></i>
+					<i name="filter-select-button" class="click fas" data-icon="filter"></i>
+					<i name="chart-select-button" class="click fas" data-icon="chart_line"></i>
 				</div>
 				<div class="content">
-					<div name="headline" class="headline">&#x00a0;</div>
+					<div name="headline" class="headline">&#x00a0;H</div>
+					<div class="item">totals</div>
+					<div id="sta_buttons" class="item">
+						YY
+						<div class="button-group">
+							<i class="fas icon" data-icon="angle_left" name="prev"></i>
+							<i class="fas icon" data-icon="angle_right" name="next"></i>
+						</div>
+						<div class="button-group">
+							<i class="fas icon" data-icon="calendar_day" name="month"></i>
+							<i class="fas icon" data-icon="calendar_alt" name="year"></i>
+							<i class="fas icon" data-icon="infinite" name="alltime"></i>
+						</div>
+						<div class="button-group">
+							<i class="fas icon" data-icon="plus" name="sum"></i>
+							<i class="fas icon" data-icon="divide" name="avg"></i>
+						</div>
+					</div>
 					<div name="content"></div>
 				</div>
 			</div>
@@ -130,19 +141,19 @@
 		</div>
 		<div id="bottom-menu" data-choice-group="active-tab" class="buttons">
 			<div name="payment-methods" data-choice="payment-methods" class="labeled-icon">
-				<i class="fas">&#xf555;<!--wallet--></i>
+				<i class="fas" data-icon="wallet"></i>
 				<span class="cutoff">payment methods</span>
 			</div>
 			<div name="categories-list" data-choice="categories-list" class="labeled-icon">
-				<i class="fas">&#xf468;<!--boxes--></i>
+				<i class="fas" data-icon="boxes"></i>
 				<span class="cutoff">categories</span>
 			</div>
 			<div name="expenses-list" data-choice="expenses-list" class="labeled-icon">
-				<i class="fas">&#xf0ca;<!--list-ul--></i>
+				<i class="fas" data-icon="list_ul"></i>
 				<span class="cutoff">expenses</span>
 			</div>
 			<div name="statistics" data-choice="statistics" class="labeled-icon">
-				<i class="fas">&#xf080;<!--chart-bar--></i>
+				<i class="fas" data-icon="chart_bar"></i>
 				<span>statistics</span>
 			</div>
 			<div data-choice="expense-editor" style="display: none">&#x00a0;</div>
