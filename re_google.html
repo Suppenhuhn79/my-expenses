@@ -47,8 +47,9 @@
 		<script>
 			let hash = window.location;
 			let home = window.location.origin + window.location.pathname.substr(0, window.location.pathname.lastIndexOf("/") + 1);
-
+			console.info("hash", hash);
 			if (/[#&?]scope=[^&]*https:\/\/www\.googleapis\.com\/auth\/drive\.appdata/.test(hash) === true) {
+				console.info("hash is success");
 				/* get auth info from Google API */
 				gapi.load("client:auth2", () => {
 					gapi.client
@@ -62,6 +63,7 @@
 							let token = authInstance.currentUser.get().getAuthResponse().access_token;
 							let expiresInSeconds = authInstance.currentUser.get().getAuthResponse().expires_in;
 							let expirationDate = new Date();
+							console.info(authInstance, token, expiresInSeconds);
 							expirationDate.setTime(expirationDate.getTime() + parseInt(expiresInSeconds) * 1000);
 							googleappApi.tokenCookie.set(token, expirationDate);
 							/* continue */
@@ -69,6 +71,7 @@
 						});
 				});
 			} else {
+				console.log("has did NOT succeed");
 				let rex = /[#&?]([^=]+)=([^&]+)/g;
 				let rem = rex.exec(hash);
 				let tableElement = document.getElementById("table");
