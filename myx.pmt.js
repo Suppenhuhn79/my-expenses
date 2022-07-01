@@ -1,4 +1,20 @@
 /**
+ * Payment method id.
+ * @typedef PmtId
+ * @type {String}
+ */
+
+/**
+ * Payment method object. Represents a single payment method.
+ * @typedef PaymentMethod
+ * @type {Object}
+ * @property {String} label
+ * @property {IconCode} icon
+ * @property {String} color
+ */
+
+
+/**
  * my-expenses "payment methods" module.
  * @namespace myxPaymentMethods
  */
@@ -8,12 +24,13 @@ let myxPaymentMethods = function ()
 	const FILE_NAME = "pmt.json";
 	/** @type {Date} */
 	let lastLoaded = null;
+	/** @type {Object<PmtId, PaymentMethod>} */
 	let data = {};
-	/** @type {Array<String>} */
+	/** @type {Array<PmtId>} */
 	let order = [];
-	/** @type {Array<String>} */
+	/** @type {Array<PmtId>} */
 	let disabledItems = [];
-	/** @type {String} */
+	/** @type {PmtId} */
 	let defaultId;
 	let elements = getNames(document.getElementById(MODULE_NAME));
 
@@ -67,7 +84,7 @@ let myxPaymentMethods = function ()
 
 	/**
 	 * Provides the label of a payment method.
-	 * @param {String} id Id of payment method to get label for
+	 * @param {PmtId} id Id of payment method to get label for
 	 * @returns {String} Label of the payment method
 	 */
 	function getLabel (id)
@@ -103,7 +120,7 @@ let myxPaymentMethods = function ()
 
 	/**
 	 * Provides a HTML element with the icon of a payment method.
-	 * @param {String} id Id of payment method to get the icon for
+	 * @param {PmtId} id Id of payment method to get the icon for
 	 * @returns {HTMLDivElement} HTML element with the payment methods icon
 	 */
 	function renderIcon (id)
@@ -123,12 +140,12 @@ let myxPaymentMethods = function ()
 	{
 		/**
 		 * Actually does render the list items.
-		 * @param {Array<String>} itemKeys Array that hold the pmt-ids to render
+		 * @param {Array<PmtId>} pmtIds Array that hold the pmt-ids to render
 		 * @param {Boolean} canSort Whether the items should have a sorting capatibility (active pmts) o not (disabled pmts)
 		 */
-		function _renderList (itemKeys, canSort)
+		function _renderList (pmtIds, canSort)
 		{
-			for (let id of itemKeys)
+			for (let id of pmtIds)
 			{
 				let div = htmlBuilder.newElement("div.item" + ((canSort) ? ".sortable" : ""),
 					{ 'data-id': id },
@@ -162,7 +179,7 @@ let myxPaymentMethods = function ()
 	/**
 	 * Opens the IconEditor for modifing a payment method or creating a new one.
 	 * Changes are not saved until `applyEdits()` is called!
-	 * @param {String} [id] Id of payment method to edit; if empty, a new payment method will be created
+	 * @param {PmtId} [id] Id of payment method to edit; if empty, a new payment method will be created
 	 */
 	function promptEditor (id)
 	{
@@ -260,12 +277,12 @@ let myxPaymentMethods = function ()
 		init: init,
 		enter: () => renderList("default"),
 		leave: () => modeHandler.setMode("default"),
-		/** @type {String} */
+		/** @type {PmtId} */
 		get defaultPmt () { return defaultId; },
 		getLabel: getLabel,
 		/**
 		 * Provides whether a payment method is set to be excluded.
-		 * @param {String} id Id of payment method
+		 * @param {PmtId} id Id of payment method
 		 * @returns {Boolean} `true` if the payment methods "exclude" flag is set, otherwise `false`
 		 */
 		isExcluded: (id) => (data[id].exclude === true),

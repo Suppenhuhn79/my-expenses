@@ -1,4 +1,22 @@
 /**
+ * Category id.
+ * @typedef CatId
+ * @type {String}
+ */
+
+/**
+ * Category object. Represents a single category.
+ * @typedef Category
+ * @type {Object}
+ * @property {String} label
+ * @property {IconCode} icon
+ * @property {String} color
+ * @property {CatId} [masterCategory]
+ * @property {Array<CatId>} [subCategories]
+ */
+
+
+/**
  * my-expenses "categories" module.
  * @namespace myxCategories
  */
@@ -8,8 +26,9 @@ let myxCategories = function ()
 	const FILE_NAME = "cat.json";
 	/** @type {Date} */
 	let lastLoaded = null;
+	/** @type {Object<CatId, Category>} */
 	let data = {};
-	/** @type {Array<String>} */
+	/** @type {Array<CatId>} */
 	let order = [];
 	let elements = getNames(document.getElementById(MODULE_NAME));
 	let modeHandler = new ModuleModeHandler(elements._self,
@@ -63,7 +82,7 @@ let myxCategories = function ()
 
 	/**
 	 * Provides the color code of a category.
-	 * @param {String} id Category id
+	 * @param {CatId} id Category id
 	 * @returns {String} RGB color code of the category
 	 */
 	function getColor (id)
@@ -74,7 +93,7 @@ let myxCategories = function ()
 	/**
 	 * Provides the label of a category.
 	 * "Fully qualified" means that sub-categoies will be prefixed by their master category name.
-	 * @param {String} id Category id
+	 * @param {CatId} id Category id
 	 * @param {Boolean} [fullQualified=true] `true`: fully qualified name (default); `false`: simple name
 	 * @returns {String} Label of the category
 	 */
@@ -90,8 +109,8 @@ let myxCategories = function ()
 
 	/**
 	 * Provides the sub-category ids of a master category.
-	 * @param {String} masterCategoryId Id of the master category
-	 * @returns {Array<String>} Sub-category ids; empty array if there aren't any
+	 * @param {CatId} masterCategoryId Id of the master category
+	 * @returns {Array<CatId>} Sub-category ids; empty array if there aren't any
 	 */
 	function getSubCategories (masterCategoryId)
 	{
@@ -100,7 +119,7 @@ let myxCategories = function ()
 
 	/**
 	 * Provides a HTML element with the icon of a category.
-	 * @param {String} id Category id
+	 * @param {CatId} id Category id
 	 * @returns {HTMLDivElement} HTML element with the category icon
 	 */
 	function renderIcon (id)
@@ -166,14 +185,14 @@ let myxCategories = function ()
 	/**
 	 * Puts a category selection element on an existing document node.
 	 * @param {HTMLElement} toElement Element to render the selection on
-	 * @param {String} [currentCatId] Id of the currently selected category; `null` if none selected
-	 * @param {Function} callback `function(selectedCategoryId: String)` to call on category selection
+	 * @param {CatId} [currentCatId] Id of the currently selected category; `null` if none selected
+	 * @param {Function} callback `function(selectedCategoryId: CatId)` to call on category selection
 	 */
 	function renderSelection (toElement, currentCatId, callback)
 	{
 		/**
 		 * Selects (highlights) a category within the selection.
-		 * @param {String} id Category id to select
+		 * @param {CatId} id Category id to select
 		 */
 		function _highlightSelection (id)
 		{
@@ -191,7 +210,7 @@ let myxCategories = function ()
 		/**
 		 * Handles selecting a category (or the "back" button).
 		 * Calls the callback function.
-		 * @param {String} id Id of the selected category
+		 * @param {CatId} id Id of the selected category
 		 */
 		function _onChoice (id)
 		{
@@ -245,8 +264,8 @@ let myxCategories = function ()
 	/**
 	 * Opens the IconEditor for modifing a category or creating a new one.
 	 * Changes are not saved until `applyEdits()` is called!
-	 * @param {String} [id] Id of category to edit; if empty, a new category will be created
-	 * @param {String} [masterCategory] Id of the categorys master category (if it's a subcategory)
+	 * @param {CatId} [id] Id of category to edit; if empty, a new category will be created
+	 * @param {CatId} [masterCategory] Id of the categorys master category (if it's a subcategory)
 	 */
 	function promptEditor (id, masterCategory)
 	{

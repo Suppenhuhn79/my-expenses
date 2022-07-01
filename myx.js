@@ -3,12 +3,24 @@
  * @typedef MonthString
  * @type {String}
  */
+
+/**
+ * Representing a FontAwesome icon as combination of a CSS style and unicode codepoint, e.g. `"fas:f100"`
+ * @typedef IconCode
+ * @type {String}
+ */
+
+
+/**
+ * Application main module.
+ * @namespace myx
+ */
 let myx = function ()
 {
 	const AUTOSIGNIN_FLAG = "myx_autosignin";
+	/** @type {HTMLElement} */
 	let activeTab = null;
 	let currencySymbol = "€";
-	// let client= document.getElementById("client");
 	let bottomMenu = document.getElementById("bottom-menu");
 	let xhrActivityIndicator = document.getElementById("xhr-indicator");
 
@@ -40,10 +52,7 @@ let myx = function ()
 
 	function init ()
 	{
-		if (localStorage.getItem(AUTOSIGNIN_FLAG))
-		{
-			localStorage.removeItem(AUTOSIGNIN_FLAG);
-		}
+		localStorage.removeItem(AUTOSIGNIN_FLAG);
 		if (typeof choices.chosen.activeTab === "undefined")
 		{
 			choices.onChoose("active-tab", onTabChosen);
@@ -101,7 +110,7 @@ let myx = function ()
 
 	function onWindowFocus ()
 	{
-		console.clear();
+		// console.clear();
 		console.debug("window focused");
 		googleappApi.init().then(
 			() =>
@@ -115,9 +124,11 @@ let myx = function ()
 			(reason) =>
 			{ // operation failed
 				googleappApi.tokenCookie.clear();
-				if ((reason?.status === 401 /* "unauthorized" */) && (localStorage.getItem(AUTOSIGNIN_FLAG) !== true))
+				console.warn("google login failed", "AUTOSIGNIN_FLAG?", localStorage.getItem(AUTOSIGNIN_FLAG));
+				if ((reason?.status === 401 /* "unauthorized" */) && (localStorage.getItem(AUTOSIGNIN_FLAG) !== "true"))
 				{
 					localStorage.setItem(AUTOSIGNIN_FLAG, true);
+					console.warn("auto retry signin");
 					googleappApi.signIn();
 				}
 				else
