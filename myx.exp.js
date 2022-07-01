@@ -1,5 +1,5 @@
 /** 
- * Represents an expense.
+ * Expense object. Represents a single expense.
  * @typedef Expense
  * @type {Object}
  * @property {Date} dat Expense date
@@ -21,16 +21,15 @@
 /**
  * my-expenses "expenses" module.
  * @namespace myxExpenses
- * @param {myxPaymentMethods} paymentMethods 
- * @param {myxCategories} categories 
  */
-let myxExpenses = function (paymentMethods, categories)
+let myxExpenses = function ()
 {
 	const MODULE_NAME = "expenses-list";
-	/** @type {Object{{Number}, {Date}}} */
+	/** @type {Object<Number,Date>} */
 	let lastLoaded = {};
 	let data = {};
 	let dataIndex = myxDataindex();
+	/** @type {ExpensesFilter} */
 	let filter = {};
 	/** @type {Array<MonthString>} */
 	let availibleMonths = [];
@@ -144,7 +143,9 @@ let myxExpenses = function (paymentMethods, categories)
 	 */
 	async function save (months)
 	{
+		/** @type {Array<Number>} */
 		let fileIndexes = [];
+		/** @type {Array<Promise>} */
 		let ops = [];
 		myx.xhrBegin();
 		if (typeof months === "string")
@@ -193,6 +194,7 @@ let myxExpenses = function (paymentMethods, categories)
 		if (bulk === false)
 		{
 			sortItems(month);
+			dataIndex.register(month);
 		}
 		availibleMonths = dataIndex.allAvailibleMonths.sort((a, b) => (a.localeCompare(b) * -1));
 	}
@@ -235,11 +237,11 @@ let myxExpenses = function (paymentMethods, categories)
 			let searchHint = "";
 			if (filter.cats.length > 0)
 			{
-				searchHint += categories.getLabel(filter.cats[0]);
+				searchHint += myx.categories.getLabel(filter.cats[0]);
 			}
 			else if (!!filter.pmt)
 			{
-				searchHint += paymentMethods.getLabel(filter.pmt);
+				searchHint += myx.paymentMethods.getLabel(filter.pmt);
 			}
 			elements.searchHint.appendChild(htmlBuilder.newElement("div.cutoff", "\u00a0", searchHint));
 			if (filter.months.length === 1)
@@ -263,6 +265,16 @@ let myxExpenses = function (paymentMethods, categories)
 	function resetFilter ()
 	{
 		setFilter({ months: [selectedMonth.toMonthString()] });
+	}
+
+	/**
+	 * Sets the current Month with no further action.
+	 * @param {Date} month Month to set
+	 */
+	function setMonth (month)
+	{
+		selectedMonth = month;
+		setFilter({ months: [month.toMonthString()] }, MODULE_NAME);
 	}
 
 	/**
@@ -304,17 +316,17 @@ let myxExpenses = function (paymentMethods, categories)
 	 */
 	function renderItem (item, dataIndex)
 	{
-		let catLabel = categories.getLabel(item.cat);
+		let catLabel = myx.categories.getLabel(item.cat);
 		let div = htmlBuilder.newElement("div.item.click",
 			{ onclick: () => popupEditor(item, item.dat.toMonthString(), dataIndex) },
-			categories.renderIcon(item.cat),
+			myx.categories.renderIcon(item.cat),
 			htmlBuilder.newElement("div.flex-fill.cutoff",
 				htmlBuilder.newElement("div.cutoff.big", item.txt || catLabel),
 				htmlBuilder.newElement("div.cutoff.grey", (!!item.txt) ? catLabel : "")),
 			htmlBuilder.newElement("div.amount.right.big", myx.formatAmountLocale(item.amt)),
-			paymentMethods.renderIcon(item.pmt)
+			myx.paymentMethods.renderIcon(item.pmt)
 		);
-		if (paymentMethods.isExcluded(item.pmt))
+		if (myx.paymentMethods.isExcluded(item.pmt))
 		{
 			div.classList.add("exclude");
 		}
@@ -427,7 +439,7 @@ let myxExpenses = function (paymentMethods, categories)
 				save([originalMonth, itemMonth]);
 			}
 			choices.choose("active-tab", MODULE_NAME);
-			setFilter({ months: [itemMonth] });
+			setMonth(new Date(itemMonth));
 			renderList();
 			elements.content.querySelector("[data-date='" + itemDate + "']")?.scrollIntoView({ block: "start", behavior: "smooth" });
 		});
@@ -493,7 +505,7 @@ let myxExpenses = function (paymentMethods, categories)
 	/* **** INIT MODULE **** */
 	pageSnippets.import("snippets/expenseeditor.xml").then(() =>
 	{
-		editor = expenseEditor(paymentMethods, categories, document.getElementById("client"));
+		editor = expenseEditor(myx.paymentMethods, myx.categories, document.getElementById("client"));
 	});
 	resetFilter();
 
@@ -504,7 +516,7 @@ let myxExpenses = function (paymentMethods, categories)
 		getCsv: getCsv, // TODO: debug only
 		save: save, // TODO: debug only
 		get selectedMonth () { return selectedMonth; },
-		set selectedMonth (value) { selectedMonth = value; },
+		set selectedMonth (value) { setMonth(value); },
 		get availibleMonths () { return availibleMonths; },
 		hasAnyData: hasAnyData,
 		loadFromFile: loadFromFile,
@@ -512,13 +524,13 @@ let myxExpenses = function (paymentMethods, categories)
 		leave: () => { resetFilter(); },
 		setFilter: setFilter,
 		edit: popupEditor,
+		popupAvalibleMonthsMenu: popupAvalibleMonthsMenu,
 
 		testDummy: () =>
 		{
 			htmlBuilder.replaceContent(elements.navPrevious, htmlBuilder.newElement("span.dummy.w2"));
 			htmlBuilder.replaceContent(elements.navNext, htmlBuilder.newElement("span.dummy.w2"));
 			htmlBuilder.replaceContent(elements.navCurrent, htmlBuilder.newElement("span.dummy.w9"));
-		},
-		popupAvalibleMonthsMenu: popupAvalibleMonthsMenu
+		}
 	};
 };
