@@ -1,165 +1,234 @@
 /**
- * my-expenses "statistics" module.
- * @param {myxExpenses} expenses
- * @param {myxPaymentMethods} paymentMethods 
- * @param {myxCategories} categories 
- * @returns 
+ * @namespace myxStatisticsTimerange
+ * @param {Function} onTimerangeChange Callback function on change `function(selectedMonths: MonthString[])`
  */
-const myxStatistics = function (expenses, categories, paymentMethods)
+const myxStatisticsTimerange = function (onTimerangeChange) 
 {
-	const MODULE_NAME = "statistics";
-	const MODE = {
-		sumPerMonth: "sumPerMonth",
-		sumPerYear: "sumPerYear",
-		avg: "avg"
-	};
-	let aggregates = myxStatisticAggregator(expenses, categories, paymentMethods);
-	let elements = getNames(document.getElementById(MODULE_NAME));
-	/** 
-	 * Represents the current statistics mode. Must be a value of `MODE`.
-	 * @type {String} */
-	let mode;
-
-	/**
-	 * Handles the currently selected time range, whicht is either
-	 * - a single month
-	 * - all months in a year or
-	 * - all time data.
+	/** @type {Array<MonthString>}
+	 * @readonly
+	 * To set use `setSelectedMonths()`
 	 */
-	let selectedTime = function ()
-	{
-		/** @type {"yyyy-mm"|"yyyy"|"*"} */
-		let selectedTime;
-		/** @type {Array<MonthString>} */
-		let selectedMonths;
-		/**
-		 * @param {"yyyy-mm"|"yyyy"|"*"} value 
-		 */
-		function set (value)
-		{
-			console.log("set selectedTime", value);
-			selectedTime = value;
-			/** @type {Array<MonthString>} */
-			if (value === "*")
-			{
-				selectedMonths = aggregates.availibleMonths;
-			}
-			else if ((/^\d{4}$/.test(value) === true) || (mode === MODE.sumPerYear))
-			{
-				selectedMonths = [];
-				selectedTime = value.substring(0, 4);
-				for (let month of aggregates.availibleMonths)
-				{
-					if (month.substring(0, 4) === selectedTime)
-					{
-						selectedMonths.push(month);
-					}
-				}
-			}
-			else if (/^\d{4}-(0[1-9]|1[0-2])$/.test(value))
-			{
-				expenses.selectedMonth = new Date(value);
-				selectedMonths = [value];
-			}
-			renderList();
-		}
-		return {
-			set: set,
-			get value () { return selectedTime; },
-			get months () { return selectedMonths; }
-		};
-	}();
+	let selectedMonths;
 
-	let statisticsModeMenu = new Menubox("statistics-type", {
-		items: [
-			{
-				key: MODE.sumPerMonth,
-				iconHtml: htmlBuilder.newElement("i.fas.icon", fa.calendar_day),
-				label: "Total expenses per month"
-			},
-			{
-				key: MODE.sumPerYear,
-				iconHtml: htmlBuilder.newElement("i.fas.icon", fa.calendar_alt),
-				label: "Total expenses per year",
-			}
-			/*,{
-				key: MODE.avg,
-				label: "Monthly averages"
-			}*/
-		]
-	}, (menuboxEvent) => setMode(menuboxEvent.itemKey));
-
-	elements.navCurrent.onclick = (mouseEvent) =>
+	function setMode (mode)
 	{
 		switch (mode)
 		{
-			case MODE.sumPerMonth:
-				expenses.popupAvalibleMonthsMenu(mouseEvent, elements.navCurrent, (month) =>
-				{
-					selectedTime.set(month.toMonthString());
-				});
+			case "month":
+				setMonth(myx.expenses.selectedMonth);
 				break;
-			case MODE.sumPerYear:
-				popupAvailibleYearsMenu(mouseEvent, elements.navCurrent, (year) =>
-				{
-					selectedTime.set(year);
-				});
+			case "year":
+				setYear(myx.expenses.selectedMonth.getFullYear());
+				break;
+			case "all":
+				_setSelectedMonths("*");
 				break;
 		}
-	};
-	elements.headline.onclick = (mouseEvent) =>
-	{
-		statisticsModeMenu.popup(mouseEvent, null, mouseEvent.target.closest(".headline"), "below bottom, start left");
 	};
 
 	/**
-	 * Pops up a menu with all availible years (and an "all time" item).
-	 * @param {Event} event Event that triggered the menu request
-	 * @param {HTMLElement} alignElement Element to align the menu to (alignment is "start left, below bottom")
-	 * @param {Function} callback `function(year: String)` to call on selection
+	 * Set the time range to a single month.
+	 * @param {Date} newMonth New month to set.
+	 * @param {Boolean} [fromExternal] Wheter setting month was triggered from outside this module (`true`) or not (`false`, default). If this is `false` the selected month in expenses will be updated.
 	 */
-	function popupAvailibleYearsMenu (event, alignElement, callback)
+	function setMonth (newMonth, fromExternal = false)
 	{
-		let menuItems = [];
-		for (let year of aggregates.availibleYears.sort().reverse())
+		if (fromExternal === false)
 		{
-			menuItems.push({ key: year });
+			myx.expenses.selectedMonth = newMonth;
 		}
-		menuItems.push(
-			{ separator: {} },
-			{ key: "*", label: "All time" }
-		);
-		let menubox = new Menubox("years-selection", { items: menuItems }, (event) =>
-		{
-			callback(event.itemKey);
-		});
-		menubox.popup(event, null, alignElement, "center, below bottom");
+		_setSelectedMonths(myx.expenses.selectedMonth.toMonthString());
+	};
+
+	/**
+	 * Sets the time range to a full year.
+	 * @param {Number} newYear New year to set
+	 */
+	function setYear (newYear)
+	{
+		const actualYear = myx.expenses.selectedMonth.getFullYear();
+		let newYearMonth = (newYear === actualYear) ? myx.expenses.selectedMonth.getMonth() : ((newYear < actualYear) ? 11 : 0);
+		let actualMonth = new Date(newYear, newYearMonth, 1);
+		myx.expenses.selectedMonth = actualMonth;
+		_setSelectedMonths(newYear.toString());
 	}
 
 	/**
-	 * Sets the statistics mode. Automatically selects time range and renders client.
-	 * @param {MODE} newMode New mode to set
+	 * Sets selected time range as array containing actual monts.
+	 * This calls the `onTimerangeChange` callback.
+	 * @param {"yyyy-mm"|"yyyy"|"*"} value Value to set the months selection. May be either a ISO-month-string, a 4-digit year string or an asterisk for _all availible data_.
 	 */
-	function setMode (newMode)
+	function _setSelectedMonths (value)
 	{
-		if (newMode !== mode)
+		if (value === "*")
 		{
-			mode = newMode;
-			htmlBuilder.replaceContent(elements.headline, htmlBuilder.newElement("div.click",
-				htmlBuilder.newElement("span.fas", fa.bars),
-				htmlBuilder.newElement("span", fa.space + statisticsModeMenu.items[newMode].label)
-			));
-			console.log("mode:", mode);
-			switch (mode)
+			myx.expenses.selectedMonth = new Date();
+			selectedMonths = myx.expenses.availibleMonths;
+		}
+		else if (/^\d{4}$/.test(value) === true)
+		{
+			selectedMonths = [];
+			selectedTime = value.substring(0, 4);
+			for (let month of myx.expenses.availibleMonths)
 			{
-				case MODE.sumPerMonth:
-					selectedTime.set((/^\d{4}-(0[1-9]|1[0-2])$/.test(selectedTime.value)) ? selectedTime.value : expenses.selectedMonth.toMonthString());
-					break;
-				case MODE.sumPerYear:
-					selectedTime.set(selectedTime.value.substring(0, 4));
-					break;
+				if (month.substring(0, 4) === selectedTime)
+				{
+					selectedMonths.push(month);
+				}
 			}
 		}
+		else if (/^\d{4}-(0[1-9]|1[0-2])$/.test(value))
+		{
+			selectedMonths = [value];
+		}
+		console.log("myxStatisticsTimerange.selectedMonths =", selectedMonths);
+		if (typeof onTimerangeChange === "function")
+		{
+			onTimerangeChange(selectedMonths);
+		}
+	}
+
+	return { // publish members
+		get selectedMonths () { return selectedMonths; },
+		/**
+		 * Sets time range selection to a single month. Updates the menubox.
+		 * @param {Date} month Month to set.
+		 */
+		selectMonth: (month) => { setMonth(month, true); },
+		setMode: setMode,
+		navigatePrevMonth: () => { setMonth(myx.expenses.selectedMonth.addMonths(-1)); },
+		navigateNextMonth: () => { setMonth(myx.expenses.selectedMonth.addMonths(1)); },
+		navigatePrevYear: () => { setYear(myx.expenses.selectedMonth.getFullYear() - 1); },
+		navigateNextYear: () => { setYear(myx.expenses.selectedMonth.getFullYear() + 1); }
+	};
+};
+
+/**
+ * my-expenses "statistics" module.
+ * @namespace myxStatistics
+ */
+const myxStatistics = function ()
+{
+	const MODULE_NAME = "statistics";
+	let elements = getNames(document.getElementById(MODULE_NAME));
+	let aggregator = myxStatisticAggregator();
+	let timerange = myxStatisticsTimerange(onTimerageChange);
+	/** @type {Object} */
+	let data;
+
+	let chartMenu = new Menubox("mxy.sta.chart", {
+		title: "Chart",
+		items: [
+			{
+				key: "pie",
+				label: "Distribution by category",
+				iconHtml: htmlBuilder.newElement("i.fas.icon", fa.chart_pie)
+			},
+			{
+				key: "areat",
+				label: "Course over time",
+				iconHtml: htmlBuilder.newElement("i.fas.icon", fa.chart_area)
+			},
+			{
+				key: "none",
+				label: "None",
+				iconHtml: htmlBuilder.newElement("i.fas.icon", fa.ban)
+			}
+		]
+	});
+
+	elements.chartSelectButton.onclick = (mouseEvent) => chartMenu.popup(mouseEvent, null, elements.chartSelectButton, "below bottom, center");
+
+	elements.navigatePrevTime.onclick = (mouseEvent) =>
+	{
+		console.log(mouseEvent.target);
+		switch (choices.chosen.timeRangeMode)
+		{
+			case "month":
+				timerange.navigatePrevMonth();
+				break;
+			case "year":
+				timerange.navigatePrevYear();
+				break;
+		}
+		_refreshNavigatorButtons();
+	};
+
+	elements.navigateNextTime.onclick = (mouseEvent) =>
+	{
+		console.log(mouseEvent.target);
+		switch (choices.chosen.timeRangeMode)
+		{
+			case "month":
+				timerange.navigateNextMonth();
+				break;
+			case "year":
+				timerange.navigateNextYear();
+				break;
+		}
+		_refreshNavigatorButtons();
+	};
+
+	function _refreshNavigatorButtons ()
+	{
+		return;
+		let actualMonth = myx.expenses.selectedMonth;
+		switch (choices.chosen.timeRangeMode)
+		{
+			case "month":
+				/* month selector */
+				elements.navigatePrevTime.style.visibility = (myx.expenses.hasAnyData(actualMonth.addMonths(-1).toMonthString())) ? null : "hidden";
+				elements.navigateNextTime.style.visibility = (myx.expenses.hasAnyData(actualMonth.addMonths(1).toMonthString())) ? null : "hidden";
+				break;
+			case "year":
+				/* year selector */
+				elements.navigatePrevTime.style.visibility = (myx.expenses.hasAnyData((new Date(actualMonth.addYears(-1).getFullYear(), 11, 1)).toMonthString())) ? null : "hidden";
+				elements.navigateNextTime.style.visibility = (myx.expenses.hasAnyData((new Date(actualMonth.addYears(1).getFullYear(), 0, 1)).toMonthString())) ? null : "hidden";
+				break;
+		}
+	}
+
+	function onTimerangeNavigated (direction)
+	{
+		switch (choices.chosen.timeRangeMode)
+		{
+			case "month":
+				{
+					switch (direction)
+					{
+						case "prev":
+							timerange.navigatePrevMonth();
+							break;
+						case "next":
+							timerange.navigateNextMonth();
+							break;
+					}
+				}
+		}
+		console.log(direction);
+	}
+
+	function onTimerangemodeChosen (choiceKey)
+	{
+		console.log(choiceKey);
+		timerange.setMode(choiceKey);
+	}
+
+	function onCalculationmodeChosen (choiceKey)
+	{
+		console.log(choiceKey);
+	}
+
+	function onTimerageChange (timerange)
+	{
+		console.warn(timerange);
+		aggregator.calc(timerange, "sum").then((aggregates) =>
+		{
+			data = aggregates;
+			console.log("aggregator:", data);
+			renderTotals();
+			// settings.selectedTime.set(expenses.selectedMonth.toMonthString());
+		});
 	}
 
 	/**
@@ -182,85 +251,79 @@ const myxStatistics = function (expenses, categories, paymentMethods)
 		);
 	}
 
-	function _renderNavItem (navElement, targetSelection)
+	function getTitle ()
 	{
-		navElement.parentElement.onclick = () =>
+		let result = "";
+		try
 		{
-			selectedTime.set(targetSelection);
-		};
-		navElement.innerText = (mode === MODE.sumPerMonth) ? getShortMonthText(new Date(targetSelection)) : targetSelection;
-		navElement.parentElement.style.visibility = ((mode === MODE.sumPerMonth) ? aggregates.availibleMonths.includes(targetSelection) : aggregates.availibleYears.includes(targetSelection)) ? "visible" : "hidden";
-	}
-
-	function _renderNavBar ()
-	{
-		console.log("_renderNavBar()", mode, selectedTime.value, selectedTime.months);
-		if (mode === MODE.sumPerMonth)
-		{
-			elements.navCurrent.innerText = getFullMonthText(expenses.selectedMonth);
-			_renderNavItem(elements.navPrevious, expenses.selectedMonth.addMonths(-1).toMonthString());
-			_renderNavItem(elements.navNext, expenses.selectedMonth.addMonths(+1).toMonthString());
-		}
-		else
-		{
-			if (selectedTime.value === "*")
+			let calculationMode = ((choices.chosen.calculationMode === "sum") ? "total" : (choices.chosen.timeRangeMode === "month") ? "average" : "monthly average") + " expenses";
+			if (choices.chosen.timeRangeMode === "alltime")
 			{
-				elements.navCurrent.innerText = "All time";
-				elements.navPrevious.parentElement.style.visibility = "hidden";
-				elements.navNext.parentElement.style.visibility = "hidden";
+				result = ["all time", calculationMode].join(" ");
 			}
 			else
 			{
-				elements.navCurrent.innerText = selectedTime.value;
-				_renderNavItem(elements.navPrevious, (Number(selectedTime.value) - 1).toString());
-				_renderNavItem(elements.navNext, (Number(selectedTime.value) + 1).toString());
+				let timeRange = (choices.chosen.timeRangeMode === "month") ? getFullMonthText(myx.expenses.selectedMonth) : myx.expenses.selectedMonth.getFullYear();
+				result = [calculationMode, "in", timeRange].join(" ");
 			}
+			return result[0].toUpperCase() + result.substring(1);
+		}
+		catch (ex)
+		{
+			console.warn(ex);
+			return "--";
 		}
 	}
 
-	function renderList ()
+	function renderTotals ()
 	{
-		_renderNavBar();
-		if (expenses.hasAnyData(expenses.selectedMonth.toMonthString()))
+		if (myx.expenses.hasAnyData(myx.expenses.selectedMonth.toMonthString()))
 		{
 			htmlBuilder.removeAllChildren(elements.content);
-			console.log(selectedTime.months, mode);
-			let data = aggregates.calc(selectedTime.months);
+			// console.log(selectedTime.months, mode);
+			// let data = aggregator.calc(selectedTime.months);
 
-			let title = "";
-			if (mode === MODE.sumPerMonth)
+			let title = "//TODO";
+			/*
+			if (selectedTime.value === "*")
+			{
+				title = "All logged expenses";
+			}
+			else if (/\d{4}-\d{2}/.test(selectedTime.value))
 			{
 				title = getFullMonthText(expenses.selectedMonth) + " total";
 			}
-			else if (mode === MODE.sumPerYear)
+			else
 			{
-				if (selectedTime.value === "*")
-				{
-					title = "All logged expenses";
-				}
-				else
-				{
-					title = "Total expenses in " + selectedTime.value;
-				}
+				title = "Total expenses in " + settings.selectedTime.value;
 			}
-			elements.content.appendChild(htmlBuilder.newElement("div.item",
-				htmlBuilder.newElement("div.flex-fill.big.bold", title),
-				htmlBuilder.newElement("div.amt.big.bold", myx.formatAmountLocale(data.total.sum)))
-			);
-			for (let catAggr of data.cats)
+			*/
+			/*
+						let navItem = htmlBuilder.newElement("div.wide-flex");
+						for (let year of aggregates.availibleYears.sort())
+						{
+							navItem.appendChild(htmlBuilder.newElement("div.dateitem",
+								year,
+								{ onclick: (e) => console.log(e) }));
+						}
+						// navItem.appendChild(htmlBuilder.newElement("div.monthslist.wide-flex"))
+			*/
+			elements.title.innerHTML = getTitle();
+			elements.amount.innerHTML = myx.formatAmountLocale(data.sum);
+			for (let catAggr of data.totals)
 			{
-				let subCatDiv = htmlBuilder.newElement("div.hidden", { 'data-cat': catAggr.id });
+				let subCatDiv = htmlBuilder.newElement("div.hidden", { 'data-cat': catAggr.catId });
 				if (catAggr.sum > 0)
 				{
-					for (let subCat of catAggr.subCats)
+					for (let subCat of catAggr.subs)
 					{
-						if ((subCat.id !== catAggr.id) || (subCat.sum > 0))
+						if ((subCat.catId !== catAggr.catId) || (subCat.sum > 0))
 						{
 							subCatDiv.appendChild(htmlBuilder.newElement("div.subcat.wide-flex" + ".grey" + (subCat.sum === 0 ? ".zero-sum" : ""),
-								{ 'data-cat': subCat.id, onclick: onSubcategoryClick },
-								categories.renderIcon(subCat.id),
+								{ 'data-cat': subCat.catId, onclick: onSubcategoryClick },
+								myx.categories.renderIcon(subCat.catId),
 								htmlBuilder.newElement("div.flex-fill.click",
-									categories.getLabel(subCat.id, false)),
+									myx.categories.getLabel(subCat.catId, false)),
 								htmlBuilder.newElement("div.amt", myx.formatAmountLocale(subCat.sum)
 								)));
 						}
@@ -268,16 +331,16 @@ const myxStatistics = function (expenses, categories, paymentMethods)
 				}
 				let div = htmlBuilder.newElement(
 					"div.item.click" + (catAggr.sum === 0 ? ".zero-sum" : ""),
-					{ onclick: () => toggleSubcategoryVisibility(catAggr.id) },
-					categories.renderIcon(catAggr.id),
+					{ onclick: () => toggleSubcategoryVisibility(catAggr.catId) },
+					myx.categories.renderIcon(catAggr.catId),
 					htmlBuilder.newElement(
 						"div.flex-fill.high-flex",
 						htmlBuilder.newElement(
 							"div.flex-fill.wide-flex",
-							htmlBuilder.newElement("div.flex-fill.cutoff.big", categories.getLabel(catAggr.id)),
+							htmlBuilder.newElement("div.flex-fill.cutoff.big", myx.categories.getLabel(catAggr.catId)),
 							htmlBuilder.newElement("div.amount.right.big", myx.formatAmountLocale(catAggr.sum))
 						),
-						renderPercentBar("percentbar", catAggr.sum / data.total.sum, categories.getColor(catAggr.id)),
+						renderPercentBar("percentbar", catAggr.sum / data.sum, myx.categories.getColor(catAggr.catId)),
 						subCatDiv
 					)
 				);
@@ -297,14 +360,9 @@ const myxStatistics = function (expenses, categories, paymentMethods)
 	{
 		console.clear();
 		console.log("stats init");
-		aggregates.init().then(() =>
-		{
-			selectedTime.set(expenses.selectedMonth.toMonthString());
-			if (mode === undefined)
-			{
-				setMode(MODE.sumPerMonth);
-			}
-		});
+		choices.choose("time-range-mode", "month");
+		choices.choose("calculation-mode", "sum");
+		timerange.selectMonth(myx.expenses.selectMonth);
 	}
 
 	/**
@@ -327,54 +385,30 @@ const myxStatistics = function (expenses, categories, paymentMethods)
 		let id = mouseEvent.target.closest("[data-cat]").dataset.cat;
 		myx.setExpenseFilter({
 			cat: id,
-			months: selectedTime.months
+			months: settings.selectedTime.months
 		}, MODULE_NAME);
 	}
 
-	return { // publish members
-		get moduleName () { return MODULE_NAME; },
-		get aggregates () { return aggregates; }, // TODO: debug only
-		get selectedTime () { return selectedTime; }, //TODO: debug only
-		enter: enter
+	choices.onChoose("time-range-mode", onTimerangemodeChosen);
+	choices.onChoose("calculation-mode", onCalculationmodeChosen);
 
-		,
-		getApexchartData: (months) =>
+	return { // publish members
+		get aggregator () { return aggregator; }, // TODO: debug only
+		get moduleName () { return MODULE_NAME; },
+		enter: enter
+		/*
+		getMonthsInYear: (year) =>
 		{
-			let apexSeries = [];
-			let monthlyTranspose = {};
-			for (let cat of categories.masterCategoryIds)
+			let mths = [];
+			for (let month of expenses.availibleMonths)
 			{
-				monthlyTranspose[cat] = [];
-			}
-			for (let month of months)
-			{
-				let aggs = aggregates.calc([month]);
+				if (month.startsWith(year))
 				{
-					for (let cat of aggs.cats)
-					{
-						monthlyTranspose[cat.id].push(Math.ceil(cat.sum));
-					}
+					mths.push(month);
 				}
 			}
-			console.log(monthlyTranspose);
-			for (let cat in monthlyTranspose)
-			{
-				apexSeries.push({ name: categories.getLabel(cat), id: cat, data: monthlyTranspose[cat] });
-			}
-			return apexSeries;
-		},
-		getApexchartDountData: (months) =>
-		{
-			let apexSeries = [];
-			console.log(months);
-			let aggs = aggregates.calc(months);
-			{
-				for (let cat of aggs.cats)
-				{
-					apexSeries.push(Math.ceil(cat.sum));
-				}
-			}
-			return apexSeries;
+			return mths.sort();
 		}
+		*/
 	};
 };

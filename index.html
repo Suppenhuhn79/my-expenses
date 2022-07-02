@@ -110,28 +110,28 @@
 			<div id="statistics" data-choice-client="statistics">
 				<div class="client-header">
 					<span class="flex-fill">Statistics</span>
-					<i name="time-select-button" class="click far" data-icon="calendar"></i>
-					<i name="mode-select-button" class="click fas" data-icon="calculator"></i>
 					<i name="filter-select-button" class="click fas" data-icon="filter"></i>
 					<i name="chart-select-button" class="click fas" data-icon="chart_line"></i>
 				</div>
 				<div class="content">
-					<div name="headline" class="headline">&#x00a0;H</div>
-					<div class="item">totals</div>
+					<div name="headline" class="headline">&#x00a0;</div>
+					<div class="item">
+						<div class="flex-fill big bold" name="title"></div>
+						<div class="amt big bold" name="amount"></div>
+					</div>
 					<div id="sta_buttons" class="item">
-						YY
-						<div class="button-group">
-							<i class="fas icon" data-icon="angle_left" name="prev"></i>
-							<i class="fas icon" data-icon="angle_right" name="next"></i>
+						<div class="button-group wide-flex">
+							<i class="fas icon" data-icon="angle_left" name="navigate-prev-time"></i>
+							<i class="fas icon" data-icon="angle_right" name="navigate-next-time"></i>
 						</div>
-						<div class="button-group">
-							<i class="fas icon" data-icon="calendar_day" name="month"></i>
-							<i class="fas icon" data-icon="calendar_alt" name="year"></i>
-							<i class="fas icon" data-icon="infinite" name="alltime"></i>
+						<div class="button-group wide-flex" data-choice-group="time-range-mode">
+							<i class="fas icon" data-icon="calendar_day" data-choice="month"></i>
+							<i class="fas icon" data-icon="calendar_alt" data-choice="year"></i>
+							<i class="fas icon" data-icon="infinite" data-choice="alltime"></i>
 						</div>
-						<div class="button-group">
-							<i class="fas icon" data-icon="plus" name="sum"></i>
-							<i class="fas icon" data-icon="divide" name="avg"></i>
+						<div class="button-group wide-flex" data-choice-group="calculation-mode">
+							<i class="fas icon" data-icon="plus" data-choice="sum"></i>
+							<i class="fas icon" data-icon="divide" data-choice="avg"></i>
 						</div>
 					</div>
 					<div name="content"></div>
