@@ -52,9 +52,7 @@
 	overflow-y: scroll;
 	overflow-x: hidden;
 }
-#client .content .item + .headline {
-	border-top: 2px solid #aaa;
-}
+
 #client .content .item {
 	display: flex;
 	flex-direction: row;
@@ -65,9 +63,10 @@
 	width: 100%;
 	padding: 0.7rem 0 0.7rem 1rem;
 	background-color: white;
-}
-#client .content .item + .item {
 	border-top: var(--item-border);
+}
+#client .content .item + .headline {
+	border-top: 2px solid #aaa;
 }
 #client .content .item:last-of-type {
 	border-bottom: 2px solid #aaa;
@@ -199,14 +198,15 @@
 	height: 2em;
 	align-items: center;
 	justify-content: center;
+	overflow: hidden;
 }
 
 #statistics .button-group .icon + .icon {
 	border-left: 2px solid var(--statisctcs-inline-button-border-color);
 }
 #statistics .button-group .icon.chosen {
-	color: var(--complementay-dark-color);
-	/* background-color: var(--complementay-light-color); */
+	color: white;
+	background-color: var(--primary-color);
 }
 
 #statistics .content .item {

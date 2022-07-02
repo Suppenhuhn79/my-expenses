@@ -256,16 +256,9 @@ const myxStatistics = function ()
 		let result = "";
 		try
 		{
-			let calculationMode = ((choices.chosen.calculationMode === "sum") ? "total" : (choices.chosen.timeRangeMode === "month") ? "average" : "monthly average") + " expenses";
-			if (choices.chosen.timeRangeMode === "alltime")
-			{
-				result = ["all time", calculationMode].join(" ");
-			}
-			else
-			{
-				let timeRange = (choices.chosen.timeRangeMode === "month") ? getFullMonthText(myx.expenses.selectedMonth) : myx.expenses.selectedMonth.getFullYear();
-				result = [calculationMode, "in", timeRange].join(" ");
-			}
+			let timeRange = (choices.chosen.timeRangeMode === "alltime") ? "all time" : (choices.chosen.timeRangeMode === "month") ? getFullMonthText(myx.expenses.selectedMonth) : myx.expenses.selectedMonth.getFullYear();
+			let calculationMode = ((choices.chosen.calculationMode === "sum") ? "total" : (choices.chosen.timeRangeMode === "month") ? "average" : "monthly average");
+			result = [timeRange, calculationMode].join(" ");
 			return result[0].toUpperCase() + result.substring(1);
 		}
 		catch (ex)
