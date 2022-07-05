@@ -210,11 +210,15 @@ let myxExpenses = function ()
 
 	/**
 	 * Checks whether there are expenses in a certain month or not.
-	 * @param {MonthString} month Month to check for data
+	 * @param {MonthString|Date} month Month to check for data
 	 * @returns {Boolean} `true` if there is any data for the month, `false` if there is no data
 	 */
 	function hasAnyData (month)
 	{
+		if (month.constructor.name === "Date")
+		{
+			month = month.toMonthString();
+		}
 		return ((!!data[month]) && (data[month].length > 0));
 	}
 
@@ -292,7 +296,7 @@ let myxExpenses = function ()
 			renderList();
 		};
 		navElement.innerText = monthNames[targetMonth.getMonth()].substring(0, 3);
-		navElement.parentElement.style.visibility = (hasAnyData(selectedMonth.toMonthString()) || hasAnyData(targetMonth.toMonthString())) ? "visible" : "hidden";
+		navElement.parentElement.style.visibility = (hasAnyData(selectedMonth) || hasAnyData(targetMonth)) ? "visible" : "hidden";
 	}
 
 	/**
