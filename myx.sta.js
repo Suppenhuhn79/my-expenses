@@ -1,18 +1,30 @@
 /**
- * @namespace myxStatisticsTimerange
- * @param {Function} onTimerangeChange Callback function on change `function(selectedMonths: MonthString[])`
+ * @typedef TimerangeMode
+ * @type {"month"|"year"|"all"}
  */
-const myxStatisticsTimerange = function (onTimerangeChange) 
+
+/**
+ * @namespace myxStatisticsTimerange
+ * @param {Function} onChange Callback function on change `function(selectedMonths: MonthString[])`
+ */
+const myxStatisticsTimerange = function (onChange) 
 {
+	/** @type {TimerangeMode} */
+	let mode = "month";
 	/** @type {Array<MonthString>}
 	 * @readonly
 	 * To set use `setSelectedMonths()`
 	 */
 	let selectedMonths;
 
-	function setMode (mode)
+	/**
+	 * Sets the given timerange mode. Affects the selected months.
+	 * @param {TimerangeMode} newMode Mode to set
+	 */
+	function setMode (newMode)
 	{
-		switch (mode)
+		mode = newMode;
+		switch (newMode)
 		{
 			case "month":
 				setMonth(myx.expenses.selectedMonth);
@@ -81,25 +93,61 @@ const myxStatisticsTimerange = function (onTimerangeChange)
 		{
 			selectedMonths = [value];
 		}
-		console.log("myxStatisticsTimerange.selectedMonths =", selectedMonths);
-		if (typeof onTimerangeChange === "function")
+		if (typeof onChange === "function")
 		{
-			onTimerangeChange(selectedMonths);
+			onChange(selectedMonths);
+		}
+	}
+
+	/**
+	 * Returns the adjacent time range (previous or following) for the current monht/year and mode.
+	 * @param {-1|1} direction Whether to calculate the previous (`-1`) or the following (`+1`) time range
+	 * @returns {Date}
+	 */
+	function getAdjacentTimerange (direction)
+	{
+		let result = myx.expenses.selectedMonth;
+		switch (mode)
+		{
+			case "month":
+				result = myx.expenses.selectedMonth.addMonths(direction);
+				break;
+			case "year":
+				result = new Date(myx.expenses.selectedMonth.getFullYear() + direction, (direction > 0) ? 0 : 11, 1);
+				break;
+		}
+		return result;
+	}
+
+	/**
+	 * Sets the current month/year.
+	 * @param {Date} date Date to navigate to.
+	 */
+	function navigateTo (date)
+	{
+		switch (mode)
+		{
+			case "month":
+				setMonth(date);
+				break;
+			case "year":
+				setYear(date.getFullYear());
+				break;
 		}
 	}
 
 	return { // publish members
 		get selectedMonths () { return selectedMonths; },
+		get nextTimerange () { return getAdjacentTimerange(1); },
+		get prevTimerange () { return getAdjacentTimerange(-1); },
+		get mode () { return mode; },
+		set mode (value) { setMode(value); },
+		navigateTo: navigateTo,
 		/**
 		 * Sets time range selection to a single month. Updates the menubox.
 		 * @param {Date} month Month to set.
 		 */
-		selectMonth: (month) => { setMonth(month, true); },
-		setMode: setMode,
-		navigatePrevMonth: () => { setMonth(myx.expenses.selectedMonth.addMonths(-1)); },
-		navigateNextMonth: () => { setMonth(myx.expenses.selectedMonth.addMonths(1)); },
-		navigatePrevYear: () => { setYear(myx.expenses.selectedMonth.getFullYear() - 1); },
-		navigateNextYear: () => { setYear(myx.expenses.selectedMonth.getFullYear() + 1); }
+		selectMonth: (month) => { setMonth(month, true); }
 	};
 };
 
@@ -139,95 +187,79 @@ const myxStatistics = function ()
 
 	elements.chartSelectButton.onclick = (mouseEvent) => chartMenu.popup(mouseEvent, null, elements.chartSelectButton, "below bottom, center");
 
-	elements.navigatePrevTime.onclick = (mouseEvent) =>
+	elements.navigatePrevTime.onclick = elements.navigateNextTime.onclick = (mouseEvent) =>
 	{
-		console.log(mouseEvent.target);
-		switch (choices.chosen.timeRangeMode)
+		if (mouseEvent.target.classList.contains("disabled") === false)
 		{
-			case "month":
-				timerange.navigatePrevMonth();
-				break;
-			case "year":
-				timerange.navigatePrevYear();
-				break;
+			let targetDate = new Date(mouseEvent.target.dataset.targetDate);
+			timerange.navigateTo(targetDate);
+			_refreshNavigatorButtons();
 		}
-		_refreshNavigatorButtons();
 	};
 
-	elements.navigateNextTime.onclick = (mouseEvent) =>
-	{
-		console.log(mouseEvent.target);
-		switch (choices.chosen.timeRangeMode)
-		{
-			case "month":
-				timerange.navigateNextMonth();
-				break;
-			case "year":
-				timerange.navigateNextYear();
-				break;
-		}
-		_refreshNavigatorButtons();
-	};
-
+	/**
+	 * Refreshes the time navigation buttons on whether there can be navigated to the previous/following time range.
+	 */
 	function _refreshNavigatorButtons ()
 	{
-		return;
-		let actualMonth = myx.expenses.selectedMonth;
-		switch (choices.chosen.timeRangeMode)
+		const items = [
+			{
+				targetDate: timerange.nextTimerange,
+				element: elements.navigateNextTime
+			},
+			{
+				targetDate: timerange.prevTimerange,
+				element: elements.navigatePrevTime
+			}
+		];
+		for (let item of items)
 		{
-			case "month":
-				/* month selector */
-				elements.navigatePrevTime.style.visibility = (myx.expenses.hasAnyData(actualMonth.addMonths(-1).toMonthString())) ? null : "hidden";
-				elements.navigateNextTime.style.visibility = (myx.expenses.hasAnyData(actualMonth.addMonths(1).toMonthString())) ? null : "hidden";
-				break;
-			case "year":
-				/* year selector */
-				elements.navigatePrevTime.style.visibility = (myx.expenses.hasAnyData((new Date(actualMonth.addYears(-1).getFullYear(), 11, 1)).toMonthString())) ? null : "hidden";
-				elements.navigateNextTime.style.visibility = (myx.expenses.hasAnyData((new Date(actualMonth.addYears(1).getFullYear(), 0, 1)).toMonthString())) ? null : "hidden";
-				break;
-		}
+			if (timerange.mode !== "all")
+			{
+				item.element.dataset.targetDate = item.targetDate.toISOString();
+				item.element.classList[myx.expenses.hasAnyData(item.targetDate) ? "remove" : "add"]("disabled");
+			}
+			else
+			{
+				item.element.classList.add("disabled");
+			}
+		};
 	}
 
-	function onTimerangeNavigated (direction)
-	{
-		switch (choices.chosen.timeRangeMode)
-		{
-			case "month":
-				{
-					switch (direction)
-					{
-						case "prev":
-							timerange.navigatePrevMonth();
-							break;
-						case "next":
-							timerange.navigateNextMonth();
-							break;
-					}
-				}
-		}
-		console.log(direction);
-	}
-
+	/**
+	 * Event handler for setting the timerange mode.
+	 * @param {TimerangeMode} choiceKey Timerange mode to set.
+	 */
 	function onTimerangemodeChosen (choiceKey)
 	{
-		console.log(choiceKey);
-		timerange.setMode(choiceKey);
+		timerange.mode = choiceKey;
+		_refreshNavigatorButtons();
 	}
 
+	/**
+	 * Event handler for setting calculation mode.
+	 * //TODO!
+	 * @param {"sum"|"avg"} choiceKey Calculation mode to set.
+	 */
 	function onCalculationmodeChosen (choiceKey)
 	{
-		console.log(choiceKey);
+		console.warn("onCalculationmodeChosen not implemented yet", choiceKey);
 	}
 
+	/**
+	 * Event handler on changing the time range.
+	 * Distinguish from `onTimerangemodeChosen()` which trigges on changing the time range mode (month/year/all time),
+	 * this is called when the time range (actual month or year) is changed.
+	 * @param {Array<MonthString>} timerange Months included within the selected actual time range.
+	 */
 	function onTimerageChange (timerange)
 	{
-		console.warn(timerange);
+		//TODO: calc sum or avg
 		aggregator.calc(timerange, "sum").then((aggregates) =>
 		{
 			data = aggregates;
 			console.log("aggregator:", data);
-			renderTotals();
-			// settings.selectedTime.set(expenses.selectedMonth.toMonthString());
+			renderContent();
 		});
 	}
 
@@ -256,7 +288,7 @@ const myxStatistics = function ()
 		let result = "";
 		try
 		{
-			let timeRange = (choices.chosen.timeRangeMode === "alltime") ? "all time" : (choices.chosen.timeRangeMode === "month") ? getFullMonthText(myx.expenses.selectedMonth) : myx.expenses.selectedMonth.getFullYear();
+			let timeRange = (choices.chosen.timeRangeMode === "all") ? "all time" : (choices.chosen.timeRangeMode === "month") ? getFullMonthText(myx.expenses.selectedMonth) : myx.expenses.selectedMonth.getFullYear();
 			let calculationMode = ((choices.chosen.calculationMode === "sum") ? "total" : (choices.chosen.timeRangeMode === "month") ? "average" : "monthly average");
 			result = [timeRange, calculationMode].join(" ");
 			return result[0].toUpperCase() + result.substring(1);
@@ -268,7 +300,7 @@ const myxStatistics = function ()
 		}
 	}
 
-	function renderTotals ()
+	function renderContent ()
 	{
 		if (myx.expenses.hasAnyData(myx.expenses.selectedMonth.toMonthString()))
 		{
@@ -356,6 +388,7 @@ const myxStatistics = function ()
 		choices.choose("time-range-mode", "month");
 		choices.choose("calculation-mode", "sum");
 		timerange.selectMonth(myx.expenses.selectMonth);
+		// _refreshNavigatorButtons();
 	}
 
 	/**
@@ -387,6 +420,8 @@ const myxStatistics = function ()
 
 	return { // publish members
 		get aggregator () { return aggregator; }, // TODO: debug only
+		get timerange () { return timerange; }, // TODO: debug only
+		get elements () { return elements; }, // TODO: debug only
 		get moduleName () { return MODULE_NAME; },
 		enter: enter
 		/*

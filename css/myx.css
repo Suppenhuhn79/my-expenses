@@ -209,6 +209,10 @@
 	background-color: var(--primary-color);
 }
 
+#statistics .button-group .icon.disabled {
+	color: white;
+}
+
 #statistics .content .item {
 	padding-right: 0.8rem;
 }
