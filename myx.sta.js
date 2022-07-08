@@ -360,7 +360,7 @@ const myxStatistics = function ()
 							htmlBuilder.newElement("div.flex-fill.cutoff.big", myx.categories.getLabel(catAggr.catId)),
 							htmlBuilder.newElement("div.amount.right.big", myx.formatAmountLocale(catAggr[k]))
 						),
-						renderPercentBar("percentbar", catAggr.sum / data.sum, myx.categories.getColor(catAggr.catId)),
+						renderPercentBar("percentbar", catAggr[k] / data[k], myx.categories.getColor(catAggr.catId)),
 						subCatDiv
 					)
 				);
