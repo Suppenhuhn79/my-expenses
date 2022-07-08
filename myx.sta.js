@@ -169,6 +169,8 @@ const myxStatistics = function ()
 	let calcMode;
 	/** @type {Object} */
 	let data;
+	/** @type {Array<MonthString>} */
+	let actualCalculatedMonths;
 
 	let chartMenu = new Menubox("mxy.sta.chart", {
 		title: "Chart",
@@ -273,18 +275,18 @@ const myxStatistics = function ()
 		_refreshNavigatorButtons();
 		if (entering === false)
 		{
-			let selectedMonths = timerange.selectedMonths;
+			actualCalculatedMonths = [...timerange.selectedMonths]; // clone array
 			/* If calculating averages, exclude the current month (if not on the last day). */
 			if (calcMode !== "sum")
 			{
 				let now = new Date();
 				let todayMonth = now.toMonthString();
-				if ((now.isLastDayOfMonth() === false) && (selectedMonths.includes(todayMonth)))
+				if ((now.isLastDayOfMonth() === false) && (actualCalculatedMonths.includes(todayMonth)))
 				{
-					selectedMonths.splice(0, selectedMonths.indexOf(todayMonth) + 1);
+					actualCalculatedMonths.splice(0, actualCalculatedMonths.indexOf(todayMonth) + 1);
 				}
 			}
-			aggregator.calc(selectedMonths, calcMode).then((aggregates) =>
+			aggregator.calc(actualCalculatedMonths, calcMode).then((aggregates) =>
 			{
 				data = aggregates;
 				console.log("aggregates:", data);
@@ -313,6 +315,18 @@ const myxStatistics = function ()
 		);
 	}
 
+	function getHeadline ()
+	{
+		let result = getSupershortMonthText(new Date(actualCalculatedMonths[0]));
+		if (actualCalculatedMonths.length > 1)
+		{
+			result = getSupershortMonthText(new Date(actualCalculatedMonths[actualCalculatedMonths.length - 1])) + "-" + result;
+		}
+		// TODO
+		result += ", all categories, all payment methods";
+		return result;
+	}
+
 	function getTitle ()
 	{
 		let result = "";
@@ -328,6 +342,7 @@ const myxStatistics = function ()
 		{
 			let k = calcMode;
 			htmlBuilder.removeAllChildren(elements.content);
+			elements.headline.innerHTML = getHeadline();
 			elements.title.innerHTML = getTitle();
 			elements.amount.innerHTML = myx.formatAmountLocale(data[k]);
 			for (let catAggr of data.totals)
@@ -439,3 +454,4 @@ const myxStatistics = function ()
 		*/
 	};
 };
+

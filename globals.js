@@ -76,6 +76,16 @@ function getFullMonthText (date)
 }
 
 /**
+ * Provides a short text (month name abbreviated to three letters + year abbreviated to tow digits) for a date.
+ * @param {Date} date Date
+ * @returns {String} Short month text ("MMMYY")
+ */
+function getSupershortMonthText (date)
+{
+	return monthNames[date.getMonth()].substring(0, 3) + date.getFullYear().toString().substring(2);
+}
+
+/**
  * Converts a kebab-case string to a camelCase string.
  * @param {string} s String to be converted to camelCase
  * @returns {string}
