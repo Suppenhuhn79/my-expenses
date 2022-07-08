@@ -76,9 +76,9 @@ function getFullMonthText (date)
 }
 
 /**
- * Provides a short text (month name abbreviated to three letters + year abbreviated to tow digits) for a date.
+ * Provides a super short text (month name abbreviated to three letters + year abbreviated to tow digits) for a date.
  * @param {Date} date Date
- * @returns {String} Short month text ("MMMYY")
+ * @returns {String} Super short month text ("MMMYY")
  */
 function getSupershortMonthText (date)
 {
