@@ -255,7 +255,7 @@ const myxStatistics = function ()
 	function onCalculationmodeChosen (choiceKey)
 	{
 		calcMode = choiceKey;
-		if ((choiceKey === "mavg") === (timerange.mode === "month"))
+		if ((choiceKey === "mavg") && (timerange.mode === "month"))
 		{
 			choices.choose("time-range-mode", "year");
 		}
