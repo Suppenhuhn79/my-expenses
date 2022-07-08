@@ -1,11 +1,24 @@
 /**
+ * @typedef AggregateItem
+ * @property {String} catId category id
+ * @property {Array<AggregateItem>} [subs] sub-category aggregates
+ * @property {Number} sum Sum of expenses
+ * @property {Number} count Sount of expenses
+ *
+ * @typedef MonthAggregate
+ * Object having a key for each master category with aggregates of all subcategories within.
+ * @type {Object<String, AggregateAtom>}
+ */
+
+/**
  * Class representing an aggregation of expenses, basicly the `sum` of amount and `count` of items.
  */
 class AggregateAtom
 {
 	/**
-	 * @param {Number} [sum] Sum of expenses, default `0`
-	 * @param {Number} [count] Count of expenses, default `0`
+	 * @param {Number} sum Sum of expenses, default `0`
+	 * @param {Number} count Count of expenses, default `0`
+	 * @param {Number} avg Average
 	 */
 	constructor(sum, count)
 	{
@@ -72,20 +85,6 @@ class AggregateAtom
 }
 
 /**
- * @typedef AggregateItem
- * @property {String} catId category id
- * @property {Array<AggregateItem>} [subs] sub-category aggregates
- * @property {Number} sum Sum of expenses
- * @property {Number} count Sount of expenses
- */
-
-/**
- * @typedef MonthAggregate
- * Object having a key for each master category with aggregates of all subcategories within.
- * @type {Object<String, AggregateAtom>}
- */
-
-/**
  * my-expenses expenses aggregation functionality for the "statistics" module.
  */
 const myxStatisticAggregator = function ()
@@ -124,24 +123,25 @@ const myxStatisticAggregator = function ()
 	 * @param {MonthString} month Month to aggregate expenses
 	 * @returns {Promise} Resolves with no data
 	 */
-	function _calcMonth (month)
+	function _calcMonth (month, sortKey)
 	{
 		return new Promise((resolve) => 
 		{
 			_aggregates[month] = {};
 			myx.expenses.data[month].reduce(_reduceExpenses, _aggregates[month]);
-			data[month] = _aggregatesToArray(_aggregates[month]);
+			data[month] = _aggregatesToArray(_aggregates[month], sortKey);
 			resolve();
 		});
 	}
 
 	/**
 	 * Converts a {MonthlyAggregates}-Object to an {AggregateAtoms}-Array.
-	 * @param {MonthAggregate} monthlyAggs Aggregated to convert to an array
+	 * @param {MonthAggregate} monthlyAggs Aggregates to convert to an array
+	 * @param {"sum"|"avg"} [sortKey] Whether to sort results by sum (default) or avg
 	 * @param {Boolean} [sumupTotals] If `true` (by default), it sums up data into `totals`
 	 * @returns {Array<AggregateAtom>} An array of aggregates
 	 */
-	function _aggregatesToArray (monthlyAggs, sumupTotals = true, sortKey = null)
+	function _aggregatesToArray (monthlyAggs, sortKey = "sum", sumupTotals = true)
 	{
 		/** @type {Array<AggregateItem>} */
 		let result = [];
@@ -168,7 +168,7 @@ const myxStatisticAggregator = function ()
 				}
 				if (["sum", "avg"].includes(sortKey))
 				{
-					masterCatAggregate.subs.sort((sortKey === "avg") ? AggregateAtom.compareBySum : AggregateAtom.compareByAvg);
+					masterCatAggregate.subs.sort((sortKey === "sum") ? AggregateAtom.compareBySum : AggregateAtom.compareByAvg);
 				}
 			}
 			result.push(Object.assign(masterCatAggregate));
@@ -185,12 +185,12 @@ const myxStatisticAggregator = function ()
 		{
 			for (let month of months)
 			{
-				asyncCalcs.push(_calcMonth(month));
+				asyncCalcs.push(_calcMonth(month, sortKey));
 			}
 			Promise.allSettled(asyncCalcs).then(
 				() =>
 				{
-					data.totals = _aggregatesToArray(_aggregates.totals, false, sortKey);
+					data.totals = _aggregatesToArray(_aggregates.totals, sortKey, false);
 					if (["sum", "avg"].includes(sortKey))
 					{
 						data.totals.sort((sortKey === "avg") ? AggregateAtom.compareByAvg : AggregateAtom.compareBySum);
