@@ -1,13 +1,10 @@
 /**
+ * @namespace myxStatisticsTimerange
+ * 
  * @typedef TimerangeMode
  * @type {"month"|"year"|"all"}
  */
-
-/**
- * @namespace myxStatisticsTimerange
- * @param {Function} onChange Callback function on change `function(selectedMonths: MonthString[])`
- */
-const myxStatisticsTimerange = function (onChange) 
+const myxStatisticsTimerange = function () 
 {
 	/** @type {TimerangeMode} */
 	let mode = "month";
@@ -93,10 +90,6 @@ const myxStatisticsTimerange = function (onChange)
 		{
 			selectedMonths = [value];
 		}
-		if (typeof onChange === "function")
-		{
-			onChange(selectedMonths);
-		}
 	}
 
 	/**
@@ -154,13 +147,26 @@ const myxStatisticsTimerange = function (onChange)
 /**
  * my-expenses "statistics" module.
  * @namespace myxStatistics
+ * 
+ * @typedef CalculationMode
+ * @type {"sum"|"mavg"}
  */
 const myxStatistics = function ()
 {
 	const MODULE_NAME = "statistics";
 	let elements = getNames(document.getElementById(MODULE_NAME));
 	let aggregator = myxStatisticAggregator();
-	let timerange = myxStatisticsTimerange(onTimerageChange);
+	let timerange = myxStatisticsTimerange(performAggregation);
+	/**
+	 * Prevents calculation while setting modes on module entering.
+	 * @type {Boolean}
+	 */
+	let entering;
+	/**
+	 * Determinants the statistics mode. Either _sum_ or _monthly average_.
+	 * @type {CalculationMode}
+	 */
+	let calcMode;
 	/** @type {Object} */
 	let data;
 
@@ -191,9 +197,8 @@ const myxStatistics = function ()
 	{
 		if (mouseEvent.target.classList.contains("disabled") === false)
 		{
-			let targetDate = new Date(mouseEvent.target.dataset.targetDate);
-			timerange.navigateTo(targetDate);
-			_refreshNavigatorButtons();
+			timerange.navigateTo(new Date(mouseEvent.target.dataset.targetDate));
+			performAggregation();
 		}
 	};
 
@@ -233,34 +238,59 @@ const myxStatistics = function ()
 	function onTimerangemodeChosen (choiceKey)
 	{
 		timerange.mode = choiceKey;
-		_refreshNavigatorButtons();
+		if ((choiceKey === "month") && (calcMode === "mavg"))
+		{
+			choices.choose("calculation-mode", "sum");
+		}
+		else
+		{
+			performAggregation();
+		}
 	}
 
 	/**
 	 * Event handler for setting calculation mode.
-	 * //TODO!
-	 * @param {"sum"|"avg"} choiceKey Calculation mode to set.
+	 * @param {CalculationMode} choiceKey Calculation mode to set.
 	 */
 	function onCalculationmodeChosen (choiceKey)
 	{
-		console.warn("onCalculationmodeChosen not implemented yet", choiceKey);
+		calcMode = choiceKey;
+		if ((choiceKey === "mavg") === (timerange.mode === "month"))
+		{
+			choices.choose("time-range-mode", "year");
+		}
+		else
+		{
+			performAggregation();
+		}
 	}
 
 	/**
-	 * Event handler on changing the time range.
-	 * Distinguish from `onTimerangemodeChosen()` which trigges on changing the time range mode (month/year/all time),
-	 * this is called when the time range (actual month or year) is changed.
-	 * @param {Array<MonthString>} timerange Months included within the selected actual time range.
+	 * Performs calculation of statistics aggregations.
 	 */
-	function onTimerageChange (timerange)
+	function performAggregation ()
 	{
-		//TODO: calc sum or avg
-		aggregator.calc(timerange, "sum").then((aggregates) =>
+		_refreshNavigatorButtons();
+		if (entering === false)
 		{
-			data = aggregates;
-			console.log("aggregator:", data);
-			renderContent();
-		});
+			let selectedMonths = timerange.selectedMonths;
+			/* If calculating averages, exclude the current month (if not on the last day). */
+			if (calcMode !== "sum")
+			{
+				let now = new Date();
+				let todayMonth = now.toMonthString();
+				if ((now.isLastDayOfMonth() === false) && (selectedMonths.includes(todayMonth)))
+				{
+					selectedMonths.splice(0, selectedMonths.indexOf(todayMonth) + 1);
+				}
+			}
+			aggregator.calc(selectedMonths, calcMode).then((aggregates) =>
+			{
+				data = aggregates;
+				console.log("aggregates:", data);
+				renderContent();
+			});
+		}
 	}
 
 	/**
@@ -286,55 +316,20 @@ const myxStatistics = function ()
 	function getTitle ()
 	{
 		let result = "";
-		try
-		{
-			let timeRange = (choices.chosen.timeRangeMode === "all") ? "all time" : (choices.chosen.timeRangeMode === "month") ? getFullMonthText(myx.expenses.selectedMonth) : myx.expenses.selectedMonth.getFullYear();
-			let calculationMode = ((choices.chosen.calculationMode === "sum") ? "total" : (choices.chosen.timeRangeMode === "month") ? "average" : "monthly average");
-			result = [timeRange, calculationMode].join(" ");
-			return result[0].toUpperCase() + result.substring(1);
-		}
-		catch (ex)
-		{
-			console.warn(ex);
-			return "--";
-		}
+		let timeRange = (choices.chosen.timeRangeMode === "all") ? "all time" : (choices.chosen.timeRangeMode === "month") ? getFullMonthText(myx.expenses.selectedMonth) : myx.expenses.selectedMonth.getFullYear();
+		let calculationMode = ((choices.chosen.calculationMode === "sum") ? "total" : (choices.chosen.timeRangeMode === "month") ? "average" : "monthly average");
+		result = [timeRange, calculationMode].join(" ");
+		return result[0].toUpperCase() + result.substring(1);
 	}
 
 	function renderContent ()
 	{
 		if (myx.expenses.hasAnyData(myx.expenses.selectedMonth.toMonthString()))
 		{
+			let k = calcMode;
 			htmlBuilder.removeAllChildren(elements.content);
-			// console.log(selectedTime.months, mode);
-			// let data = aggregator.calc(selectedTime.months);
-
-			let title = "//TODO";
-			/*
-			if (selectedTime.value === "*")
-			{
-				title = "All logged expenses";
-			}
-			else if (/\d{4}-\d{2}/.test(selectedTime.value))
-			{
-				title = getFullMonthText(expenses.selectedMonth) + " total";
-			}
-			else
-			{
-				title = "Total expenses in " + settings.selectedTime.value;
-			}
-			*/
-			/*
-						let navItem = htmlBuilder.newElement("div.wide-flex");
-						for (let year of aggregates.availibleYears.sort())
-						{
-							navItem.appendChild(htmlBuilder.newElement("div.dateitem",
-								year,
-								{ onclick: (e) => console.log(e) }));
-						}
-						// navItem.appendChild(htmlBuilder.newElement("div.monthslist.wide-flex"))
-			*/
 			elements.title.innerHTML = getTitle();
-			elements.amount.innerHTML = myx.formatAmountLocale(data.sum);
+			elements.amount.innerHTML = myx.formatAmountLocale(data[k]);
 			for (let catAggr of data.totals)
 			{
 				let subCatDiv = htmlBuilder.newElement("div.hidden", { 'data-cat': catAggr.catId });
@@ -349,7 +344,7 @@ const myxStatistics = function ()
 								myx.categories.renderIcon(subCat.catId),
 								htmlBuilder.newElement("div.flex-fill.click",
 									myx.categories.getLabel(subCat.catId, false)),
-								htmlBuilder.newElement("div.amt", myx.formatAmountLocale(subCat.sum)
+								htmlBuilder.newElement("div.amt", myx.formatAmountLocale(subCat[k])
 								)));
 						}
 					}
@@ -363,7 +358,7 @@ const myxStatistics = function ()
 						htmlBuilder.newElement(
 							"div.flex-fill.wide-flex",
 							htmlBuilder.newElement("div.flex-fill.cutoff.big", myx.categories.getLabel(catAggr.catId)),
-							htmlBuilder.newElement("div.amount.right.big", myx.formatAmountLocale(catAggr.sum))
+							htmlBuilder.newElement("div.amount.right.big", myx.formatAmountLocale(catAggr[k]))
 						),
 						renderPercentBar("percentbar", catAggr.sum / data.sum, myx.categories.getColor(catAggr.catId)),
 						subCatDiv
@@ -385,10 +380,12 @@ const myxStatistics = function ()
 	{
 		console.clear();
 		console.log("stats init");
+		entering = true;
 		choices.choose("time-range-mode", "month");
 		choices.choose("calculation-mode", "sum");
 		timerange.selectMonth(myx.expenses.selectMonth);
-		// _refreshNavigatorButtons();
+		entering = false;
+		performAggregation();
 	}
 
 	/**
@@ -408,6 +405,8 @@ const myxStatistics = function ()
 	function onSubcategoryClick (mouseEvent)
 	{
 		mouseEvent.stopPropagation();
+		return;
+		// TODO!
 		let id = mouseEvent.target.closest("[data-cat]").dataset.cat;
 		myx.setExpenseFilter({
 			cat: id,

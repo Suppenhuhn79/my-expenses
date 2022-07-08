@@ -15,6 +15,8 @@
  */
 class AggregateAtom
 {
+	static compareField = "sum";
+
 	/**
 	 * @param {Number} sum Sum of expenses, default `0`
 	 * @param {Number} count Count of expenses, default `0`
@@ -28,7 +30,7 @@ class AggregateAtom
 	}
 
 	/**
-	 * Adds the sum and count of antore aggregate atom.
+	 * Adds the sum and count of an other aggregate atom.
 	 * @param {AggregateAtom} agg Aggregate atom to add
 	 * @returns {AggregateAtom} Returns this aggregate atom
 	 */
@@ -54,6 +56,9 @@ class AggregateAtom
 		return this;
 	}
 
+	/**
+	 * Calculates the agerage value (`avg`).
+	 */
 	_calcAvg ()
 	{
 		this.avg = (this.count > 0) ? this.sum / this.count : 0;
@@ -66,21 +71,24 @@ class AggregateAtom
 	 * @returns {Number} Number to indicate whether `a` is to sort before, after or equal to `b`
 	 * @static
 	 */
-	static compareBySum (a, b)
+	static compare (a, b)
 	{
-		return b.sum - a.sum;
+		const k = AggregateAtom.compareField;
+		return b[k] - a[k];
 	}
 
 	/**
-	 * Compares two aggregate atoms by their average value. To use in an `<array>.sort()` context.
-	 * @param {AggregateAtom} a First value to compare
-	 * @param {AggregateAtom} b Second value to compare
-	 * @returns {Number} Number to indicate whether `a` is to sort before, after or equal to `b`
+	 * Adds two aggregate atoms. To use in an `<array>.reduce()` context.
+	 * @param {AggregateAtom} prev Previuos object
+	 * @param {AggregateAtom} curr Current object to add to the previous one
+	 * @returns {AggregateAtom} Result of the addition
 	 * @static
 	 */
-	static compareByAvg (a, b)
+	static reduce (prev, curr)
 	{
-		return b.avg - a.avg;
+		prev.sum += curr.sum;
+		prev.count += curr.count;
+		return prev;
 	}
 }
 
@@ -89,16 +97,20 @@ class AggregateAtom
  */
 const myxStatisticAggregator = function ()
 {
-	/** @type {Object<MonthString, Object>} */
-	let data = {};
-	/** @type {MonthAggregate} */
+	/**
+	 * Count of months selected for aggregation. Required for calculating monthly agerages.
+	 * @type {Number}
+	 */
+	let _monthCount;
+	/** @type {Object<MonthString, MonthAggregate>} */
 	let _aggregates = {};
 
 	/**
+	 * //TODO: JsDoc
 	 * Sums up expenses into an object of aggregation atoms. To use in an `<array>.reduce()` only.
 	 * @param {MonthAggregate} prev Summed up expenses so far
 	 * @param {Expense} curr Current expense to add
-	 * @returns {MonthAggregate} Object having category ids as members containing sum and count of this categories expenses
+	 * @returns {AggregateAtom} Object having category ids as members containing sum and count of this categories expenses
 	 */
 	function _reduceExpenses (prev, curr)
 	{
@@ -110,38 +122,13 @@ const myxStatisticAggregator = function ()
 		return prev;
 	}
 
-	function _reduceAggregateAtoms (prev, curr)
-	{
-		prev.sum += curr.sum;
-		prev.count += curr.count;
-		return prev;
-	}
-
-	/**
-	 * Sums up all expenses per category in the given month.
-	 * Target dataset is `_aggregates`.
-	 * @param {MonthString} month Month to aggregate expenses
-	 * @returns {Promise} Resolves with no data
-	 */
-	function _calcMonth (month, sortKey)
-	{
-		return new Promise((resolve) => 
-		{
-			_aggregates[month] = {};
-			myx.expenses.data[month].reduce(_reduceExpenses, _aggregates[month]);
-			data[month] = _aggregatesToArray(_aggregates[month], sortKey);
-			resolve();
-		});
-	}
-
 	/**
 	 * Converts a {MonthlyAggregates}-Object to an {AggregateAtoms}-Array.
 	 * @param {MonthAggregate} monthlyAggs Aggregates to convert to an array
-	 * @param {"sum"|"avg"} [sortKey] Whether to sort results by sum (default) or avg
 	 * @param {Boolean} [sumupTotals] If `true` (by default), it sums up data into `totals`
 	 * @returns {Array<AggregateAtom>} An array of aggregates
 	 */
-	function _aggregatesToArray (monthlyAggs, sortKey = "sum", sumupTotals = true)
+	function _aggregatesToArray (monthlyAggs, sumupTotals = true)
 	{
 		/** @type {Array<AggregateItem>} */
 		let result = [];
@@ -159,52 +146,74 @@ const myxStatisticAggregator = function ()
 				 * @type {AggregateAtom}
 				 */
 				let catAggregate = monthlyAggs[subcatId] || new AggregateAtom();
-				_aggregates.totals[subcatId] ||= new AggregateAtom();
 				masterCatAggregate.add(catAggregate);
-				masterCatAggregate.subs.push(catAggregate.extend({ catId: subcatId }));
+				masterCatAggregate.subs.push(catAggregate.extend({ catId: subcatId, mavg: catAggregate.sum / _monthCount }));
 				if (sumupTotals)
 				{
+					_aggregates.totals[subcatId] ||= new AggregateAtom();
 					_aggregates.totals[subcatId].add(catAggregate);
 				}
-				if (["sum", "avg"].includes(sortKey))
-				{
-					masterCatAggregate.subs.sort((sortKey === "sum") ? AggregateAtom.compareBySum : AggregateAtom.compareByAvg);
-				}
+				masterCatAggregate.subs.sort(AggregateAtom.compare);
 			}
+			masterCatAggregate.extend({ mavg: masterCatAggregate.sum / _monthCount });
 			result.push(Object.assign(masterCatAggregate));
 		}
 		return result;
 	}
 
+	/**
+	 * Sums up all expenses per category in the given month.
+	 * Target dataset is `_aggregates`.
+	 * @param {MonthString} month Month to aggregate expenses
+	 * @returns {Promise} Resolves with no data
+	 */
+	function _calcMonth (month)
+	{
+		return new Promise((resolve) => 
+		{
+			let aggregate = {};
+			myx.expenses.data[month].reduce(_reduceExpenses, aggregate);
+			_aggregates[month] = _aggregatesToArray(aggregate);
+			resolve();
+		});
+	}
+
+	/**
+	 * 
+	 * @param {Array<MonthString>} months Months to calculate
+	 * @param {"sum"|"avg"} sortKey Whether to sort results by sum (default) or average
+	 * @returns {Promise<>}
+	 */
 	function calc (months, sortKey)
 	{
 		/** @type {Array<Promise>} */
 		let asyncCalcs = [];
-		_aggregates = { totals: {} };
+		_aggregates = {
+			totals: {},
+		};
+		_monthCount = months.length;
+		AggregateAtom.sortKey = sortKey;
 		return new Promise((resolve) =>
 		{
 			for (let month of months)
 			{
-				asyncCalcs.push(_calcMonth(month, sortKey));
+				asyncCalcs.push(_calcMonth(month));
 			}
 			Promise.allSettled(asyncCalcs).then(
 				() =>
 				{
-					data.totals = _aggregatesToArray(_aggregates.totals, sortKey, false);
-					if (["sum", "avg"].includes(sortKey))
-					{
-						data.totals.sort((sortKey === "avg") ? AggregateAtom.compareByAvg : AggregateAtom.compareBySum);
-					}
-					Object.assign(data, data.totals.reduce(_reduceAggregateAtoms, new AggregateAtom()));
-					resolve(data);
+					_aggregates.totals = _aggregatesToArray(_aggregates.totals, false);
+					_aggregates.totals.sort(AggregateAtom.compare);
+					Object.assign(_aggregates, _aggregates.totals.reduce(AggregateAtom.reduce, new AggregateAtom()));
+					_aggregates.mavg = _aggregates.sum / _monthCount;
+					resolve(_aggregates);
 				}
 			);
 		});
-
 	}
 
 	return { // public interface
-		get data () { return data; }, // TODO: debug only
+		get data () { return _aggregates; }, // TODO: debug only
 		calc: calc
 	};
 };
