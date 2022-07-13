@@ -58,23 +58,35 @@ let myx = function ()
 			choices.onChoose("active-tab", onTabChosen);
 			choices.choose("active-tab", expenses.moduleName);
 		}
-		let latestFileLoaded = false;
+		/**
+		 * Iterable promises of all file load actions
+		 * @type {Array<Promise>} */
+		let asyncCalls = [];
+		/**
+		 * Flag whether loading the latest data file. The latest data file is always the file with the
+		 * highest number and loaded very first.
+		 * @type {Boolean} */
+		let loadingLatestFile = true;
 		for (let fileIndex = Object.keys(googleappApi.files).length; fileIndex > 0; fileIndex -= 1)
 		{
 			let fileName = "data-" + fileIndex + ".csv";
 			if (googleappApi.files[fileName] !== undefined)
 			{
-				expenses.loadFromFile(fileIndex).then(() =>
+				console.log("init()", "asyncCalls", asyncCalls, loadingLatestFile);
+				asyncCalls.push(expenses.loadFromFile(fileIndex));
+				if (loadingLatestFile)
 				{
-					if (latestFileLoaded === false)
-					{
-						expenses.enter();
-						latestFileLoaded = true;
-					}
-				});
+					console.log("init()", "latest file loaded");
+					asyncCalls[0].then(() => { expenses.enter(); });
+					loadingLatestFile = false;
+				}
 			}
 		}
-		expenses.ready();
+		Promise.allSettled(asyncCalls).then(() =>
+		{
+			console.log("init()", "allSettled");
+			expenses.ready();
+		});
 	}
 
 	function onTabChosen (tabName, event)
