@@ -1,15 +1,12 @@
 /**
- * String representing a month in format `yyyy-mm`.
  * @typedef MonthString
+ * String representing a month in format `yyyy-mm`.
  * @type {String}
- */
-
-/**
- * Representing a FontAwesome icon as combination of a CSS style and unicode codepoint, e.g. `"fas:f100"`
+ * 
  * @typedef IconCode
+ * Representing a FontAwesome icon as combination of a CSS style and unicode codepoint, e.g. `"fas:f100"`
  * @type {String}
  */
-
 
 /**
  * Application main module.
@@ -29,10 +26,45 @@ let myx = function ()
 	let expenses = myxExpenses(paymentMethods, categories);
 	let statistics = myxStatistics(expenses, categories, paymentMethods);
 
-	document.getElementById("bottom-menu").onclick = (mouseEvent) =>
+	function init ()
 	{
+		/**
+		 * Iterable promises of all file load actions
+		 * @type {Array<Promise>} */
+		let asyncCalls = [];
+		/**
+		 * Flag whether loading the latest data file. The latest data file is always the file with the
+		 * highest number and loaded very first.
+		 * @type {Boolean} */
+		let loadingLatestFile = true;
+		localStorage.removeItem(AUTOSIGNIN_FLAG);
+		for (let fileIndex = Object.keys(googleappApi.files).length; fileIndex > 0; fileIndex -= 1)
+		{
+			let fileName = "data-" + fileIndex + ".csv";
+			if (googleappApi.files[fileName] !== undefined)
+			{
+				console.log("init()", "asyncCalls", asyncCalls, loadingLatestFile);
+				asyncCalls.push(expenses.loadFromFile(fileIndex));
+				if (loadingLatestFile)
+				{
+					console.log("init()", "latest file loaded");
+					asyncCalls[0].then(() => { choices.choose("active-tab", choices.chosen.activeTab || expenses.moduleName); });
+					loadingLatestFile = false;
+				}
+			}
+		}
+		Promise.allSettled(asyncCalls).then(() =>
+		{
+			console.log("init()", "allSettled");
+			expenses.ready();
+		});
+	}
+
+	function onTabChosen (tabName)
+	{
+		(tabName.endsWith("-editor")) ? bottomMenu.classList.add("hidden") : bottomMenu.classList.remove("hidden");
 		activeTab?.leave?.();
-		switch (mouseEvent.target.closest("[data-choice]").dataset.choice)
+		switch (tabName)
 		{
 			case paymentMethods.moduleName:
 				activeTab = paymentMethods;
@@ -48,57 +80,6 @@ let myx = function ()
 				break;
 		}
 		activeTab.enter();
-	};
-
-	function init ()
-	{
-		localStorage.removeItem(AUTOSIGNIN_FLAG);
-		if (typeof choices.chosen.activeTab === "undefined")
-		{
-			choices.onChoose("active-tab", onTabChosen);
-			choices.choose("active-tab", expenses.moduleName);
-		}
-		/**
-		 * Iterable promises of all file load actions
-		 * @type {Array<Promise>} */
-		let asyncCalls = [];
-		/**
-		 * Flag whether loading the latest data file. The latest data file is always the file with the
-		 * highest number and loaded very first.
-		 * @type {Boolean} */
-		let loadingLatestFile = true;
-		for (let fileIndex = Object.keys(googleappApi.files).length; fileIndex > 0; fileIndex -= 1)
-		{
-			let fileName = "data-" + fileIndex + ".csv";
-			if (googleappApi.files[fileName] !== undefined)
-			{
-				console.log("init()", "asyncCalls", asyncCalls, loadingLatestFile);
-				asyncCalls.push(expenses.loadFromFile(fileIndex));
-				if (loadingLatestFile)
-				{
-					console.log("init()", "latest file loaded");
-					asyncCalls[0].then(() => { expenses.enter(); });
-					loadingLatestFile = false;
-				}
-			}
-		}
-		Promise.allSettled(asyncCalls).then(() =>
-		{
-			console.log("init()", "allSettled");
-			expenses.ready();
-		});
-	}
-
-	function onTabChosen (tabName, event)
-	{
-		if (tabName.endsWith("-editor"))
-		{
-			bottomMenu.classList.add("hidden");
-		}
-		else
-		{
-			bottomMenu.classList.remove("hidden");
-		}
 	}
 
 	function getIconAttributes (iconCode)
@@ -170,7 +151,7 @@ let myx = function ()
 	}
 
 	doFontAwesome(document.body);
-
+	choices.onChoose("active-tab", onTabChosen);
 	pageSnippets.import("snippets/iconeditor.xml").then(() =>
 	{
 		window.iconEditor = iconEditor(document.getElementById("client"));
