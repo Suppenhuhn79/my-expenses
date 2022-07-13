@@ -43,19 +43,13 @@ let myxExpenses = function ()
 	 * Memorizing currently loading file, so so file is loaded twice.
 	 * @type {Map<Number,Boolan>} */
 	let currentlyLoadingFiles = new Map();
+	/**
+	 * Flag whether the module is ready. It is, after all data files have been loaded.
+	 * @type {Boolean} */
+	let isReady = false;
 
 	elements.backSearchButton.onclick = () => { choices.choose("active-tab", filter._origin); };
 	elements.cancelSearchButton.onclick = () => { resetFilter(); renderList(); };
-
-	elements.navCurrent.onclick = (mouseEvent) =>
-	{
-		popupAvalibleMonthsMenu(mouseEvent, elements.navCurrent, (month) =>
-		{
-			selectedMonth = month;
-			resetFilter();
-			renderList();
-		});
-	};
 
 	/**
 	 * Loads data from a file. Converts the CSV data to an object and adds it to `data`.
@@ -69,20 +63,10 @@ let myxExpenses = function ()
 			const KEYS = ["dat", "amt", "cat", "txt", "pmt"];
 			let fileName = "data-" + fileIndex.toString() + ".csv";
 			let lastModified = googleappApi.files[fileName].modifiedTime;
-			console.log(fileIndex, currentlyLoadingFiles.get(fileIndex), currentlyLoadingFiles);
+			console.log("Loading", "fileIndex:", fileIndex, "isLoading?", currentlyLoadingFiles.get(fileIndex), "Map:", currentlyLoadingFiles);
 			if ((currentlyLoadingFiles.get(fileIndex) !== true) && ((typeof lastLoaded[fileIndex] === "undefined") || (lastLoaded[fileIndex] < lastModified)))
 			{
 				currentlyLoadingFiles.set(fileIndex, true);
-				for (let monthInFile of dataIndex.allMonthsInFile(fileIndex))
-				{
-					data[monthInFile] = [];
-				};
-				if (dataIndex.allMonthsInFile(fileIndex).includes(selectedMonth.toMonthString()))
-				{
-					htmlBuilder.replaceContent(elements.navPrevious, htmlBuilder.newElement("span.dummy.w2"));
-					htmlBuilder.replaceContent(elements.navNext, htmlBuilder.newElement("span.dummy.w2"));
-					htmlBuilder.replaceContent(elements.navCurrent, htmlBuilder.newElement("span.dummy.w9"));
-				};
 				googleappApi.loadFileEx(fileName).then((result) =>
 				{
 					for (let line of result.split("\n"))
@@ -93,6 +77,7 @@ let myxExpenses = function ()
 							let month = vals[0].substr(0, 7);
 							let obj = {};
 							dataIndex.register(month, fileIndex);
+							data[month] ||= [];
 							for (let c = 0, cc = KEYS.length; c < cc; c += 1)
 							{
 								obj[KEYS[c]] = (c === 0) ? new Date(vals[c]) : ((c === 1) ? Number(vals[c]) : vals[c]);
@@ -101,8 +86,6 @@ let myxExpenses = function ()
 							add(obj, true);
 						}
 					}
-					elements.addExpenseButton.classList.remove("hidden");
-					elements.addExpenseButton.onclick = onAddExpenseClick;
 					for (let month of dataIndex.allMonthsInFile(fileIndex))
 					{
 						sortItems(month);
@@ -118,6 +101,22 @@ let myxExpenses = function ()
 				resolve();
 			}
 		});
+	}
+
+	/**
+	 * Sets the `isReady` flag to `true` and activates UI elements.
+	 */
+	function ready ()
+	{
+		if (isReady === false)
+		{
+			_renderNavItem(elements.navPrevious, selectedMonth.truncMonth(-1));
+			_renderNavItem(elements.navNext, selectedMonth.truncMonth(+1));
+			elements.addExpenseButton.classList.remove("hidden");
+			elements.addExpenseButton.onclick = onAddExpenseClick;
+			elements.navCurrent.onclick = onNavCurrentClick;
+			isReady = true;
+		}
 	}
 
 	/**
@@ -347,8 +346,11 @@ let myxExpenses = function ()
 	function renderList ()
 	{
 		elements.navCurrent.innerText = getFullMonthText(selectedMonth);
-		_renderNavItem(elements.navPrevious, selectedMonth.truncMonth(-1));
-		_renderNavItem(elements.navNext, selectedMonth.truncMonth(+1));
+		if (isReady)
+		{
+			_renderNavItem(elements.navPrevious, selectedMonth.truncMonth(-1));
+			_renderNavItem(elements.navNext, selectedMonth.truncMonth(+1));
+		}
 		htmlBuilder.removeAllChildren(elements.content);
 		let items = [];
 		elements.content.scrollTop = 0;
@@ -485,6 +487,20 @@ let myxExpenses = function ()
 	}
 
 	/**
+	 * Handler for clicks on the "current month" nav item.
+	 * @param {MouseEvent} mouseEvent Event that was fired by click/tap.
+	 */
+	function onNavCurrentClick (mouseEvent)
+	{
+		popupAvalibleMonthsMenu(mouseEvent, elements.navCurrent, (month) =>
+		{
+			selectedMonth = month;
+			resetFilter();
+			renderList();
+		});
+	};
+
+	/**
 	 * Handler for "add expense" button click. Pops up ExpenseEditor for new expense.
 	 */
 	function onAddExpenseClick ()
@@ -524,6 +540,7 @@ let myxExpenses = function ()
 		get availibleMonths () { return availibleMonths; },
 		hasAnyData: hasAnyData,
 		loadFromFile: loadFromFile,
+		ready: ready,
 		enter: () => { renderList(); },
 		leave: () => { resetFilter(); },
 		setFilter: setFilter,

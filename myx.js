@@ -58,22 +58,23 @@ let myx = function ()
 			choices.onChoose("active-tab", onTabChosen);
 			choices.choose("active-tab", expenses.moduleName);
 		}
-		let latestFileIndex = null;
+		let latestFileLoaded = false;
 		for (let fileIndex = Object.keys(googleappApi.files).length; fileIndex > 0; fileIndex -= 1)
 		{
 			let fileName = "data-" + fileIndex + ".csv";
 			if (googleappApi.files[fileName] !== undefined)
 			{
-				latestFileIndex ||= fileIndex;
 				expenses.loadFromFile(fileIndex).then(() =>
 				{
-					if (latestFileIndex === fileIndex)
+					if (latestFileLoaded === false)
 					{
 						expenses.enter();
+						latestFileLoaded = true;
 					}
 				});
 			}
 		}
+		expenses.ready();
 	}
 
 	function onTabChosen (tabName, event)
