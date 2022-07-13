@@ -16,7 +16,7 @@ const myxDataindex = function ()
 	/**
 	 * Sets an entry for a _fileindex/month_ into the toc data.
 	 * @param {MonthString} month Month to register
-	 * @param {Number} [fileNumber] Data file number; if not given and the month is already registered, nothing happens. If it's a new month, it will be assigned to a file automatically.
+	 * @param {Number} [fileNumber] Data file number; if not given and the month is already registered, nothing happens. If it's a new month, it will be assigned to a fileNumber automatically.
 	 */
 	function register (month, fileNumber = null)
 	{
