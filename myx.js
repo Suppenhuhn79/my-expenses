@@ -32,31 +32,19 @@ let myx = function ()
 		 * Iterable promises of all file load actions
 		 * @type {Array<Promise>} */
 		let asyncCalls = [];
-		/**
-		 * Flag whether loading the latest data file. The latest data file is always the file with the
-		 * highest number and loaded very first.
-		 * @type {Boolean} */
-		let loadingLatestFile = true;
 		localStorage.removeItem(AUTOSIGNIN_FLAG);
 		for (let fileIndex = Object.keys(googleappApi.files).length; fileIndex > 0; fileIndex -= 1)
 		{
 			let fileName = "data-" + fileIndex + ".csv";
 			if (googleappApi.files[fileName] !== undefined)
 			{
-				console.log("init()", "asyncCalls", asyncCalls, loadingLatestFile);
 				asyncCalls.push(expenses.loadFromFile(fileIndex));
-				if (loadingLatestFile)
-				{
-					console.log("init()", "latest file loaded");
-					asyncCalls[0].then(() => { choices.choose("active-tab", choices.chosen.activeTab || expenses.moduleName); });
-					loadingLatestFile = false;
-				}
 			}
 		}
 		Promise.allSettled(asyncCalls).then(() =>
 		{
-			console.log("init()", "allSettled");
-			expenses.ready();
+			document.getElementById("dummy")?.remove();
+			choices.choose("active-tab", choices.chosen.activeTab || expenses.moduleName);
 		});
 	}
 

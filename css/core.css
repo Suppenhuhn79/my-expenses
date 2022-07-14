@@ -154,7 +154,6 @@ body {
 
 .cat-icon,
 .pmt-icon {
-	/* font-size: 1rem; */
 	display: flex;
 	width: 2em;
 	min-width: 2em;
@@ -253,14 +252,16 @@ i.fab {
 }
 
 .dummy {
+	background-color: #eee;
+	background-size: 150px 100%;
+	background-image: repeating-linear-gradient(90deg, #fff 0%, #ddd 100%);
+	animation: dummy-gradient linear 1s infinite;
+}
+.dummy.text {
 	height: 1em;
-	background-color: #fff;
 	border-radius: 0.3rem;
 	display: inline-block;
 	margin-bottom: -0.1em;
-	background-size: 150% 100%;
-	background-image: repeating-linear-gradient(90deg, #fff 0%, #ccc 50%, #fff 100%);
-	animation: dummy-gradient linear 1s infinite;
 }
 .dummy.w2 {
 	width: 2em;
@@ -270,9 +271,9 @@ i.fab {
 }
 @keyframes dummy-gradient {
 	0% {
-		background-position: 200% 0%;
+		background-position: 0px 0%;
 	}
 	100% {
-		background-position: -100% 0%;
+		background-position: 150px 0%;
 	}
 }

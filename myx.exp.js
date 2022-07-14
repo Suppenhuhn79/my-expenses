@@ -43,13 +43,11 @@ let myxExpenses = function ()
 	 * Memorizing currently loading file, so so file is loaded twice.
 	 * @type {Map<Number,Boolan>} */
 	let currentlyLoadingFiles = new Map();
-	/**
-	 * Flag whether the module is ready. It is, after all data files have been loaded.
-	 * @type {Boolean} */
-	let isReady = false;
 
 	elements.backSearchButton.onclick = () => { choices.choose("active-tab", filter._origin); };
 	elements.cancelSearchButton.onclick = () => { resetFilter(); renderList(); };
+	elements.addExpenseButton.onclick = onAddExpenseClick;
+	elements.navCurrent.onclick = onNavCurrentClick;
 
 	/**
 	 * Loads data from a file. Converts the CSV data to an object and adds it to `data`.
@@ -101,22 +99,6 @@ let myxExpenses = function ()
 				resolve();
 			}
 		});
-	}
-
-	/**
-	 * Sets the `isReady` flag to `true` and activates UI elements.
-	 */
-	function ready ()
-	{
-		if (isReady === false)
-		{
-			_renderNavItem(elements.navPrevious, selectedMonth.truncMonth(-1));
-			_renderNavItem(elements.navNext, selectedMonth.truncMonth(+1));
-			elements.addExpenseButton.classList.remove("hidden");
-			elements.addExpenseButton.onclick = onAddExpenseClick;
-			elements.navCurrent.onclick = onNavCurrentClick;
-			isReady = true;
-		}
 	}
 
 	/**
@@ -346,11 +328,8 @@ let myxExpenses = function ()
 	function renderList ()
 	{
 		elements.navCurrent.innerText = getFullMonthText(selectedMonth);
-		if (isReady)
-		{
-			_renderNavItem(elements.navPrevious, selectedMonth.truncMonth(-1));
-			_renderNavItem(elements.navNext, selectedMonth.truncMonth(+1));
-		}
+		_renderNavItem(elements.navPrevious, selectedMonth.truncMonth(-1));
+		_renderNavItem(elements.navNext, selectedMonth.truncMonth(+1));
 		htmlBuilder.removeAllChildren(elements.content);
 		let items = [];
 		elements.content.scrollTop = 0;
@@ -540,18 +519,10 @@ let myxExpenses = function ()
 		get availibleMonths () { return availibleMonths; },
 		hasAnyData: hasAnyData,
 		loadFromFile: loadFromFile,
-		ready: ready,
 		enter: () => { renderList(); },
 		leave: () => { resetFilter(); },
 		setFilter: setFilter,
 		edit: popupEditor,
-		popupAvalibleMonthsMenu: popupAvalibleMonthsMenu,
-
-		testDummy: () =>
-		{
-			htmlBuilder.replaceContent(elements.navPrevious, htmlBuilder.newElement("span.dummy.w2"));
-			htmlBuilder.replaceContent(elements.navNext, htmlBuilder.newElement("span.dummy.w2"));
-			htmlBuilder.replaceContent(elements.navCurrent, htmlBuilder.newElement("span.dummy.w9"));
-		}
+		popupAvalibleMonthsMenu: popupAvalibleMonthsMenu
 	};
 };
