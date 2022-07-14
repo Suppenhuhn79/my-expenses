@@ -1,20 +1,19 @@
 /** 
- * Expense object. Represents a single expense.
  * @typedef Expense
+ * Expense object. Represents a single expense.
  * @type {Object}
  * @property {Date} dat Expense date
  * @property {Number} amt Expense amount
- * @property {String} cat Expense category - id reference to categories
- * @property {String} pmt Used payment method - id referenc to payment methods
+ * @property {CatId} cat Expense category - id reference to categories
+ * @property {PmtId} pmt Used payment method - id referenc to payment methods
  * @property {String} [txt] Additional text 
- */
-/**
- * Defines filter for listing expenses.
+ *
  * @typedef ExpensesFilter
+ * Defines filter for listing expenses.
  * @type {Object}
- * @property {String} [pmt] Payment method id
- * @property {String} [cat] Category id (if sole)
- * @property {Array<String>} [cats] Category ids (if many)
+ * @property {PmtId} [pmt] Payment method id
+ * @property {CatId} [cat] Category id (if sole)
+ * @property {Array<CatId>} [cats] Category ids (if many)
  * @property {Array<MonthString>} [months] Months; set to all availibe months if ommited
  */
 
