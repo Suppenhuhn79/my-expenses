@@ -5,7 +5,7 @@
  * @property {Date} dat Expense date
  * @property {Number} amt Expense amount
  * @property {IdString} cat Expense category - id reference to categories
- * @property {IdString} pmt Used payment method - id referenc to payment methods
+ * @property {IdString} pmt Used payment method - id reference to payment methods
  * @property {String} [txt] Additional text 
  *
  * @typedef ExpensesFilter
@@ -18,8 +18,8 @@
  */
 
 /**
- * my-expenses "expenses" module.
  * @namespace myxExpenses
+ * my-expenses "expenses" module.
  */
 let myxExpenses = function ()
 {

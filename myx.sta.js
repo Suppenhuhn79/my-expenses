@@ -1,8 +1,15 @@
 /**
- * @namespace myxStatisticsTimerange
+ * @typedef CalculationMode
+ * Defines a statistics calculation mode, which can be totals (sum) or monthly averages.
+ * @type {"sum"|"mavg"}
  * 
  * @typedef TimerangeMode
+ * Defines a time range mode, which can be a single month, a full year or all time.
  * @type {"month"|"year"|"all"}
+ */
+
+/**
+ * @namespace myxStatisticsTimerange
  */
 const myxStatisticsTimerange = function () 
 {
@@ -147,9 +154,6 @@ const myxStatisticsTimerange = function ()
 /**
  * my-expenses "statistics" module.
  * @namespace myxStatistics
- * 
- * @typedef CalculationMode
- * @type {"sum"|"mavg"}
  */
 const myxStatistics = function ()
 {

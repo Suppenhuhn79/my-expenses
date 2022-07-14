@@ -7,10 +7,9 @@
  * @property {String} color
  */
 
-
 /**
- * my-expenses "payment methods" module.
  * @namespace myxPaymentMethods
+ * my-expenses "payment methods" module.
  */
 let myxPaymentMethods = function ()
 {

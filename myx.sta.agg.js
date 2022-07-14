@@ -1,13 +1,13 @@
 /**
  * @typedef AggregateItem
- * @property {String} catId category id
+ * @property {IdString} catId category id
  * @property {Array<AggregateItem>} [subs] sub-category aggregates
  * @property {Number} sum Sum of expenses
  * @property {Number} count Sount of expenses
  *
  * @typedef MonthAggregate
  * Object having a key for each master category with aggregates of all subcategories within.
- * @type {Object<String, AggregateAtom>}
+ * @type {Object<IdString, AggregateAtom>}
  */
 
 /**
@@ -93,6 +93,7 @@ class AggregateAtom
 }
 
 /**
+ * @namespace myxStatisticAggregator
  * my-expenses expenses aggregation functionality for the "statistics" module.
  */
 const myxStatisticAggregator = function ()
@@ -182,7 +183,7 @@ const myxStatisticAggregator = function ()
 	 * 
 	 * @param {Array<MonthString>} months Months to calculate
 	 * @param {"sum"|"avg"} sortKey Whether to sort results by sum (default) or average
-	 * @returns {Promise<>}
+	 * @returns {Promise}
 	 */
 	function calc (months, sortKey)
 	{

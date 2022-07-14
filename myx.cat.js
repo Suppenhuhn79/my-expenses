@@ -9,10 +9,9 @@
  * @property {Array<IdString>} [subCategories]
  */
 
-
 /**
- * my-expenses "categories" module.
  * @namespace myxCategories
+ * my-expenses "categories" module.
  */
 let myxCategories = function ()
 {
