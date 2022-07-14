@@ -57,7 +57,14 @@ let myxExpenses = function ()
 	{
 		return new Promise((resolve) =>
 		{
+			/**
+			 * Mapping of CSV columns to `Expense` object memebers
+			 * @type {Array<String>} */
 			const KEYS = ["dat", "amt", "cat", "txt", "pmt"];
+			/**
+			 * Collection of already loaded months so we can clear the `data[<month>]` array.
+			 * @type {Array<MonthString>} */
+			let monthsLoaded = [];
 			let fileName = "data-" + fileIndex.toString() + ".csv";
 			let lastModified = googleappApi.files[fileName].modifiedTime;
 			console.log("Loading", "fileIndex:", fileIndex, "isLoading?", currentlyLoadingFiles.get(fileIndex), "Map:", currentlyLoadingFiles);
@@ -71,10 +78,14 @@ let myxExpenses = function ()
 						if (!!line)
 						{
 							let vals = line.split("\t");
-							let month = vals[0].substr(0, 7);
 							let obj = {};
-							dataIndex.register(month, fileIndex);
-							data[month] ||= [];
+							let month = vals[0].substr(0, 7);
+							if (monthsLoaded.includes(month) === false)
+							{
+								dataIndex.register(month, fileIndex);
+								data[month] = [];
+								monthsLoaded.push(month);
+							}
 							for (let c = 0, cc = KEYS.length; c < cc; c += 1)
 							{
 								obj[KEYS[c]] = (c === 0) ? new Date(vals[c]) : ((c === 1) ? Number(vals[c]) : vals[c]);
