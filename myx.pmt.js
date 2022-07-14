@@ -1,8 +1,4 @@
 /**
- * @typedef PmtId
- * Payment method id.
- * @type {String}
- * 
  * @typedef PaymentMethod
  * Payment method object. Represents a single payment method.
  * @type {Object}
@@ -22,13 +18,13 @@ let myxPaymentMethods = function ()
 	const FILE_NAME = "pmt.json";
 	/** @type {Date} */
 	let lastLoaded = null;
-	/** @type {Object<PmtId, PaymentMethod>} */
+	/** @type {Object<IdString, PaymentMethod>} */
 	let data = {};
-	/** @type {Array<PmtId>} */
+	/** @type {Array<IdString>} */
 	let order = [];
-	/** @type {Array<PmtId>} */
+	/** @type {Array<IdString>} */
 	let disabledItems = [];
-	/** @type {PmtId} */
+	/** @type {IdString} */
 	let defaultId;
 	let elements = getNames(document.getElementById(MODULE_NAME));
 
@@ -82,7 +78,7 @@ let myxPaymentMethods = function ()
 
 	/**
 	 * Provides the label of a payment method.
-	 * @param {PmtId} id Id of payment method to get label for
+	 * @param {IdString} id Id of payment method to get label for
 	 * @returns {String} Label of the payment method
 	 */
 	function getLabel (id)
@@ -118,7 +114,7 @@ let myxPaymentMethods = function ()
 
 	/**
 	 * Provides a HTML element with the icon of a payment method.
-	 * @param {PmtId} id Id of payment method to get the icon for
+	 * @param {IdString} id Id of payment method to get the icon for
 	 * @returns {HTMLDivElement} HTML element with the payment methods icon
 	 */
 	function renderIcon (id)
@@ -138,7 +134,7 @@ let myxPaymentMethods = function ()
 	{
 		/**
 		 * Actually does render the list items.
-		 * @param {Array<PmtId>} pmtIds Array that hold the pmt-ids to render
+		 * @param {Array<IdString>} pmtIds Array that hold the pmt-ids to render
 		 * @param {Boolean} canSort Whether the items should have a sorting capatibility (active pmts) o not (disabled pmts)
 		 */
 		function _renderList (pmtIds, canSort)
@@ -177,7 +173,7 @@ let myxPaymentMethods = function ()
 	/**
 	 * Opens the IconEditor for modifing a payment method or creating a new one.
 	 * Changes are not saved until `applyEdits()` is called!
-	 * @param {PmtId} [id] Id of payment method to edit; if empty, a new payment method will be created
+	 * @param {IdString} [id] Id of payment method to edit; if empty, a new payment method will be created
 	 */
 	function promptEditor (id)
 	{
@@ -275,12 +271,12 @@ let myxPaymentMethods = function ()
 		init: init,
 		enter: () => renderList("default"),
 		leave: () => modeHandler.setMode("default"),
-		/** @type {PmtId} */
+		/** @type {IdString} */
 		get defaultPmt () { return defaultId; },
 		getLabel: getLabel,
 		/**
 		 * Provides whether a payment method is set to be excluded.
-		 * @param {PmtId} id Id of payment method
+		 * @param {IdString} id Id of payment method
 		 * @returns {Boolean} `true` if the payment methods "exclude" flag is set, otherwise `false`
 		 */
 		isExcluded: (id) => (data[id].exclude === true),

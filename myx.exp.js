@@ -4,16 +4,16 @@
  * @type {Object}
  * @property {Date} dat Expense date
  * @property {Number} amt Expense amount
- * @property {CatId} cat Expense category - id reference to categories
- * @property {PmtId} pmt Used payment method - id referenc to payment methods
+ * @property {IdString} cat Expense category - id reference to categories
+ * @property {IdString} pmt Used payment method - id referenc to payment methods
  * @property {String} [txt] Additional text 
  *
  * @typedef ExpensesFilter
  * Defines filter for listing expenses.
  * @type {Object}
- * @property {PmtId} [pmt] Payment method id
- * @property {CatId} [cat] Category id (if sole)
- * @property {Array<CatId>} [cats] Category ids (if many)
+ * @property {IdString} [pmt] Payment method id
+ * @property {IdString} [cat] Category id (if sole)
+ * @property {Array<IdString>} [cats] Category ids (if many)
  * @property {Array<MonthString>} [months] Months; set to all availibe months if ommited
  */
 

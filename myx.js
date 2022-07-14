@@ -3,8 +3,12 @@
  * String representing a month in format `yyyy-mm`.
  * @type {String}
  * 
+ * @typedef IdString
+ * String used as identifier. Can be obtained via `myx.newId()`.
+ * @type {String}
+ * 
  * @typedef IconCode
- * Representing a FontAwesome icon as combination of a CSS style and unicode codepoint, e.g. `"fas:f100"`
+ * Representing a FontAwesome icon as combination of a CSS style and unicode codepoint, e.g. `"fas:f100"`.
  * @type {String}
  */
 
