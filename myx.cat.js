@@ -1,12 +1,10 @@
 /**
- * Category id.
  * @typedef CatId
+ * Category id.
  * @type {String}
- */
-
-/**
- * Category object. Represents a single category.
+ * 
  * @typedef Category
+ * Category object. Represents a single category.
  * @type {Object}
  * @property {String} label
  * @property {IconCode} icon

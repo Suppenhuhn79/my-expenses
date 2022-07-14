@@ -1,12 +1,10 @@
 /**
- * Payment method id.
  * @typedef PmtId
+ * Payment method id.
  * @type {String}
- */
-
-/**
- * Payment method object. Represents a single payment method.
+ * 
  * @typedef PaymentMethod
+ * Payment method object. Represents a single payment method.
  * @type {Object}
  * @property {String} label
  * @property {IconCode} icon
