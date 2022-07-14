@@ -298,20 +298,22 @@ const myxStatistics = function ()
 	/**
 	 * Provides a HTML element that draws a progress bar.
 	 * @param {String} baseClass CSS class name for percent bar element
-	 * @param {Number} percentRatio Percentage (`0<n<1`) filled on the bar
+	 * @param {Number} ratio Percentage (`0<n<1`) filled on the bar
 	 * @param {String} color CSS color value for percentage
 	 * @returns {HTMLDivElement}
 	 */
-	function renderPercentBar (baseClass, percentRatio, color)
+	function renderPercentBar (baseClass, ratio, color)
 	{
-		let percentAsCssString = Math.round(percentRatio * 100) + "%;";
-		let labelPosition = "left:" + ((percentRatio < 0.9) ? percentAsCssString : "calc(100% - 4.5em)") + ";";
+		let ratioPercent = Math.round(ratio * 100);
+		let percentAsCssString = ratioPercent + "%;";
+		let ratioAsPercentString = ((ratio > 0) && (ratioPercent < 1)) ? "< 1" : ratioPercent.toString();
+		let labelPosition = "left:" + ((ratio < 0.9) ? percentAsCssString : "calc(100% - 4.5em)") + ";";
 		return htmlBuilder.newElement("div." + baseClass,
 			{ style: "position:relative;" },
 			htmlBuilder.newElement("div",
 				{ style: "width:" + percentAsCssString + "height:100%;background-color:" + color + ";" }),
 			htmlBuilder.newElement("div.label",
-				{ style: "position:relative;" + labelPosition }, Math.round(percentRatio * 100) + fa.space + "%")
+				{ style: "position:relative;" + labelPosition }, ratioAsPercentString + fa.space + "%")
 		);
 	}
 
