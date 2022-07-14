@@ -24,7 +24,7 @@
 let myxExpenses = function ()
 {
 	const MODULE_NAME = "expenses-list";
-	/** @type {Object<Number,Date>} */
+	/** @type {Object<Number, Date>} */
 	let lastLoaded = {};
 	let data = {};
 	let dataIndex = myxDataindex();
@@ -40,7 +40,7 @@ let myxExpenses = function ()
 	let selectedMonth = new Date();
 	/**
 	 * Memorizing currently loading file, so so file is loaded twice.
-	 * @type {Map<Number,Boolan>} */
+	 * @type {Map<Number, Boolan>} */
 	let currentlyLoadingFiles = new Map();
 
 	elements.backSearchButton.onclick = () => { choices.set("active-tab", filter._origin); };
