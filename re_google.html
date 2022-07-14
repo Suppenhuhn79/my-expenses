@@ -32,7 +32,13 @@
 			<h1>my expenses</h1>
 		</div>
 		<div id="client" style="overflow: scroll">
-			<div id="not-signed-in" class="fullscreen-client" style="height: auto; display: none">
+			<div id="processing">
+				<div class="fullscreen-msg">
+					<div class="icon fas">&#xf252;</div>
+					<div class="label">Signing in...</div>
+				</div>
+			</div>
+			<div id="not-signed-in" style="display: none">
 				<div class="fullscreen-msg">
 					<div class="icon far">&#xf119;</div>
 					<div class="label">Your sign in attempt was not successful.</div>
@@ -79,6 +85,7 @@
 					tableElement.appendChild(htmlBuilder.newElement("tr", htmlBuilder.newElement("td", rem[1]), htmlBuilder.newElement("td", decodeURIComponent(rem[2]))));
 					rem = rex.exec(hash);
 				}
+				document.getElementById("processing").style.display = "none";
 				document.getElementById("not-signed-in").style.display = null;
 			}
 		</script>
