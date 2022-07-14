@@ -25,7 +25,7 @@ const expenseEditor = function (paymentMethods, categories, targetElement)
 	};
 	elements.cancel.onclick = (mouseEvent) =>
 	{
-		choices.choose("active-tab", originTabName);
+		choices.set("active-tab", originTabName);
 	};
 	elements.dat.onchange = (event) =>
 	{
@@ -110,7 +110,7 @@ const expenseEditor = function (paymentMethods, categories, targetElement)
 
 	function popup (item, dataMonth, dataIndex, callback)
 	{
-		originTabName = choices.chosen.activeTab;
+		originTabName = choices.get("active-tab");
 		originalItem = JSON.stringify(item);
 		currentItem = Object.assign({
 			dat: new Date(),
@@ -128,7 +128,7 @@ const expenseEditor = function (paymentMethods, categories, targetElement)
 		amountAsString = amountBits[0] + (amountBits[1] ? "." + (amountBits[1] + "00").substring(0, 2) : "");
 		setAmountText();
 		elements.txt.value = currentItem.txt || "";
-		choices.choose("active-tab", "expense-editor");
+		choices.set("active-tab", "expense-editor");
 		categories.renderSelection(elements.categorySelector, currentItem.cat, onCategoryChosen);
 		checkCapatibilities();
 	};

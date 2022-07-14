@@ -43,7 +43,7 @@ let myxExpenses = function ()
 	 * @type {Map<Number,Boolan>} */
 	let currentlyLoadingFiles = new Map();
 
-	elements.backSearchButton.onclick = () => { choices.choose("active-tab", filter._origin); };
+	elements.backSearchButton.onclick = () => { choices.set("active-tab", filter._origin); };
 	elements.cancelSearchButton.onclick = () => { resetFilter(); renderList(); };
 	elements.addExpenseButton.onclick = onAddExpenseClick;
 	elements.navCurrent.onclick = onNavCurrentClick;
@@ -233,7 +233,7 @@ let myxExpenses = function ()
 				elements.searchHint.appendChild(htmlBuilder.newElement("div", "\u00a0", "in " + getShortMonthText(new Date(filter.months[0]))));
 			}
 			modeHandler.setMode("search");
-			choices.choose("active-tab", MODULE_NAME);
+			choices.set("active-tab", MODULE_NAME);
 			renderList();
 		}
 		else
@@ -422,7 +422,7 @@ let myxExpenses = function ()
 			{
 				save([originalMonth, itemMonth]);
 			}
-			choices.choose("active-tab", MODULE_NAME);
+			choices.set("active-tab", MODULE_NAME);
 			setMonth(new Date(itemMonth));
 			renderList();
 			elements.content.querySelector("[data-date='" + itemDate + "']")?.scrollIntoView({ block: "start", behavior: "smooth" });

@@ -197,12 +197,12 @@ let myxCategories = function ()
 		function _highlightSelection (id)
 		{
 			let catColor = getColor(id);
-			for (let otherElement of toElement.querySelectorAll("[data-choice]"))
+			for (let otherElement of toElement.querySelectorAll("[data-choice-value]"))
 			{
 				otherElement.style.backgroundColor = null;
 				otherElement.style.color = null;
 			};
-			let element = toElement.querySelector("[data-choice='" + id + "']");
+			let element = toElement.querySelector("[data-choice-value='" + id + "']");
 			element.style.backgroundColor = catColor;
 			element.style.color = "#fff";
 			element.scrollIntoView({ inline: "center" });
@@ -230,14 +230,14 @@ let myxCategories = function ()
 			callback(id);
 		}
 		htmlBuilder.removeAllChildren(toElement);
-		toElement.dataset.choiceGroup = "category-selection";
+		toElement.dataset.choice = "category-selection";
 		let headCat = (currentCatId) ? (data[currentCatId].masterCategory || currentCatId) : null;
 		let catSet = (currentCatId) ? [headCat].concat(data[headCat].subCategories || []) : order;
 		if (currentCatId)
 		{
 			toElement.appendChild(htmlBuilder.newElement("div.item.labeled-icon.click",
 				htmlBuilder.newElement("div.cat-icon.back.fas",
-					{ 'data-choice': "__back__" },
+					{ 'data-choice-value': "__back__" },
 					fa.arrow_left)));
 		}
 		for (let key of catSet)
@@ -245,7 +245,7 @@ let myxCategories = function ()
 			if ((currentCatId) || (!data[key].masterCategory))
 			{
 				toElement.appendChild(htmlBuilder.newElement("div.item.labeled-icon.click",
-					{ 'data-choice': key },
+					{ 'data-choice-value': key },
 					renderIcon(key),
 					htmlBuilder.newElement("div.label", data[key].label)));
 			}

@@ -44,30 +44,34 @@ let myx = function ()
 		Promise.allSettled(asyncCalls).then(() =>
 		{
 			document.getElementById("dummy")?.remove();
-			choices.choose("active-tab", choices.chosen.activeTab || expenses.moduleName);
+			choices.set("active-tab", choices.get("active-tab") || expenses.moduleName);
+			onTabChosen(choices.get("active-tab"), true);
 		});
 	}
 
-	function onTabChosen (tabName)
+	function onTabChosen (tabName, interactive)
 	{
 		(tabName.endsWith("-editor")) ? bottomMenu.classList.add("hidden") : bottomMenu.classList.remove("hidden");
-		activeTab?.leave?.();
-		switch (tabName)
+		if (interactive)
 		{
-			case paymentMethods.moduleName:
-				activeTab = paymentMethods;
-				break;
-			case categories.moduleName:
-				activeTab = categories;
-				break;
-			case expenses.moduleName:
-				activeTab = expenses;
-				break;
-			case statistics.moduleName:
-				activeTab = statistics;
-				break;
+			activeTab?.leave?.();
+			switch (tabName)
+			{
+				case paymentMethods.moduleName:
+					activeTab = paymentMethods;
+					break;
+				case categories.moduleName:
+					activeTab = categories;
+					break;
+				case expenses.moduleName:
+					activeTab = expenses;
+					break;
+				case statistics.moduleName:
+					activeTab = statistics;
+					break;
+			}
+			activeTab.enter();
 		}
-		activeTab.enter();
 	}
 
 	function getIconAttributes (iconCode)
@@ -117,7 +121,7 @@ let myx = function ()
 				{
 					document.getElementById("bottom-menu").classList.add("hidden");
 					document.getElementById("signin-button").onclick = googleappApi.signIn;
-					choices.choose("active-tab", "not-signed-in");
+					choices.set("active-tab", "not-signed-in");
 				}
 			}
 		);

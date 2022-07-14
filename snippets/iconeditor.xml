@@ -33,13 +33,13 @@
 					</div>
 				</div>
 				<!-- </div> -->
-				<div data-choice-group="iconeditor-tab" class="top wide-flex tabs">
-					<div data-choice="icon-selection" class="flex-fill">ICON</div>
-					<div data-choice="color-selection" name="color-tab-button" class="flex-fill conditional on-mastercategory on-paymentmethod">COLOR</div>
+				<div data-choice="iconeditor-tab" class="top wide-flex tabs">
+					<div data-choice-value="icon-selection" class="flex-fill">ICON</div>
+					<div data-choice-value="color-selection" name="color-tab-button" class="flex-fill conditional on-mastercategory on-paymentmethod">COLOR</div>
 				</div>
-				<div data-choice-clients-group="iconeditor-tab" class="high-flex flex-fill overflow-hidden">
+				<div class="high-flex flex-fill overflow-hidden">
 					<div data-choice-client="icon-selection" class="high-flex flex-fill overflow-hidden">
-						<div name="known-icons-list" data-choice-group="iconeditor-icon" class="autowrap-grid flex-fill overflow-scroll">
+						<div name="known-icons-list" data-choice="iconeditor-icon" class="autowrap-grid flex-fill overflow-scroll">
 						</div>
 						<div name="custom-icon-editor" class="wide-flex">
 							<select name="fa-scope" size="1" ps:onchange="onCustomIconEdited">
@@ -53,7 +53,7 @@
 					<div data-choice-client="color-selection" name="color-selector" class="high-flex flex-fill overflow-hidden">
 
 						<!-- <div" class="high-flex flex-fill"> -->
-						<div name="colorselector-bubbles" class="autowrap-grid flex-fill overflow-scroll" data-choice-group="iconeditor-color">
+						<div name="colorselector-bubbles" class="autowrap-grid flex-fill overflow-scroll" data-choice="iconeditor-color">
 						</div>
 						<div class="tuners">
 							<input name="lightness" type="range" min="0.2" max="0.7" step="0.1" ps:onchange="setLightness"/>

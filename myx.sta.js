@@ -242,7 +242,7 @@ const myxStatistics = function ()
 		timerange.mode = choiceKey;
 		if ((choiceKey === "month") && (calcMode === "mavg"))
 		{
-			choices.choose("calculation-mode", "sum");
+			choices.set("calculation-mode", "sum");
 		}
 		else
 		{
@@ -259,7 +259,7 @@ const myxStatistics = function ()
 		calcMode = choiceKey;
 		if ((choiceKey === "mavg") && (timerange.mode === "month"))
 		{
-			choices.choose("time-range-mode", "year");
+			choices.set("time-range-mode", "year");
 		}
 		else
 		{
@@ -332,8 +332,8 @@ const myxStatistics = function ()
 	function getTitle ()
 	{
 		let result = "";
-		let timeRange = (choices.chosen.timeRangeMode === "all") ? "all time" : (choices.chosen.timeRangeMode === "month") ? getFullMonthText(myx.expenses.selectedMonth) : myx.expenses.selectedMonth.getFullYear();
-		let calculationMode = ((choices.chosen.calculationMode === "sum") ? "total" : (choices.chosen.timeRangeMode === "month") ? "average" : "monthly average");
+		let timeRange = (choices.get("time-range-mode") === "all") ? "all time" : (choices.get("time-range-mode") === "month") ? getFullMonthText(myx.expenses.selectedMonth) : myx.expenses.selectedMonth.getFullYear();
+		let calculationMode = ((choices.get("calculation-mode") === "sum") ? "total" : (choices.get("time-range-mode") === "month") ? "average" : "monthly average");
 		result = [timeRange, calculationMode].join(" ");
 		return result[0].toUpperCase() + result.substring(1);
 	}
@@ -398,8 +398,8 @@ const myxStatistics = function ()
 		console.clear();
 		console.log("stats init");
 		entering = true;
-		choices.choose("time-range-mode", "month");
-		choices.choose("calculation-mode", "sum");
+		choices.set("time-range-mode", "month");
+		choices.set("calculation-mode", "sum");
 		timerange.selectMonth(myx.expenses.selectMonth);
 		entering = false;
 		performAggregation();

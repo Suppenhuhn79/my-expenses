@@ -121,7 +121,7 @@
 					<i name="apply-edits-button" class="click for-mode edit-mode fas" data-icon="check">?</i>
 					<i name="cancel-edits-button" class="click for-mode edit-mode fas" data-icon="times">?</i>
 				</div>
-				<div class="content" data-choice-group="default-payment-method">
+				<div class="content" data-choice="default-payment-method">
 					<div class="for-mode default-mode edit-mode headline">Active payment methods</div>
 					<div class="for-mode search-mode headline">Tap payment method to search for expenses</div>
 					<div name="content">&#x00a0;</div>
@@ -147,15 +147,15 @@
 							<i class="fas icon" data-icon="angle_left" name="navigate-prev-time">?</i>
 							<i class="fas icon" data-icon="angle_right" name="navigate-next-time">?</i>
 						</div>
-						<div class="button-group wide-flex" data-choice-group="time-range-mode">
-							<i class="fas icon" data-icon="calendar_day" data-choice="month">?</i>
-							<i class="fas icon" data-icon="calendar_alt" data-choice="year">?</i>
-							<i class="fas icon" data-icon="infinite" data-choice="all">?</i>
+						<div class="button-group wide-flex" data-choice="time-range-mode">
+							<i class="fas icon" data-icon="calendar_day" data-choice-value="month">?</i>
+							<i class="fas icon" data-icon="calendar_alt" data-choice-value="year">?</i>
+							<i class="fas icon" data-icon="infinite" data-choice-value="all">?</i>
 						</div>
 						<div class="flex-fill">&#x00a0;</div>
-						<div class="button-group wide-flex" data-choice-group="calculation-mode">
-							<i class="fas icon" data-icon="plus" data-choice="sum">?</i>
-							<i class="fas icon" data-icon="divide" data-choice="mavg">?</i>
+						<div class="button-group wide-flex" data-choice="calculation-mode">
+							<i class="fas icon" data-icon="plus" data-choice-value="sum">?</i>
+							<i class="fas icon" data-icon="divide" data-choice-value="mavg">?</i>
 						</div>
 					</div>
 					<div name="content"></div>
@@ -163,25 +163,25 @@
 			</div>
 			<!-- bottom menu -->
 		</div>
-		<div id="bottom-menu" data-choice-group="active-tab" class="buttons">
-			<div name="payment-methods" data-choice="payment-methods" class="labeled-icon">
+		<div id="bottom-menu" data-choice="active-tab" class="buttons">
+			<div name="payment-methods" data-choice-value="payment-methods" class="labeled-icon">
 				<i class="fas" data-icon="wallet">?</i>
 				<span class="cutoff">payment methods</span>
 			</div>
-			<div name="categories-list" data-choice="categories-list" class="labeled-icon">
+			<div name="categories-list" data-choice-value="categories-list" class="labeled-icon">
 				<i class="fas" data-icon="boxes">?</i>
 				<span class="cutoff">categories</span>
 			</div>
-			<div name="expenses-list" data-choice="expenses-list" class="labeled-icon">
+			<div name="expenses-list" data-choice-value="expenses-list" class="labeled-icon">
 				<i class="fas" data-icon="list_ul">?</i>
 				<span class="cutoff">expenses</span>
 			</div>
-			<div name="statistics" data-choice="statistics" class="labeled-icon">
+			<div name="statistics" data-choice-value="statistics" class="labeled-icon">
 				<i class="fas" data-icon="chart_bar">?</i>
 				<span>statistics</span>
 			</div>
-			<div data-choice="expense-editor" style="display: none">&#x00a0;</div>
-			<div data-choice="icon-editor" style="display: none">&#x00a0;</div>
+			<div data-choice-value="expense-editor" style="display: none">&#x00a0;</div>
+			<div data-choice-value="icon-editor" style="display: none">&#x00a0;</div>
 		</div>
 
 		<div id="xhr-indicator" class="hidden">&#x00a0;</div>

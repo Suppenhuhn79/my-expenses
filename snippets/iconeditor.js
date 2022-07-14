@@ -70,7 +70,7 @@ const iconEditor = function (targetElement)
 
 	function popup (mode, obj, callback)
 	{
-		let originTabName = choices.chosen.activeTab;
+		let originTabName = choices.get("active-tab");
 		currentObject = Object.assign({}, {
 			label: "?",
 			icon: DEFAULT_ICON,
@@ -88,17 +88,17 @@ const iconEditor = function (targetElement)
 			currentObject.label = elements.objectLabel.value || "?";
 			delete currentObject.meta;
 			callback(currentObject, checks.getAllChecked(elements._self));
-			choices.choose("active-tab", originTabName);
+			choices.set("active-tab", originTabName);
 		};
 		elements._self.classList = obj.meta.cssModifier;
-		elements.cancel.onclick = () => choices.choose("active-tab", originTabName);
+		elements.cancel.onclick = () => choices.set("active-tab", originTabName);
 		elements.title.innerText = obj.meta.header;
 		elements.headline.innerText = obj.meta.headline || "\u00a0";
-		choices.choose("active-tab", "icon-editor");
-		choices.choose("iconeditor-icon", currentObject.icon);
-		choices.choose("iconeditor-color", currentObject.color);
-		choices.choose("iconeditor-tab", "icon-selection");
-		elements.knownIconsList.querySelector("[data-choice='" + currentObject.icon + "']")?.scrollIntoView({ block: "center" });
+		choices.set("active-tab", "icon-editor");
+		choices.set("iconeditor-icon", currentObject.icon);
+		choices.set("iconeditor-color", currentObject.color);
+		choices.set("iconeditor-tab", "icon-selection");
+		elements.knownIconsList.querySelector("[data-choice-value='" + currentObject.icon + "']")?.scrollIntoView({ block: "center" });
 	};
 
 	/* =========== constructor =========== */
@@ -112,7 +112,7 @@ const iconEditor = function (targetElement)
 	for (let icon of ICONS)
 	{
 		elements.knownIconsList.appendChild(htmlBuilder.newElement("div.icon." + icon.substring(0, 3),
-			{ 'data-choice': icon },
+			{ 'data-choice-value': icon },
 			"&#x" + icon.substring(4) + ";"));
 	};
 	targetElement.appendChild(elements._self);

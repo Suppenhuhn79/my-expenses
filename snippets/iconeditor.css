@@ -16,12 +16,12 @@
 	/* flex-direction: column; */
 }
 
-#icon-editor .top [data-choice] {
+#icon-editor .top [data-choice-value] {
 	padding-top: calc(0.5em - 4px);
 	border-top: 4px solid transparent;
 	color: #aaa;
 }
-#icon-editor .top [data-choice].chosen {
+#icon-editor .top [data-choice-value].chosen {
 	border-top-color: #eee;
 	color: #000;
 }
