@@ -24,8 +24,6 @@
 let myxExpenses = function ()
 {
 	const MODULE_NAME = "expenses-list";
-	/** @type {Object<Number, Date>} */
-	let lastLoaded = {};
 	let data = {};
 	let dataIndex = myxDataindex();
 	/** @type {ExpensesFilter} */
@@ -66,9 +64,7 @@ let myxExpenses = function ()
 			 * @type {Array<MonthString>} */
 			let monthsLoaded = [];
 			let fileName = "data-" + fileIndex.toString() + ".csv";
-			let lastModified = googleappApi.files[fileName].modifiedTime;
-			console.log("Loading", "fileIndex:", fileIndex, "isLoading?", currentlyLoadingFiles.get(fileIndex), "Map:", currentlyLoadingFiles);
-			if ((currentlyLoadingFiles.get(fileIndex) !== true) && ((typeof lastLoaded[fileIndex] === "undefined") || (lastLoaded[fileIndex] < lastModified)))
+			if ((currentlyLoadingFiles.get(fileIndex) !== true) && (googleappApi.isModified(fileName)))
 			{
 				currentlyLoadingFiles.set(fileIndex, true);
 				googleappApi.loadFileEx(fileName).then((result) =>
@@ -98,14 +94,12 @@ let myxExpenses = function ()
 					{
 						sortItems(month);
 					}
-					lastLoaded[fileIndex] = lastModified;
 					currentlyLoadingFiles.set(fileIndex, false);
 					resolve();
 				});
 			}
 			else
 			{
-				console.debug(fileName, "not modified");
 				resolve();
 			}
 		});

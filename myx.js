@@ -173,10 +173,16 @@ let myx = function ()
 }();
 
 // inject caching method into googleappApi
+
+/**
+ * @memberof googleappApi
+ * @type {Map<String, Date>}
+ */
+googleappApi.lastLoaded = new Map();
+
 /**
  * Loads a file from Google Drive but previously checks if the file is cached in LocalStorage.
  * @memberof googleappApi
- * @static
  * @param {String} name File name to load
  * @returns {Promise<any>}
  */
@@ -184,20 +190,42 @@ googleappApi.loadFileEx = function (name)
 {
 	return new Promise((resolve) =>
 	{
-		let cacheName = "myx_" + name.substring(0, name.lastIndexOf(".")).replaceAll(/[^\w\d]/g, "_"); //filename.replaceAll(/\./g, "_");
+		let cacheName = "myx_" + name.substring(0, name.lastIndexOf(".")).replaceAll(/[^\w\d]/g, "_");
 		let cache = JSON.parse(localStorage.getItem(cacheName));
-		if ((!!cache) && !!cache.data && !(new Date(cache.date) < googleappApi.files[name].modifiedTime))
+		if (googleappApi.files[name] !== undefined)
 		{
-			console.info("Loading " + name + " from cache");
-			resolve(cache.data);
+			if ((!!cache) && !!cache.data && !(new Date(cache.date) < googleappApi.files[name].modifiedTime))
+			{
+				console.info("Loading " + name + " from cache");
+				googleappApi.lastLoaded.set(name, new Date());
+				resolve(cache.data);
+			}
+			else
+			{
+				console.info("Loading", name);
+				googleappApi.loadFile(name).then((payload) =>
+				{
+					localStorage.setItem(cacheName, JSON.stringify({ data: payload, date: googleappApi.files[name].modifiedTime }));
+					googleappApi.lastLoaded.set(name, new Date());
+					resolve(payload);
+				});
+			}
 		}
 		else
 		{
-			googleappApi.loadFile(name).then((payload) =>
-			{
-				localStorage.setItem(cacheName, JSON.stringify({ data: payload, date: googleappApi.files[name].modifiedTime }));
-				resolve(payload);
-			});
+			console.info("File does not exist", name);
+			resolve();
 		}
 	});
+};
+
+googleappApi.isModified = function (name)
+{
+	let lastLoaded = googleappApi.lastLoaded.get(name);
+	let isModified = ((lastLoaded === undefined) || (lastLoaded < googleappApi.files[name].modifiedTime));
+	if (isModified === false)
+	{
+		console.info("Not modified", name);
+	}
+	return isModified;
 };

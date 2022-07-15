@@ -15,8 +15,6 @@ let myxPaymentMethods = function ()
 {
 	const MODULE_NAME = "payment-methods";
 	const FILE_NAME = "pmt.json";
-	/** @type {Date} */
-	let lastLoaded = null;
 	/** @type {Object<IdString, PaymentMethod>} */
 	let data = {};
 	/** @type {Array<IdString>} */
@@ -54,8 +52,7 @@ let myxPaymentMethods = function ()
 	{
 		return new Promise((resolve) =>
 		{
-			let lastModified = googleappApi.files[FILE_NAME].modifiedTime;
-			if (lastLoaded < lastModified)
+			if (googleappApi.isModified(FILE_NAME))
 			{
 				googleappApi.loadFileEx(FILE_NAME).then((obj) =>
 				{
@@ -63,13 +60,11 @@ let myxPaymentMethods = function ()
 					order = obj.order;
 					disabledItems = obj.disabled || [];
 					defaultId = obj['default'] || Object.keys(obj.items)[0];
-					lastLoaded = lastModified;
 					resolve();
 				});
 			}
 			else
 			{
-				console.debug(FILE_NAME, "not modified");
 				resolve();
 			}
 		});
