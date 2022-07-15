@@ -45,7 +45,7 @@ const myxStatisticsTimerange = function ()
 	/**
 	 * Set the time range to a single month.
 	 * @param {Date} newMonth New month to set.
-	 * @param {Boolean} [fromExternal] Wheter setting month was triggered from outside this module (`true`) or not (`false`, default). If this is `false` the selected month in expenses will be updated.
+	 * @param {Boolean} [fromExternal] Whether setting month was triggered from outside this module (`true`) or not (`false`, default). If this is `false` the selected month in the _expenses_ module will be updated.
 	 */
 	function setMonth (newMonth, fromExternal = false)
 	{
