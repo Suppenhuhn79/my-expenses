@@ -20,18 +20,12 @@
 	--complementay-darkest-color: #a75d00;
 
 	--header-gradient: linear-gradient(90deg, var(--primary-dark-color) 0%, var(--primary-color) 20%, var(--primary-light-color) 100%);
-	/*
-	--complement-white-color: #ffebcb;
-	--complement-light-color: #ffc76c;
-	--complement-color: #ffaf2e;
-	--complement-dark-color: #d88600;
-	--complement-black-color: #533300;
-*/
-	/* --z-index-header: 10; */
 
 	font-size: 16px;
 	font-family: var(--font);
 	user-select: none;
+	outline: none;
+	-webkit-tap-highlight-color: transparent;
 }
 
 html,
@@ -269,11 +263,27 @@ i.fab {
 .dummy.w9 {
 	width: 9em;
 }
+
 @keyframes dummy-gradient {
 	0% {
 		background-position: 0px 0%;
 	}
 	100% {
 		background-position: 150px 0%;
+	}
+}
+
+@media (hover: hover) {
+	.buttons > div:hover,
+	.labeled-icon:hover,
+	.menubox .menuitem:hover,
+	.menubox .menubutton:hover,
+	#expense-editor tbody td:hover {
+		background-color: #eee;
+		cursor: pointer;
+	}
+	#icon-editor .icon:hover {
+		cursor: pointer;
+		box-shadow: 0 0 0 4px #eee;
 	}
 }
