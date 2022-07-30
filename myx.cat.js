@@ -17,6 +17,16 @@ let myxCategories = function ()
 {
 	const MODULE_NAME = "categories-list";
 	const FILE_NAME = "cat.json";
+	const DEFAULTS = {
+		order: ["f92921c5"],
+		items: {
+			f92921c5: {
+				label: "Shopping",
+				icon: "fas:f291",
+				color: "#479eeb",
+			}
+		}
+	};
 	/** @type {Object<IdString, Category>} */
 	let data = {};
 	/** @type {Array<IdString>} */
@@ -54,7 +64,7 @@ let myxCategories = function ()
 		{
 			if (googleappApi.isModified(FILE_NAME))
 			{
-				googleappApi.loadFileEx(FILE_NAME).then((obj) =>
+				googleappApi.loadFileEx(FILE_NAME).then((obj = DEFAULTS) =>
 				{
 					data = obj.items;
 					order = obj.order;

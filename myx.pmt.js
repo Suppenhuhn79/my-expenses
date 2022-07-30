@@ -15,6 +15,22 @@ let myxPaymentMethods = function ()
 {
 	const MODULE_NAME = "payment-methods";
 	const FILE_NAME = "pmt.json";
+	const DEFAULTS = {
+		order: ["d2ba53b0", "b6eb6e66"],
+		default: "d2ba53b0",
+		items: {
+			d2ba53b0: {
+				label: "Cash",
+				icon: "fas:f53a",
+				color: "#008000"
+			},
+			b6eb6e66: {
+				label: "Bank account",
+				icon: "far:f09d",
+				color: "#ebb147"
+			}
+		}
+	};
 	/** @type {Object<IdString, PaymentMethod>} */
 	let data = {};
 	/** @type {Array<IdString>} */
@@ -54,7 +70,7 @@ let myxPaymentMethods = function ()
 		{
 			if (googleappApi.isModified(FILE_NAME))
 			{
-				googleappApi.loadFileEx(FILE_NAME).then((obj) =>
+				googleappApi.loadFileEx(FILE_NAME).then((obj = DEFAULTS) =>
 				{
 					data = obj.items;
 					order = obj.order;
