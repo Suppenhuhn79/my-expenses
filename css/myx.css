@@ -347,6 +347,25 @@
 	box-shadow: 0 0.1rem 0.2rem 0.01rem #00000040;
 }
 
+.buttons {
+	min-height: 3rem;
+	align-items: center;
+	background-color: #fff;
+	color: #999;
+}
+.buttons.wide-flex > div {
+	display: flex;
+	justify-content: center;
+	border-top: 1px solid grey;
+	padding: 0.5em;
+	text-transform: uppercase;
+	height: 100%;
+	align-items: center;
+}
+.buttons.wide-flex > div + div {
+	border-left: 1px solid grey;
+}
+
 .dragger-ns {
 	cursor: ns-resize;
 	padding: 0 1em;

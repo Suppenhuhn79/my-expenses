@@ -151,22 +151,3 @@ input[name="unicode-codepoint"] {
 	justify-items: center;
 	align-content: start;
 }
-
-.buttons {
-	min-height: 3rem;
-	align-items: center;
-	background-color: #fff;
-	color: #999;
-}
-.buttons.wide-flex > div {
-	display: flex;
-	justify-content: center;
-	border-top: 1px solid grey;
-	padding: 0.5em;
-	text-transform: uppercase;
-	height: 100%;
-	align-items: center;
-}
-.buttons.wide-flex > div + div {
-	border-left: 1px solid grey;
-}
