@@ -344,7 +344,7 @@ const myxStatistics = function ()
 
 	function renderContent ()
 	{
-		if (myx.expenses.hasAnyData(myx.expenses.selectedMonth.toMonthString()))
+		if (myx.expenses.hasActualData(myx.expenses.selectedMonth.toMonthString()))
 		{
 			let k = calcMode;
 			htmlBuilder.removeAllChildren(elements.content);

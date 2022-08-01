@@ -217,20 +217,6 @@ let myxExpenses = function ()
 	}
 
 	/**
-	 * Checks whether there are any expenses (actual or upcoming repeatings) in a certain month or not.
-	 * @param {MonthString|Date} month Month to check for data
-	 * @returns {Boolean} `true` if there is any data for the month, `false` if there is no data
-	 */
-	function hasAnyData (month)
-	{
-		if (month.constructor.name === "Date")
-		{
-			month = month.toMonthString();
-		}
-		return (repeatings.get(month).concat(data[month] || []).length > 0);
-	}
-
-	/**
 	 * Checks whether there are actual expenses in a certain month or not.
 	 * @param {MonthString|Date} month Month to check for data
 	 * @returns {Boolean} `true` if there is any actual data for the month, `false` if there is no data
@@ -377,32 +363,29 @@ let myxExpenses = function ()
 		elements.content.scrollTop = 0;
 		for (let month of filter.months.sort().reverse())
 		{
-			if (hasAnyData(month))
+			let currentDay = 0;
+			let headline;
+			let repeatingExpenses = repeatings.get(month);
+			let actualExpenses = data[month] || [];
+			let items = actualExpenses.concat(repeatingExpenses);
+			let actualCount = actualExpenses.length;
+			for (let i = items.length - 1; i >= 0; i -= 1)
 			{
-				let currentDay = 0;
-				let headline;
-				let repeatingExpenses = repeatings.get(month);
-				let actualExpenses = data[month] || [];
-				let items = actualExpenses.concat(repeatingExpenses);
-				let actualCount = actualExpenses.length;
-				for (let i = items.length - 1; i >= 0; i -= 1)
+				let item = items[i];
+				if (item.dat.getDate() !== currentDay)
 				{
-					let item = items[i];
-					if (item.dat.getDate() !== currentDay)
+					currentDay = item.dat.getDate();
+					headline = renderHeadline(item.dat);
+				}
+				if (((filter.cats.length === 0) || (filter.cats.includes(item.cat)))
+					&& ((!filter.pmt) || (item.pmt === filter.pmt)))
+				{
+					if (!!headline)
 					{
-						currentDay = item.dat.getDate();
-						headline = renderHeadline(item.dat);
+						renders.push(headline);
+						headline = null;
 					}
-					if (((filter.cats.length === 0) || (filter.cats.includes(item.cat)))
-						&& ((!filter.pmt) || (item.pmt === filter.pmt)))
-					{
-						if (!!headline)
-						{
-							renders.push(headline);
-							headline = null;
-						}
-						renders.push(renderItem(item, (i < actualCount) ? i : -1 /* actualCount - i - 1 */));
-					}
+					renders.push(renderItem(item, (i < actualCount) ? i : -1 /* actualCount - i - 1 */));
 				}
 			}
 		}
@@ -572,7 +555,6 @@ let myxExpenses = function ()
 		set selectedMonth (value) { setMonth(value); },
 		get availibleMonths () { return availibleMonths; },
 		hasActualData: hasActualData,
-		hasAnyData: hasAnyData,
 		loadFromFile: loadFromFile,
 		enter: () => { renderList(); },
 		leave: () => { resetFilter(); },
