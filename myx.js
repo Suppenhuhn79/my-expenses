@@ -27,8 +27,8 @@ let myx = function ()
 
 	let paymentMethods = myxPaymentMethods();
 	let categories = myxCategories();
-	let expenses = myxExpenses(paymentMethods, categories);
-	let statistics = myxStatistics(expenses, categories, paymentMethods);
+	let expenses = myxExpenses();
+	let statistics = myxStatistics();
 
 	function init ()
 	{
@@ -108,7 +108,8 @@ let myx = function ()
 				console.table(googleappApi.files);
 				Promise.allSettled([
 					categories.init(),
-					paymentMethods.init()
+					paymentMethods.init(),
+					expenses.init(),
 				]).then(init);
 			},
 			(reason) =>
@@ -156,10 +157,10 @@ let myx = function ()
 	onWindowFocus();
 
 	return { // publish members
-		categories: categories, // TODO: debug only
-		paymentMethods: paymentMethods, // TODO: debug only
 		statistics: statistics, // TODO: debug only
 		expenses: expenses, // TODO: debug only
+		categories: categories,
+		paymentMethods: paymentMethods,
 		get currencySymbol () { return currencySymbol; },
 		getIconAttributes: getIconAttributes,
 		addExpense: expenses.edit,

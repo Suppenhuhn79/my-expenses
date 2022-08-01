@@ -228,7 +228,7 @@ const myxStatistics = function ()
 			if (timerange.mode !== "all")
 			{
 				item.element.dataset.targetDate = item.targetDate.toISOString();
-				item.element.classList[myx.expenses.hasAnyData(item.targetDate) ? "remove" : "add"]("disabled");
+				item.element.classList[myx.expenses.hasActualData(item.targetDate) ? "remove" : "add"]("disabled");
 			}
 			else
 			{

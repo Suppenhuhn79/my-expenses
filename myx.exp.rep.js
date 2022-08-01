@@ -1,40 +1,77 @@
 const repFile = {
-	"2c495feb": {
-		"expense": {
-			"dat": "2022-01-31",
-			"inf": "last of month"
+	items: {
+		/*
+			"2c495feb": {
+				"expense": {
+					dat: "2022-06-30",
+					txt: "last of month",
+					cat: "4d482941",
+					pmt: "1117367a",
+					amt: 999
+				},
+				"interval": {
+					"months": 1,
+					"originalDate": 31
+				}
+			},
+			*/
+		"bf6dbd10": { // 2022-04-29	65	145a19f7		80d529cf
+			"expense": {
+				dat: "2022-07-29",
+				cat: "145a19f7",
+				pmt: "80d529cf",
+				amt: 65
+			},
+			"interval": {
+				"months": 1,
+				"originalDate": 29
+			}
 		},
-		"interval": {
-			"months": 1,
-			"originalDate": 31
+		"e72d996e": { // 2022-04-15	11.99	5d4a6fae		80d529cf
+			"expense": {
+				dat: "2022-07-15",
+				cat: "5d4a6fae",
+				pmt: "80d529cf",
+				amt: 11.99
+			},
+			"interval": {
+				"months": 1,
+				"originalDate": 15
+			}
 		}
+		/*,
+		"64b5e2c0": {
+			"expense": {
+				dat: "2022-06-01",
+				txt: "first of month",
+				cat: "9d69977f",
+				pmt: "80d529cf",
+				amt: 91
+			},
+			"interval": {
+				"months": 1,
+				"originalDate": 1
+			}
+		} /*,
+		"947ac085": {
+			"expense": {
+				"dat": "2022-07-01",
+				"inf": "weekly"
+			},
+			"interval": {
+				"weeks": 1
+			}
+		}
+		*/
 	},
-	"64b5e2c0": {
-		"expense": {
-			"dat": "2022-01-01",
-			"inf": "first of month"
-		},
-		"interval": {
-			"months": 1,
-			"originalDate": 1
-		}
-	},
-	"947ac085": {
-		"expense": {
-			"dat": "2022-07-01",
-			"inf": "weekly"
-		},
-		"interval": {
-			"weeks": 1
-		}
-	}
+	order: ["bf6dbd10", "e72d996e"]
 };
 
 /**
  * @typedef RepeatingIntervall
- * A repeating intervall may be either a count of `weeks` or a count of `months`.
+ * A repeating interval may be either a count of `weeks` or a count of `months`.
  * @type {Object}
- * @property {Number} [weeks] Count of weeks between intervall points
+ * @property {Number} [weeks] Count of weeks between interval points
  * @property {Number} [months] Count of months between interval points
  * @property {Number} [originalDate] Initial execution day of month (for preserving execution on last-of-month)
  * 
@@ -43,16 +80,62 @@ const repFile = {
  * @type {Object}
  * @property {Expense} expense
  * @property {RepeatingIntervall} interval
+ * @property {Date} nextDueDate
  */
 
 let repeatingExpenses = function ()
 {
 	const FILE_NAME = "rep.json";
+	const DEFAULTS = {
+		items: {},
+		order: []
+	};
+
+	/** @type {Object<IdString, RepeatingExpense>} */
+	let data = {};
+	/** @type {Array<IdString>} */
+	let order = [];
 
 	/**
-	 * @type {Object<IdString, RepeatingExpense>}
+ * Initializes the module by loading repeating expenses from file.
+ * @returns {Promise<void>}
+ */
+	function init ()
+	{
+		return new Promise((resolve) =>
+		{
+			if (googleappApi.isModified(FILE_NAME))
+			{
+				googleappApi.loadFileEx(FILE_NAME).then((obj = DEFAULTS) =>
+				{
+					data = obj.items;
+					order = obj.order;
+					for (let id in data)
+					{
+						/** @type {Expense} */
+						let expense = data[id].expense;
+						expense.dat = new Date(expense.dat); // convert String to Date
+						data[id].nextDueDate = new Date(data[id].nextDueDate); // convert String to Date
+					}
+					resolve();
+				});
+			}
+			else
+			{
+				resolve();
+			}
+		});
+	}
+
+	/**
+	 * Saves changes to file.
+	 * @async
 	 */
-	let data = {};
+	async function saveToFile ()
+	{
+		myx.xhrBegin();
+		googleappApi.saveToFile(FILE_NAME, { order: order, items: data }).then(myx.xhrSuccess, myx.xhrError);
+	}
 
 	/**
 	 * Calculates the next date in an interval.
@@ -71,7 +154,7 @@ let repeatingExpenses = function ()
 		else
 		{
 			interval.months ||= 1;
-			interval.originalDate ||= 1;
+			interval.originalDate ||= date.getDate();
 			result = date.shiftMonths(interval.months);
 			result.setDate(Math.min(interval.originalDate, result.endOfMonth().getDate()));
 		}
@@ -79,8 +162,65 @@ let repeatingExpenses = function ()
 	}
 
 	/**
+	 * Adds or modifies a repeating expense.
+	 * @param {IdString} [id] Id of repeating expense; if ommited and an interval is given, an new repeating expense is added
+	 * @param {Expense} expense Expense data
+	 * @param {RepeatingIntervall} [interval] New repeating interval for the expense; if ommited, the repeating expense is deleted
+	 * @returns {IdString|null} Id or the modified/added expense or `undefined` if repeating expense hab been deleted
+	 */
+	function modify (id, expense, interval)
+	{
+		console.log("repExps BEFORE modification:", order, Object.assign({}, data));
+		console.group("setting repeating expense");
+		console.log("id:", id);
+		console.log("expense:", expense);
+		console.log("interval:", interval);
+		if (!!interval)
+		{
+			id ||= myx.newId();
+			if (order.includes(id) === false)
+			{
+				order.push(id);
+			}
+			data[id] = {
+				expense: {
+					dat: expense.dat,
+					amt: expense.amt,
+					cat: expense.cat,
+					pmt: expense.pmt,
+					txt: expense.txt
+				},
+				interval: Object.assign({}, interval, { originalDate: expense.dat.getDate() }),
+				nextDueDate: (expense.dat < new Date()) ? nextIntervalDate(expense.dat, interval) : expense.dat
+			};
+			console.log("data[id]:", data[id]);
+		}
+		else
+		{
+			if (!!data[id])
+			{
+				delete data[id];
+				order.splice(order.indexOf(id), 1);
+			}
+			id = null;
+		}
+		console.groupEnd();
+		console.log("repExps AFTER modification:", order, data);
+		saveToFile();
+		return id;
+	}
+
+	function addExpense (repeatingExpense, executionDate)
+	{
+		repeatingExpense.expense.dat = executionDate;
+		repeatingExpense.nextDueDate = nextIntervalDate(executionDate, repeatingExpense.interval);
+		console.warn("ADD:", executionDate.toIsoFormatText("YMD"), myx.categories.getLabel(repeatingExpense.expense.cat), repeatingExpense.expense.amt);
+		return repeatingExpense;
+	}
+
+	/**
 	 * Processes all repeating expenses. Checks if a due date has passed (creates an actual expense, if so) and returns a list of all upcoming expenses.
-	 * @param {Date} month
+	 * @param {MonthString} month
 	 * @returns {Array<Expense>} List of all upcoming expenses; **note:** every expense has an additional `rep` member providing the repeating expense id.
 	 */
 	function process (month)
@@ -89,16 +229,13 @@ let repeatingExpenses = function ()
 		let result = [];
 		/** @type {Date} */
 		let now = new Date();
-		/** @type {String} */
-		let requestedMonth = month.toMonthString();
 		/** @type {Date} */
-		let endOfPreview = month.endOfMonth();
-		console.debug("preview until:", endOfPreview.toIsoFormatText());
-		for (let id in data)
+		let endOfPreview = (new Date(month)).endOfMonth();
+		for (let id of order)
 		{
 			/** @type {RepeatingExpense} */
 			let item = data[id];
-			let itemPreviewDate = nextIntervalDate(item.expense.dat, item.interval);
+			let itemPreviewDate = item.nextDueDate;
 			let i = 0;
 			while (itemPreviewDate <= endOfPreview)
 			{
@@ -109,50 +246,16 @@ let repeatingExpenses = function ()
 				}
 				if (itemPreviewDate < now)
 				{
-					item.expense.dat = itemPreviewDate;
-					data[id] = item;
-					console.debug("myx.expenses.add", Object.assign({ rep: id }, item.expense)); // TODO
+					data[id] = addExpense(item, itemPreviewDate);
 				}
-				itemPreviewDate = nextIntervalDate(itemPreviewDate, item.interval);
-				if ((itemPreviewDate > now) && (itemPreviewDate.toMonthString() === requestedMonth))
+				else if ((itemPreviewDate > now) && (itemPreviewDate.toMonthString() === month))
 				{
 					result.push(Object.assign({ rep: id }, item.expense, { dat: itemPreviewDate }));
 				}
+				itemPreviewDate = nextIntervalDate(itemPreviewDate, item.interval);
 			}
 		}
 		return result.sort((a, b) => (a.dat - b.dat));
-	}
-
-	/**
-	 * Initializes the module by loading repeating expenses from file on Google Drive.
-	 * @returns {Promise<void>}
-	 */
-	function init ()
-	{
-		return new Promise((resolve) =>
-		{
-			googleappApi.loadFileEx(FILE_NAME).then((obj) =>
-			{
-				data = obj || {};
-				for (let id in data)
-				{
-					/** @type {Expense} */
-					let expense = data[id].expense;
-					expense.dat = new Date(expense.dat); // convert String to Date
-				}
-				resolve();
-			});
-		});
-	}
-
-	/**
-	 * Saves changes to file.
-	 * @async
-	 */
-	async function saveToFile ()
-	{
-		myx.xhrBegin();
-		googleappApi.saveToFile(FILE_NAME, data).then(myx.xhrSuccess, myx.xhrError);
 	}
 
 	/**
@@ -162,6 +265,7 @@ let repeatingExpenses = function ()
 	 */
 	function promptEditor (expense, id)
 	{
+		console.warn("NOT IMPLEMENTED YET: promptEditor()");
 		id ||= myx.newId();
 		if (data[id] === undefined)
 		{
@@ -171,19 +275,35 @@ let repeatingExpenses = function ()
 		// TODO: Do shit & saveToFile();
 	}
 
+	/**
+	 * Returns a super short interval text, which is basicly the interval count and an indicator whether its months or weeks.
+	 * @param {RepeatingIntervall} interval Interval to get the text for
+	 * @returns {String}
+	 */
+	function getSupershortIntervalText (interval)
+	{
+		return (interval.weeks > 0) ? interval.weeks.toString() + "/w" : interval.months.toString() + "/m";
+	}
+
 	return {
 		get data () { return data; }, // TODO: debug only
+		nextIntervalDate: nextIntervalDate, // TODO: debug only
 		init: init,
 		promptEditor: promptEditor,
 		get: process,
+		set: modify,
 		/**
 		 * Returns the next due date of a repeating expense.
 		 * @param {IdString} id Repeating expense id
 		 * @returns {Date}
 		 */
-		nextDueDateOf: (id) => { return nextIntervalDate(data[id].expense.dat, data[id].interval); }
+		nextDueDateOf: (id) => { return nextIntervalDate(data[id].expense.dat, data[id].interval); },
+		/**
+		 * Returns the interval of a repeating expense.
+		 * @param {IdString} id Repeating expense id
+		 * @returns {RepeatingIntervall} Interval of the repeating expense
+		 */
+		intervalOf: (id) => { return data[id]?.interval || {}; },
+		getSupershortIntervalText: getSupershortIntervalText
 	};
 };
-
-// let r = repeatingExpenses();
-// r.init().then(() => { console.log("Repeating expenses have loaded.", r.data); });

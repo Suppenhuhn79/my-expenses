@@ -65,6 +65,13 @@
 	background-color: white;
 	border-top: var(--item-border);
 }
+#client .content .item.preview {
+	opacity: 0.55;
+	color: var(--primary-darkest-color);
+}
+#client .content .item.preview .cat-icon {
+	opacity: 0.7;
+}
 #client .content .item + .headline {
 	border-top: 2px solid #aaa;
 }
@@ -142,7 +149,7 @@
 	border-bottom-width: 2px;
 	border-radius: 0.2rem;
 	box-shadow: 0 0.1rem 0.2rem 0.01rem #00000040;
-	background-color: #f8f8f8;
+	background-color: #f6f6f6;
 	font-family: var(--font);
 	font-size: 1rem;
 	cursor: pointer;
@@ -212,7 +219,7 @@
 
 #statistics .button-group .icon.disabled {
 	color: #ccc;
-	background-color: #f8f8f8;
+	background-color: #f6f6f6;
 }
 
 #statistics .content .item {

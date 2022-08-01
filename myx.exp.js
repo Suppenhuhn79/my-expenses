@@ -7,6 +7,7 @@
  * @property {IdString} cat Expense category - id reference to categories
  * @property {IdString} pmt Used payment method - id reference to payment methods
  * @property {String} [txt] Additional text 
+ * @property {IdString} [rep] Repeating expense - id reference to repeating expenses
  *
  * @typedef ExpensesFilter
  * Defines filter for listing expenses.
@@ -32,6 +33,7 @@ let myxExpenses = function ()
 	let availibleMonths = [];
 	let elements = getNames(document.getElementById("expenses-list"));
 	let modeHandler = new ModuleModeHandler(elements._self);
+	let repeatings = repeatingExpenses();
 	/** @type {expenseEditor} */
 	let editor;
 	/** @type {Date} */
@@ -47,9 +49,33 @@ let myxExpenses = function ()
 	elements.navCurrent.onclick = onNavCurrentClick;
 
 	/**
+	 * Initializes the module by importing expenses editor and loading repeating expenses from file.
+	 * @returns {Promise<void>} Promise
+	 */
+	function init ()
+	{
+		return new Promise((resolve) => 
+		{
+			Promise.allSettled([
+				pageSnippets.import("snippets/expenseeditor.xml"),
+				repeatings.init()
+			]).then(() =>
+			{
+				editor = expenseEditor(repeatings, document.getElementById("client"));
+				doFontAwesome(document.getElementById("expense-editor"));
+				resetFilter();
+				window.r = repeatings; // TODO: debug only
+				console.log("Repeating expenses (`r`) have loaded.", window.r.data); // TODO: debug only
+				localStorage.removeItem("myx_rep"); // TODO: debug only
+				resolve();
+			});
+		});
+	};
+
+	/**
 	 * Loads data from a file. Converts the CSV data to an object and adds it to `data`.
 	 * @param {Number} fileIndex Index (`1..x`) of file to load
-	 * @returns {Promise<void>} Returns a Promise `resolve()`
+	 * @returns {Promise<void>} Promise
 	 */
 	function loadFromFile (fileIndex = 1)
 	{
@@ -58,7 +84,7 @@ let myxExpenses = function ()
 			/**
 			 * Mapping of CSV columns to `Expense` object memebers
 			 * @type {Array<String>} */
-			const KEYS = ["dat", "amt", "cat", "txt", "pmt"];
+			const KEYS = ["dat", "amt", "cat", "txt", "pmt", "rep"];
 			/**
 			 * Collection of already loaded months so we can clear the `data[<month>]` array.
 			 * @type {Array<MonthString>} */
@@ -115,7 +141,7 @@ let myxExpenses = function ()
 		let text = "";
 		for (let item of data[month])
 		{
-			text += [item.dat.toIsoFormatText("YMD"), item.amt, item.cat, item.txt, item.pmt].join("\t") + "\n";
+			text += [item.dat.toIsoFormatText("YMD"), item.amt, item.cat, item.txt, item.pmt, item.rep].join("\t") + "\n";
 		}
 		return text;
 	}
@@ -126,7 +152,7 @@ let myxExpenses = function ()
 	 * @param {MonthString|Array<MonthString>} months Months to save data
 	 * @async
 	 */
-	async function save (months)
+	async function saveToFile (months)
 	{
 		/** @type {Array<Number>} */
 		let fileIndexes = [];
@@ -171,10 +197,7 @@ let myxExpenses = function ()
 	function add (expense, bulk = false)
 	{
 		let month = expense.dat.toIsoFormatText("YM");
-		if (!hasAnyData(month))
-		{
-			data[month] = [];
-		}
+		data[month] ||= [];
 		data[month].push(Object.assign({}, expense));
 		if (bulk === false)
 		{
@@ -194,7 +217,7 @@ let myxExpenses = function ()
 	}
 
 	/**
-	 * Checks whether there are expenses in a certain month or not.
+	 * Checks whether there are any expenses (actual or upcoming repeatings) in a certain month or not.
 	 * @param {MonthString|Date} month Month to check for data
 	 * @returns {Boolean} `true` if there is any data for the month, `false` if there is no data
 	 */
@@ -204,8 +227,22 @@ let myxExpenses = function ()
 		{
 			month = month.toMonthString();
 		}
-		return ((!!data[month]) && (data[month].length > 0));
+		return (repeatings.get(month).concat(data[month] || []).length > 0);
 	}
+
+	/**
+	 * Checks whether there are actual expenses in a certain month or not.
+	 * @param {MonthString|Date} month Month to check for data
+	 * @returns {Boolean} `true` if there is any actual data for the month, `false` if there is no data
+	 */
+	function hasActualData (month)
+	{
+		if (month.constructor.name === "Date")
+		{
+			month = month.toMonthString();
+		}
+		return ((!!data[month]) && (data[month].length > 0));
+	};
 
 	/**
 	 * Sets the current filter and renders the list. Also the title will get a _seach hint_.
@@ -281,7 +318,7 @@ let myxExpenses = function ()
 			renderList();
 		};
 		navElement.innerText = monthNames[targetMonth.getMonth()].substring(0, 3);
-		navElement.parentElement.style.visibility = (hasAnyData(selectedMonth) || hasAnyData(targetMonth)) ? "visible" : "hidden";
+		navElement.parentElement.style.visibility = (hasActualData(selectedMonth) || hasActualData(targetMonth)) ? "visible" : "hidden";
 	}
 
 	/**
@@ -306,8 +343,9 @@ let myxExpenses = function ()
 	function renderItem (item, dataIndex)
 	{
 		let catLabel = myx.categories.getLabel(item.cat);
-		let div = htmlBuilder.newElement("div.item.click",
+		let div = htmlBuilder.newElement("div.item.click" + ((item.dat > new Date()) ? ".preview" : ""),
 			{ onclick: () => popupEditor(item, item.dat.toMonthString(), dataIndex) },
+			// dataIndex,
 			myx.categories.renderIcon(item.cat),
 			htmlBuilder.newElement("div.flex-fill.cutoff",
 				htmlBuilder.newElement("div.cutoff.big", item.txt || catLabel),
@@ -335,7 +373,7 @@ let myxExpenses = function ()
 		_renderNavItem(elements.navPrevious, selectedMonth.shiftMonths(-1));
 		_renderNavItem(elements.navNext, selectedMonth.shiftMonths(+1));
 		htmlBuilder.removeAllChildren(elements.content);
-		let items = [];
+		let renders = [];
 		elements.content.scrollTop = 0;
 		for (let month of filter.months.sort().reverse())
 		{
@@ -343,9 +381,13 @@ let myxExpenses = function ()
 			{
 				let currentDay = 0;
 				let headline;
-				for (let i = data[month].length - 1; i >= 0; i -= 1)
+				let repeatingExpenses = repeatings.get(month);
+				let actualExpenses = data[month] || [];
+				let items = actualExpenses.concat(repeatingExpenses);
+				let actualCount = actualExpenses.length;
+				for (let i = items.length - 1; i >= 0; i -= 1)
 				{
-					let item = data[month][i];
+					let item = items[i];
 					if (item.dat.getDate() !== currentDay)
 					{
 						currentDay = item.dat.getDate();
@@ -356,19 +398,19 @@ let myxExpenses = function ()
 					{
 						if (!!headline)
 						{
-							items.push(headline);
+							renders.push(headline);
 							headline = null;
 						}
-						items.push(renderItem(item, i));
+						renders.push(renderItem(item, (i < actualCount) ? i : -1 /* actualCount - i - 1 */));
 					}
 				}
 			}
 		}
-		if (items.length > 0)
+		if (renders.length > 0)
 		{
-			for (let item of items)
+			for (let render of renders)
 			{
-				elements.content.appendChild(item);
+				elements.content.appendChild(render);
 			}
 			if (((filter.cats.length > 0) || (!!filter.pmt)) && (filter.months.length < availibleMonths.length))
 			{
@@ -398,39 +440,52 @@ let myxExpenses = function ()
 	 */
 	function popupEditor (item, dataMonth, dataIndex)
 	{
-		editor.popup(item, dataMonth, dataIndex, (mode, item, originalMonth, originalIndex) =>
+		console.log("[!] popupEditor", dataIndex, item);
+		let editorItem = Object.assign({}, item);
+		if (!!item.rep)
 		{
+			editorItem.interval = repeatings.intervalOf(editorItem.rep);
+		}
+		editor.popup(editorItem, dataMonth, dataIndex, (mode, item, originalMonth, originalIndex) =>
+		{
+			console.log("got edited:", item, originalMonth, originalIndex);
 			let itemDate = item.dat.toIsoFormatText("YMD");
 			let itemMonth = itemDate.substr(0, 7);
-			switch (mode)
+			if (mode === "delete")
 			{
-				case "append":
-					add(item);
-					break;
-				case "modify":
-					if (itemMonth === originalMonth)
-					{
-						data[originalMonth][originalIndex] = Object.assign({}, item);
-						sortItems(originalMonth);
-					}
-					else
-					{
-						data[originalMonth].splice(originalIndex, 1);
+				data[originalMonth].splice(originalIndex, 1);
+				repeatings.set(item.rep, null, null);
+			}
+			else
+			{
+				item.rep = repeatings.set(item.rep, item, item.interval);
+				switch (mode)
+				{
+					case "append":
 						add(item);
-					}
-					break;
-				case "delete":
-					data[originalMonth].splice(originalIndex, 1);
-					break;
+						break;
+					case "modify":
+						if (itemMonth === originalMonth)
+						{
+							data[originalMonth][originalIndex] = Object.assign({}, item);
+							sortItems(originalMonth);
+						}
+						else
+						{
+							data[originalMonth].splice(originalIndex, 1);
+							add(item);
+						}
+						break;
+				}
 			}
 			if (mode !== "not_modified")
 			{
-				save([originalMonth, itemMonth]);
+				saveToFile([originalMonth, itemMonth]);
 			}
 			choices.set("active-tab", MODULE_NAME);
 			setMonth(new Date(itemMonth));
 			renderList();
-			elements.content.querySelector("[data-date='" + itemDate + "']")?.scrollIntoView({ block: "start", behavior: "smooth" });
+			elements.content.querySelector("[data-date='" + itemDate + "']")?.scrollIntoView({ block: "start", behavior: "auto" });
 		});
 	}
 
@@ -506,21 +561,17 @@ let myxExpenses = function ()
 	}
 
 	/* **** INIT MODULE **** */
-	pageSnippets.import("snippets/expenseeditor.xml").then(() =>
-	{
-		editor = expenseEditor(myx.paymentMethods, myx.categories, document.getElementById("client"));
-	});
-	resetFilter();
-
 	return { // publish members
-		get moduleName () { return MODULE_NAME; },
-		get data () { return data; },
+		get data () { return data; }, // TODO: debug only
 		get index () { return dataIndex; }, // TODO: debug only
 		getCsv: getCsv, // TODO: debug only
-		save: save, // TODO: debug only
+		save: saveToFile, // TODO: debug only
+		get moduleName () { return MODULE_NAME; },
+		init: init,
 		get selectedMonth () { return selectedMonth; },
 		set selectedMonth (value) { setMonth(value); },
 		get availibleMonths () { return availibleMonths; },
+		hasActualData: hasActualData,
 		hasAnyData: hasAnyData,
 		loadFromFile: loadFromFile,
 		enter: () => { renderList(); },

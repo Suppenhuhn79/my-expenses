@@ -105,13 +105,13 @@ const localeSeparator = (function ()
 	};
 })();
 
-// Expand Date class with useful capatibilities 
+// Extend Date class with useful capatibilities 
 Date.prototype.toMonthString = function ()
 {
 	return this.toIsoFormatText("YM");
 };
 
-// Expand Array class with useful capatibilities 
+// Extend Array class with useful capatibilities 
 Array.prototype.removeDuplicates = function ()
 {
 	this.splice(0, this.length, ...new Set(this));
@@ -126,6 +126,7 @@ const fa = {
 	angle_right: "&#xf105;",
 	arrow_left: "&#xf060;",
 	asterisk: "&#xf069;",
+	backspace: "&#xf55a;",
 	backward: "&#xf04a;",
 	ban: "&#xf05e;",
 	bars: "&#xf0c9;",
@@ -139,6 +140,7 @@ const fa = {
 	chart_line: "&#xf201;",
 	chart_pie: "&#xf200;",
 	check: "&#xf00c;",
+	clone: "&#xf24d;",
 	divide: "&#xf529;",
 	filter: "&#xf0b0;",
 	infinite: "&#xf534;",
@@ -147,12 +149,14 @@ const fa = {
 	pen: "&#xf304;",
 	plus: "&#xf067;",
 	plus_square: "&#xf0fe;",
+	redo: "&#xf01e;",
 	search: "&#xf002;",
 	smiley_meh: "&#xf11a;",
 	sort: "&#xf0dc;",
 	space: "&#x00a0;",
 	star: "&#xf005;",
 	times: "&#xf00d;",
+	trash_alt: "&#xf2ed;",
 	wallet: "&#xf555;"
 };
 
@@ -160,6 +164,7 @@ function doFontAwesome (element)
 {
 	for (let e of element.querySelectorAll("i[data-icon]"))
 	{
-		e.innerHTML = fa[e.dataset.icon] || "[" + e.dataset.icon + "]";
+		let iconKey = e.dataset.icon.replaceAll(/-/g, "_");
+		e.innerHTML = fa[iconKey] || "[" + iconKey + "]";
 	}
 }

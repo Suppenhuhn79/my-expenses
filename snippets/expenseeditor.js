@@ -1,4 +1,4 @@
-const expenseEditor = function (paymentMethods, categories, targetElement)
+const expenseEditor = function (repeatingExpenses, targetElement)
 {
 	let elements = getNames(pageSnippets.expenseEditor.produce());
 	let originTabName;
@@ -35,7 +35,7 @@ const expenseEditor = function (paymentMethods, categories, targetElement)
 	elements.pmt.onclick = (event) =>
 	{
 		event.stopPropagation();
-		paymentMethods.prompt(elements.pmt, (pmt) =>
+		myx.paymentMethods.prompt(elements.pmt, (pmt) =>
 		{
 			currentItem.pmt = pmt;
 			renderPmt();
@@ -51,11 +51,26 @@ const expenseEditor = function (paymentMethods, categories, targetElement)
 				break;
 		};
 	};
+	elements.redo.onclick = (mouseEvent) =>
+	{
+		if (!elements.delete.classList.contains("disabled"))
+		{
+			if ((currentItem.interval?.months > 0) || (currentItem.interval?.weeks > 0))
+			{
+				delete currentItem.interval;
+			}
+			else
+			{
+				currentItem.interval = { months: 1 };
+			}
+			checkCapatibilities();
+		}
+	};
 	elements.delete.onclick = (mouseEvent) =>
 	{
 		if (!elements.delete.classList.contains("disabled"))
 		{
-			confirmDeletePrompt.popup(mouseEvent, null, mouseEvent.target, "start left, above bottom");
+			confirmDeletePrompt.popup(mouseEvent, null, mouseEvent.target.closest("td"), "start left, above bottom");
 		}
 	};
 	elements.keypad.onclick = (mouseEvent) =>
@@ -84,13 +99,23 @@ const expenseEditor = function (paymentMethods, categories, targetElement)
 
 	function checkCapatibilities ()
 	{
-		for (let name of ["clone", "delete"])
+		for (let name of ["clone", "redo", "delete"])
 		{
 			(typeof originalIndex === "number") ? elements[name].classList.remove("disabled") : elements[name].classList.add("disabled");
 		}
 		(currentItem.cat) ? elements.apply.classList.remove("disabled") : elements.apply.classList.add("disabled");
 		elements.title.innerText = (typeof originalIndex === "number") ? "edit expense" : "add expense";
 		elements.dat.value = currentItem.dat.toIsoFormatText("YMD");
+		if ((currentItem.interval?.months > 0) || (currentItem.interval?.weeks > 0))
+		{
+			elements.repeatingButtonOverlay.innerHTML = repeatingExpenses.getSupershortIntervalText(currentItem.interval);
+			elements.repeatingButtonOverlay.style.display = null;
+		}
+		else
+		{
+			elements.repeatingButtonOverlay.style.display = "none";
+		}
+		// TODO: capatibilities for preview of repeating expenses
 	};
 
 	function setAmountText ()
@@ -102,8 +127,8 @@ const expenseEditor = function (paymentMethods, categories, targetElement)
 	function renderPmt ()
 	{
 		let div = htmlBuilder.newElement("div.labeled-icon",
-			paymentMethods.renderIcon(currentItem?.pmt || paymentMethods.defaultPmt),
-			htmlBuilder.newElement("div.label.cutoff", paymentMethods.getLabel(currentItem.pmt))
+			myx.paymentMethods.renderIcon(currentItem?.pmt || myx.paymentMethods.defaultPmt),
+			htmlBuilder.newElement("div.label.cutoff", myx.paymentMethods.getLabel(currentItem.pmt))
 		);
 		htmlBuilder.replaceContent(elements.pmt, div);
 	};
@@ -116,7 +141,7 @@ const expenseEditor = function (paymentMethods, categories, targetElement)
 			dat: new Date(),
 			amt: 0,
 			cat: null,
-			pmt: paymentMethods.defaultPmt
+			pmt: myx.paymentMethods.defaultPmt
 		}, item);
 		originalMonth = dataMonth;
 		originalIndex = dataIndex;
@@ -129,7 +154,7 @@ const expenseEditor = function (paymentMethods, categories, targetElement)
 		setAmountText();
 		elements.txt.value = currentItem.txt || "";
 		choices.set("active-tab", "expense-editor");
-		categories.renderSelection(elements.categorySelector, currentItem.cat, onCategoryChosen);
+		myx.categories.renderSelection(elements.categorySelector, currentItem.cat, onCategoryChosen);
 		checkCapatibilities();
 	};
 
@@ -160,7 +185,7 @@ const expenseEditor = function (paymentMethods, categories, targetElement)
 			currentItem.amt = Number(amountAsString);
 			currentItem.txt = elements.txt.value || null;
 			let callbackMode = (typeof originalIndex === "number") ? "modify" : "append";
-			if (stringHash(JSON.stringify(currentItem)) === stringHash(originalItem))
+			if ((stringHash(JSON.stringify(currentItem)) === stringHash(originalItem)) || (originalIndex < 0))
 			{
 				callbackMode = "not_modified";
 			}
