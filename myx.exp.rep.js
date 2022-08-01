@@ -1,75 +1,6 @@
-const repFile = {
-	items: {
-		/*
-			"2c495feb": {
-				"expense": {
-					dat: "2022-06-30",
-					txt: "last of month",
-					cat: "4d482941",
-					pmt: "1117367a",
-					amt: 999
-				},
-				"interval": {
-					"months": 1,
-					"originalDate": 31
-				}
-			},
-			*/
-		"bf6dbd10": { // 2022-04-29	65	145a19f7		80d529cf
-			"expense": {
-				dat: "2022-07-29",
-				cat: "145a19f7",
-				pmt: "80d529cf",
-				amt: 65
-			},
-			"interval": {
-				"months": 1,
-				"originalDate": 29
-			}
-		},
-		"e72d996e": { // 2022-04-15	11.99	5d4a6fae		80d529cf
-			"expense": {
-				dat: "2022-07-15",
-				cat: "5d4a6fae",
-				pmt: "80d529cf",
-				amt: 11.99
-			},
-			"interval": {
-				"months": 1,
-				"originalDate": 15
-			}
-		}
-		/*,
-		"64b5e2c0": {
-			"expense": {
-				dat: "2022-06-01",
-				txt: "first of month",
-				cat: "9d69977f",
-				pmt: "80d529cf",
-				amt: 91
-			},
-			"interval": {
-				"months": 1,
-				"originalDate": 1
-			}
-		} /*,
-		"947ac085": {
-			"expense": {
-				"dat": "2022-07-01",
-				"inf": "weekly"
-			},
-			"interval": {
-				"weeks": 1
-			}
-		}
-		*/
-	},
-	order: ["bf6dbd10", "e72d996e"]
-};
-
 /**
  * @typedef RepeatingIntervall
- * A repeating interval may be either a count of `weeks` or a count of `months`.
+ * A repeating interval; may be either a count of `weeks` or a count of `months`.
  * @type {Object}
  * @property {Number} [weeks] Count of weeks between interval points
  * @property {Number} [months] Count of months between interval points
@@ -166,7 +97,7 @@ let repeatingExpenses = function ()
 	 * @param {IdString} [id] Id of repeating expense; if ommited and an interval is given, an new repeating expense is added
 	 * @param {Expense} expense Expense data
 	 * @param {RepeatingIntervall} [interval] New repeating interval for the expense; if ommited, the repeating expense is deleted
-	 * @returns {IdString|null} Id or the modified/added expense or `undefined` if repeating expense hab been deleted
+	 * @returns {IdString|null} Id of the modified/added expense or `undefined` if repeating expense hab been deleted
 	 */
 	function modify (id, expense, interval)
 	{
@@ -210,6 +141,12 @@ let repeatingExpenses = function ()
 		return id;
 	}
 
+	/**
+	 * Adds an repeating expense as an actual expense.
+	 * @param {RepeatingExpense} repeatingExpense Repeating expense to add as actual expense
+	 * @param {Date} executionDate Actual execution date of expense to add
+	 * @returns {RepeatingExpense} repeating expense with updated `nextDueDate`
+	 */
 	function addExpense (repeatingExpense, executionDate)
 	{
 		repeatingExpense.expense.dat = executionDate;
@@ -292,12 +229,6 @@ let repeatingExpenses = function ()
 		promptEditor: promptEditor,
 		get: process,
 		set: modify,
-		/**
-		 * Returns the next due date of a repeating expense.
-		 * @param {IdString} id Repeating expense id
-		 * @returns {Date}
-		 */
-		nextDueDateOf: (id) => { return nextIntervalDate(data[id].expense.dat, data[id].interval); },
 		/**
 		 * Returns the interval of a repeating expense.
 		 * @param {IdString} id Repeating expense id
