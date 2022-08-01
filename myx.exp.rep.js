@@ -28,10 +28,10 @@ let repeatingExpenses = function ()
 	let order = [];
 
 	/**
- * Initializes the module by loading repeating expenses from file.
- * @returns {Promise<void>}
- */
-	function init ()
+	* Loads _repeating expenses_ from cache or remote file (if modified).
+	* @returns {Promise<void>}
+	*/
+	function fetchData ()
 	{
 		return new Promise((resolve) =>
 		{
@@ -225,7 +225,7 @@ let repeatingExpenses = function ()
 	return {
 		get data () { return data; }, // TODO: debug only
 		nextIntervalDate: nextIntervalDate, // TODO: debug only
-		init: init,
+		fetchData: fetchData,
 		promptEditor: promptEditor,
 		get: process,
 		set: modify,

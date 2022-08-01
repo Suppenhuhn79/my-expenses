@@ -49,7 +49,7 @@ let myxExpenses = function ()
 	elements.navCurrent.onclick = onNavCurrentClick;
 
 	/**
-	 * Initializes the module by importing expenses editor and loading repeating expenses from file.
+	 * Initializes the module.
 	 * @returns {Promise<void>} Promise
 	 */
 	function init ()
@@ -57,8 +57,7 @@ let myxExpenses = function ()
 		return new Promise((resolve) => 
 		{
 			Promise.allSettled([
-				pageSnippets.import("snippets/expenseeditor.xml"),
-				repeatings.init()
+				pageSnippets.import("snippets/expenseeditor.xml")
 			]).then(() =>
 			{
 				editor = expenseEditor(repeatings, document.getElementById("client"));
@@ -66,7 +65,34 @@ let myxExpenses = function ()
 				resetFilter();
 				window.r = repeatings; // TODO: debug only
 				console.log("Repeating expenses (`r`) have loaded.", window.r.data); // TODO: debug only
-				localStorage.removeItem("myx_rep"); // TODO: debug only
+				resolve();
+			});
+		});
+	};
+
+	/**
+	 * Loads _expenses_ and _repeating expenses_ from cache or remote files (if modified).
+	 * @returns {Promise<void>} Promise
+	 */
+	function fetchData ()
+	{
+		return new Promise((resolve) => 
+		{
+			/**
+			 * Iterable promises of all file load actions
+			 * @type {Array<Promise>} */
+			let asyncCalls = [];
+			asyncCalls.push(repeatings.fetchData());
+			for (let fileIndex = Object.keys(googleappApi.files).length; fileIndex > 0; fileIndex -= 1)
+			{
+				let fileName = "data-" + fileIndex + ".csv";
+				if (googleappApi.files[fileName] !== undefined)
+				{
+					asyncCalls.push(loadFromFile(fileIndex));
+				}
+			}
+			Promise.allSettled(asyncCalls).then(() =>
+			{
 				resolve();
 			});
 		});
@@ -423,7 +449,6 @@ let myxExpenses = function ()
 	 */
 	function popupEditor (item, dataMonth, dataIndex)
 	{
-		console.log("[!] popupEditor", dataIndex, item);
 		let editorItem = Object.assign({}, item);
 		if (!!item.rep)
 		{
@@ -543,7 +568,6 @@ let myxExpenses = function ()
 		popupEditor({ dat: itemDate });
 	}
 
-	/* **** INIT MODULE **** */
 	return { // publish members
 		get data () { return data; }, // TODO: debug only
 		get index () { return dataIndex; }, // TODO: debug only
@@ -551,15 +575,14 @@ let myxExpenses = function ()
 		save: saveToFile, // TODO: debug only
 		get moduleName () { return MODULE_NAME; },
 		init: init,
+		fetchData: fetchData,
 		get selectedMonth () { return selectedMonth; },
 		set selectedMonth (value) { setMonth(value); },
 		get availibleMonths () { return availibleMonths; },
 		hasActualData: hasActualData,
-		loadFromFile: loadFromFile,
-		enter: () => { renderList(); },
-		leave: () => { resetFilter(); },
+		enter: renderList,
+		leave: resetFilter,
 		setFilter: setFilter,
-		edit: popupEditor,
-		popupAvalibleMonthsMenu: popupAvalibleMonthsMenu
+		edit: popupEditor
 	};
 };

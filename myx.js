@@ -32,24 +32,19 @@ let myx = function ()
 
 	function init ()
 	{
-		/**
-		 * Iterable promises of all file load actions
-		 * @type {Array<Promise>} */
-		let asyncCalls = [];
-		localStorage.removeItem(AUTOSIGNIN_FLAG);
-		for (let fileIndex = Object.keys(googleappApi.files).length; fileIndex > 0; fileIndex -= 1)
+		return new Promise((resolve) =>
 		{
-			let fileName = "data-" + fileIndex + ".csv";
-			if (googleappApi.files[fileName] !== undefined)
+			doFontAwesome(document.body);
+			choices.onChoose("active-tab", onTabChosen);
+			window.addEventListener("focus", onWindowFocus, false);
+			Promise.allSettled([
+				pageSnippets.import("snippets/iconeditor.xml"),
+				expenses.init()
+			]).then(() =>
 			{
-				asyncCalls.push(expenses.loadFromFile(fileIndex));
-			}
-		}
-		Promise.allSettled(asyncCalls).then(() =>
-		{
-			document.getElementById("dummy")?.remove();
-			choices.set("active-tab", choices.get("active-tab") || expenses.moduleName);
-			onTabChosen(choices.get("active-tab"), true);
+				window.iconEditor = iconEditor(document.getElementById("client"));
+				resolve();
+			});
 		});
 	}
 
@@ -105,12 +100,18 @@ let myx = function ()
 		googleappApi.init().then(
 			() =>
 			{ // successfully signed in
+				localStorage.removeItem(AUTOSIGNIN_FLAG);
 				console.table(googleappApi.files);
 				Promise.allSettled([
-					categories.init(),
-					paymentMethods.init(),
-					expenses.init(),
-				]).then(init);
+					categories.fetchData(),
+					paymentMethods.fetchData(),
+					expenses.fetchData(),
+				]).then(() => 
+				{
+					document.getElementById("dummy")?.remove();
+					choices.set("active-tab", choices.get("active-tab") || expenses.moduleName);
+					onTabChosen(choices.get("active-tab"), true);
+				});
 			},
 			(reason) =>
 			{ // operation failed
@@ -128,6 +129,7 @@ let myx = function ()
 					document.getElementById("signin-button").onclick = googleappApi.signIn;
 					choices.set("active-tab", "not-signed-in");
 				}
+				localStorage.removeItem(AUTOSIGNIN_FLAG);
 			}
 		);
 	};
@@ -147,14 +149,7 @@ let myx = function ()
 		xhrActivityIndicator.classList = ["error"];
 	}
 
-	doFontAwesome(document.body);
-	choices.onChoose("active-tab", onTabChosen);
-	pageSnippets.import("snippets/iconeditor.xml").then(() =>
-	{
-		window.iconEditor = iconEditor(document.getElementById("client"));
-	});
-	window.addEventListener("focus", onWindowFocus, false);
-	onWindowFocus();
+	init().then(onWindowFocus);
 
 	return { // publish members
 		statistics: statistics, // TODO: debug only

@@ -61,10 +61,10 @@ let myxPaymentMethods = function ()
 	elements.addButton.onclick = () => promptEditor();
 
 	/**
-	 * Initializes the module by loading payment methods from file.
+	 * Loads _payment methods_ from cache or remote file (if modified).
 	 * @returns {Promise<void>} Promise
 	 */
-	function init ()
+	function fetchData ()
 	{
 		return new Promise((resolve) =>
 		{
@@ -278,7 +278,7 @@ let myxPaymentMethods = function ()
 
 	return { // publish members
 		get moduleName () { return MODULE_NAME; },
-		init: init,
+		fetchData: fetchData,
 		enter: () => renderList("default"),
 		leave: () => modeHandler.setMode("default"),
 		/** @type {IdString} */
