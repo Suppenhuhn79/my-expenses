@@ -55,7 +55,7 @@ let myxCategories = function ()
 	elements.addButton.onclick = () => promptEditor();
 
 	/**
-	 * Initializes the module by loading categories from config file on Google Drive.
+	 * Initializes the module by loading categories from file.
 	 * @returns {Promise<void>} Promise
 	 */
 	function init ()

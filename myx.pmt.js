@@ -61,7 +61,7 @@ let myxPaymentMethods = function ()
 	elements.addButton.onclick = () => promptEditor();
 
 	/**
-	 * Initializes the module by loading payment methods from config file on Google Drive.
+	 * Initializes the module by loading payment methods from file.
 	 * @returns {Promise<void>} Promise
 	 */
 	function init ()
