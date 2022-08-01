@@ -55,7 +55,7 @@ textarea {
 }
 
 html {
-	height: 100vh;
+	height: 100%;
 	background-color: #eee;
 }
 
@@ -67,18 +67,15 @@ body {
 
 [data-choice-client]:not(.chosen) {
 	display: none !important;
-	/* visibility: hidden; */
 }
 
 .high-flex {
 	display: flex;
 	flex-direction: column;
-	/* width: 100%; */
 }
 .wide-flex {
 	display: flex;
 	flex-direction: row;
-	/* width: 100%; */
 }
 .flex-fill {
 	flex: 1;
