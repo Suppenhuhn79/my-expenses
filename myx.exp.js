@@ -381,25 +381,47 @@ let myxExpenses = function ()
 	 */
 	function renderList ()
 	{
+		/** @type {Array<HTMLElement>} */
+		let renders = [];
+		/** @type {date} */
+		let today = new Date();
+		/** @type {Date} */
+		let lastDateRendered;// = new Date();
 		elements.navCurrent.innerText = getFullMonthText(selectedMonth);
 		_renderNavItem(elements.navPrevious, selectedMonth.shiftMonths(-1));
 		_renderNavItem(elements.navNext, selectedMonth.shiftMonths(+1));
 		htmlBuilder.removeAllChildren(elements.content);
-		let renders = [];
 		elements.content.scrollTop = 0;
 		for (let month of filter.months.sort().reverse())
 		{
+			/** @type {Number} */
 			let currentDay = 0;
+			/** @type {HTMLElement} */
 			let headline;
+			/** @type {Array<Expense>} */
 			let repeatingExpenses = repeatings.get(month);
+			/** @type {Array<Expense>} */
 			let actualExpenses = data[month] || [];
+			/** @type {Array<Expense>} */
 			let items = actualExpenses.concat(repeatingExpenses);
+			/** @type {Number} */
 			let actualCount = actualExpenses.length;
 			for (let i = items.length - 1; i >= 0; i -= 1)
 			{
 				let item = items[i];
 				if (item.dat.getDate() !== currentDay)
 				{
+					if ((lastDateRendered > today) && (item.dat <= today))
+					{
+						let marker = htmlBuilder.newElement("div#previewmarker.headline.center",
+							{ onclick: () => { elements.content.scrollTo({ top: 0, behavior: "smooth" }); } },
+							htmlBuilder.newElement("i.fas", { 'data-icon': "angle-double-up" }),
+							"&#x00a0;Upcoming expenses preview&#x00a0;",
+							htmlBuilder.newElement("i.fas", { 'data-icon': "angle-double-up" })
+						);
+						doFontAwesome(marker);
+						renders.push(marker);
+					}
 					currentDay = item.dat.getDate();
 					headline = renderHeadline(item.dat);
 				}
@@ -413,6 +435,7 @@ let myxExpenses = function ()
 					}
 					renders.push(renderItem(item, (i < actualCount) ? i : -1 /* actualCount - i - 1 */));
 				}
+				lastDateRendered = item.dat;
 			}
 		}
 		if (renders.length > 0)
@@ -431,6 +454,7 @@ let myxExpenses = function ()
 			{
 				elements.content.appendChild(htmlBuilder.newElement("div.spacer"));
 			}
+			document.getElementById("previewmarker")?.scrollIntoView({ block: "start", behavior: "auto" });
 		}
 		else
 		{
@@ -449,6 +473,7 @@ let myxExpenses = function ()
 	 */
 	function popupEditor (item, dataMonth, dataIndex)
 	{
+		/** @type {Expense}*/
 		let editorItem = Object.assign({}, item);
 		if (!!item.rep)
 		{

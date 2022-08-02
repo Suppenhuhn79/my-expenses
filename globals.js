@@ -124,6 +124,8 @@ const weekdayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "F
 const fa = {
 	angle_left: "&#xf104;",
 	angle_right: "&#xf105;",
+	angle_up: "&#xf106;",
+	angle_double_up: "&#xf102;",
 	arrow_left: "&#xf060;",
 	asterisk: "&#xf069;",
 	backspace: "&#xf55a;",
@@ -143,6 +145,7 @@ const fa = {
 	clone: "&#xf24d;",
 	divide: "&#xf529;",
 	filter: "&#xf0b0;",
+	hourglass_half: "&#xf252;",
 	infinite: "&#xf534;",
 	list_ul: "&#xf0ca;",
 	micoscope: "&#xf610;",
