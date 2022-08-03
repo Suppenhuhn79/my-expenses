@@ -1,9 +1,10 @@
 /**
- * Provides an index of which data file does contain which months.
- * File numbers start at 1.
+ * @namespace myxExpensesDataindex
+ * myx-expenses data index of which data file does contain which months.
+ * File numbers start at `1`.
  * Months are notated as string in `yyyy-mm`-format.
  */
-const myxDataindex = function () 
+const myxExpensesDataindex = function () 
 {
 	const MAX_MONTHS_PER_FILE = 5;
 	/**

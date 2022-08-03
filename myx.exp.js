@@ -26,7 +26,7 @@ let myxExpenses = function ()
 {
 	const MODULE_NAME = "expenses-tab";
 	let data = {};
-	let dataIndex = myxDataindex();
+	let dataIndex = myxExpensesDataindex();
 	/** @type {ExpensesFilter} */
 	let filter = {};
 	/** @type {Array<MonthString>} */
