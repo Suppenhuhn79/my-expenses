@@ -1,23 +1,13 @@
-class ModuleModeHandler
+/**
+ * Creates a new instance of ModuleModeHandler.
+ * @param {HTMLElement} element Element that contains module items
+ * @param {Function} dataGetter `function(): Object` to get the current module data before switching to "edit" mode
+ * @param {Function} dataSetter `function(data: Object)` to call to reset modified data when cancelling "edit" mode
+ */
+function ModuleModeHandler (element, dataGetter, dataSetter)
 {
-	#element;
-	#dataBeforeEdit;
-	#dataGetter;
-	#dataSetter;
-	currentMode = "default";
-
-	/**
-	 * Creates a new instance of ModuleModeHandler.
-	 * @param {HTMLElement} element Element that contains module items
-	 * @param {Function} dataGetter `function(): Object` to get the current module data before switching to "edit" mode
-	 * @param {Function} dataSetter `function(data: Object)` to call to reset modified data when cancelling "edit" mode
-	 */
-	constructor(element, dataGetter, dataSetter)
-	{
-		this.#element = element;
-		this.#dataGetter = dataGetter;
-		this.#dataSetter = dataSetter;
-	}
+	let dataBeforeEdit;
+	this.currentMode = "default";
 
 	/**
 	 * Sets the current mode for the module. Hides all elements that have the class "for-mode"
@@ -27,30 +17,30 @@ class ModuleModeHandler
 	 * is restored to backup via `dataSetter()`.
 	 * @param {String} newMode Mew mode to set
 	 */
-	setMode (newMode)
+	this.setMode = function (newMode)
 	{
 		console.log("setMode", this.currentMode, "-->", newMode);
-		if ((typeof this.#dataGetter === "function") && (typeof this.#dataSetter === "function"))
+		if ((typeof dataGetter === "function") && (typeof dataSetter === "function"))
 		{
 			if ((this.currentMode === "default") && (newMode === "edit"))
 			{
 				// backup data to persistent json string
-				this.#dataBeforeEdit = JSON.stringify(this.#dataGetter());
+				dataBeforeEdit = JSON.stringify(dataGetter());
 			}
 			else if ((this.currentMode === "edit") && (newMode === "default"))
 			{
 				// revert data to pre-edit state
-				this.#dataSetter(JSON.parse(this.#dataBeforeEdit));
+				dataSetter(JSON.parse(dataBeforeEdit));
 			}
 		}
 		this.currentMode = newMode || "default";
 		if (newMode.startsWith("__") === false) // a mode with "__" prefix is an intermediate mode and we don't need to update the ui
 		{
 			let modeCssClass = this.currentMode + "-mode";
-			for (let element of this.#element.querySelectorAll(".for-mode"))
+			for (let childElement of element.querySelectorAll(".for-mode"))
 			{
-				(element.classList.contains(modeCssClass)) ? element.classList.remove("hidden") : element.classList.add("hidden");
+				(childElement.classList.contains(modeCssClass)) ? childElement.classList.remove("hidden") : childElement.classList.add("hidden");
 			}
 		}
-	}
+	};
 }
