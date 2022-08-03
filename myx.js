@@ -32,11 +32,12 @@ let myx = function ()
 
 	function init ()
 	{
+		doFontAwesome(document.body);
+		choices.set("active-tab", "data-dummy");
+		choices.onChoose("active-tab", onTabChosen);
+		window.addEventListener("focus", onWindowFocus, false);
 		return new Promise((resolve) =>
 		{
-			doFontAwesome(document.body);
-			choices.onChoose("active-tab", onTabChosen);
-			window.addEventListener("focus", onWindowFocus, false);
 			Promise.allSettled([
 				pageSnippets.import("snippets/iconeditor.xml"),
 				expenses.init()
@@ -50,7 +51,8 @@ let myx = function ()
 
 	function onTabChosen (tabName, interactive)
 	{
-		(tabName.endsWith("-editor")) ? bottomMenu.classList.add("hidden") : bottomMenu.classList.remove("hidden");
+		console.log("onTabChosen", tabName, interactive);
+		(tabName.endsWith("-tab")) ? bottomMenu.classList.remove("hidden") : bottomMenu.classList.add("hidden");
 		if (interactive)
 		{
 			activeTab?.leave?.();
@@ -69,7 +71,7 @@ let myx = function ()
 					activeTab = statistics;
 					break;
 			}
-			activeTab.enter();
+			activeTab?.enter?.();
 		}
 	}
 
@@ -97,6 +99,11 @@ let myx = function ()
 	{
 		// console.clear();
 		console.debug("window focused");
+		let currentChosenTab = choices.get("active-tab");
+		if (currentChosenTab !== "data-dummy")
+		{
+			xhrBegin();
+		}
 		googleappApi.init().then(
 			() =>
 			{ // successfully signed in
@@ -108,15 +115,22 @@ let myx = function ()
 					expenses.fetchData(),
 				]).then(() => 
 				{
-					document.getElementById("dummy")?.remove();
-					choices.set("active-tab", choices.get("active-tab") || expenses.moduleName);
+					let currentContentElement = document.querySelector("#client .chosen .content");
+					let currentScrollPosition = currentContentElement?.scrollTop || 0;
+					xhrSuccess();
+					choices.set("active-tab", (currentChosenTab === "data-dummy") ? expenses.moduleName : currentChosenTab);
 					onTabChosen(choices.get("active-tab"), true);
+					if (!!currentContentElement)
+					{
+						currentContentElement.scrollTop = currentScrollPosition;
+					}
 				});
 			},
 			(reason) =>
 			{ // operation failed
 				googleappApi.tokenCookie.clear();
-				console.warn("google login failed", "AUTOSIGNIN_FLAG?", localStorage.getItem(AUTOSIGNIN_FLAG));
+				xhrActivityIndicator.classList = [];
+				console.warn("google login failed", reason, "AUTOSIGNIN_FLAG?", localStorage.getItem(AUTOSIGNIN_FLAG));
 				if ((reason?.status === 401 /* "unauthorized" */) && (localStorage.getItem(AUTOSIGNIN_FLAG) !== "true"))
 				{
 					localStorage.setItem(AUTOSIGNIN_FLAG, true);
@@ -125,26 +139,28 @@ let myx = function ()
 				}
 				else
 				{
-					document.getElementById("bottom-menu").classList.add("hidden");
-					document.getElementById("signin-button").onclick = googleappApi.signIn;
 					choices.set("active-tab", "not-signed-in");
+					document.getElementById("signin-button").onclick = googleappApi.signIn;
 				}
 				localStorage.removeItem(AUTOSIGNIN_FLAG);
 			}
 		);
 	};
 
-	function xhrOnBegin ()
+	function xhrBegin ()
 	{
 		xhrActivityIndicator.classList = ["active"];
 	}
 
-	function xhrOnSuccess ()
+	function xhrSuccess ()
 	{
-		xhrActivityIndicator.classList = ["success"];
+		if (xhrActivityIndicator.classList.contains("active"))
+		{
+			xhrActivityIndicator.classList = ["success"];
+		}
 	}
 
-	function xhrOnError ()
+	function xhrError ()
 	{
 		xhrActivityIndicator.classList = ["error"];
 	}
@@ -162,9 +178,9 @@ let myx = function ()
 		setExpenseFilter: expenses.setFilter,
 		newId: newId,
 		formatAmountLocale: formatAmountLocale,
-		xhrBegin: xhrOnBegin,
-		xhrSuccess: xhrOnSuccess,
-		xhrError: xhrOnError
+		xhrBegin: xhrBegin,
+		xhrSuccess: xhrSuccess,
+		xhrError: xhrError
 	};
 }();
 

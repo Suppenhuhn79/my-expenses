@@ -157,7 +157,7 @@ const myxStatisticsTimerange = function ()
  */
 const myxStatistics = function ()
 {
-	const MODULE_NAME = "statistics";
+	const MODULE_NAME = "statistics-tab";
 	let elements = getNames(document.getElementById(MODULE_NAME));
 	let aggregator = myxStatisticAggregator();
 	let timerange = myxStatisticsTimerange(performAggregation);
@@ -176,7 +176,7 @@ const myxStatistics = function ()
 	/** @type {Array<MonthString>} */
 	let actualCalculatedMonths;
 
-	let chartMenu = new Menubox("mxy.sta.chart", {
+	let chartMenu = new Menubox("sta.chart", {
 		title: "Chart",
 		items: [
 			{

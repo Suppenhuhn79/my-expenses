@@ -24,16 +24,16 @@
  */
 let myxExpenses = function ()
 {
-	const MODULE_NAME = "expenses-list";
+	const MODULE_NAME = "expenses-tab";
 	let data = {};
 	let dataIndex = myxDataindex();
 	/** @type {ExpensesFilter} */
 	let filter = {};
 	/** @type {Array<MonthString>} */
 	let availibleMonths = [];
-	let elements = getNames(document.getElementById("expenses-list"));
+	let elements = getNames(document.getElementById("expenses-tab"));
 	let modeHandler = new ModuleModeHandler(elements._self);
-	let repeatings = repeatingExpenses();
+	let repeatings = myxRepeatingExpenses();
 	/** @type {expenseEditor} */
 	let editor;
 	/** @type {Date} */
@@ -547,7 +547,7 @@ let myxExpenses = function ()
 				label: monthNames[monthAsDate.getMonth()] + "\u00a0" + monthYear
 			});
 		}
-		let menubox = new Menubox("months-selection", { items: menuItems }, (event) =>
+		let menubox = new Menubox("exp.months-selection", { items: menuItems }, (event) =>
 		{
 			if (typeof callback === "function")
 			{

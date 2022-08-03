@@ -13,7 +13,7 @@
  */
 let myxPaymentMethods = function ()
 {
-	const MODULE_NAME = "payment-methods";
+	const MODULE_NAME = "payment-methods-tab";
 	const FILE_NAME = "pmt.json";
 	const DEFAULTS = {
 		order: ["d2ba53b0", "b6eb6e66"],
@@ -112,7 +112,7 @@ let myxPaymentMethods = function ()
 				iconHtml: renderIcon(id)
 			});
 		}
-		let menubox = new Menubox("payment-methods", { items: menuItems }, (event) =>
+		let menubox = new Menubox("pmt.selection", { items: menuItems }, (event) =>
 		{
 			if (typeof callback === "function")
 			{

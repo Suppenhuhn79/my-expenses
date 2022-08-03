@@ -32,15 +32,18 @@
 			<h1>my expenses</h1>
 		</div>
 		<div id="client">
-			<div id="not-signed-in" class="fullscreen-client" data-choice-client="not-signed-in">
+			<!-- not sigend in -->
+			<div id="not-signed-in" data-choice-client="not-signed-in" class="fullscreen-msg">
 				<div class="fullscreen-msg">
-					<div class="icon far" data-icon="smiley_meh"></div>
+					<div class="icon">
+						<i class="icon far" data-icon="smiley-meh"></i>
+					</div>
 					<div class="label">You are not sigend in.</div>
 					<div id="signin-button" class="click">Click here to sign in.</div>
 				</div>
 			</div>
 			<!-- dummy tab -->
-			<div id="dummy">
+			<div id="data-dummy" data-choice-client="data-dummy">
 				<div class="client-header">
 					<div><span class="dummy text w2"></span></div>
 					<div class="center flex-fill"><span class="dummy text w9"></span></div>
@@ -63,7 +66,7 @@
 				</div>
 			</div>
 			<!-- client tab "EXPENSES" -->
-			<div id="expenses-list" data-choice-client="expenses-list">
+			<div id="expenses-tab" data-choice-client="expenses-tab">
 				<div name="month-navigator" class="client-header for-mode default-mode">
 					<div class="click">
 						<span name="nav-previous"><span class="dummy w2"></span></span>
@@ -92,7 +95,7 @@
 				</div>
 			</div>
 			<!-- client tab "CATEGORIES" -->
-			<div id="categories-list" data-choice-client="categories-list">
+			<div id="categories-tab" data-choice-client="categories-tab">
 				<div class="client-header">
 					<span class="flex-fill">categories</span>
 					<i name="edit-button" class="click for-mode default-mode fas" data-icon="pen">?</i>
@@ -110,7 +113,7 @@
 				</div>
 			</div>
 			<!-- client tab "PAYMENT METHODS" -->
-			<div id="payment-methods" data-choice-client="payment-methods">
+			<div id="payment-methods-tab" data-choice-client="payment-methods-tab">
 				<div class="client-header">
 					<span class="flex-fill">payment methods</span>
 					<i name="edit-button" class="click for-mode default-mode fas" data-icon="pen">?</i>
@@ -127,9 +130,7 @@
 				</div>
 			</div>
 			<!-- STATSISTICS -->
-			<!-- infinite: fas:f534 -->
-			<!-- year: far:f073 -->
-			<div id="statistics" data-choice-client="statistics">
+			<div id="statistics-tab" data-choice-client="statistics-tab">
 				<div class="client-header">
 					<span class="flex-fill">Statistics</span>
 					<i name="filter-select-button" class="click fas" data-icon="filter">?</i>
@@ -141,7 +142,7 @@
 						<div class="flex-fill big bold cutoff" name="title"></div>
 						<div class="amt big bold" name="amount"></div>
 					</div>
-					<div id="sta_buttons" class="item" style="border: none">
+					<div id="statistics-buttons" class="item">
 						<div class="button-group wide-flex">
 							<i class="fas icon" data-icon="angle_left" name="navigate-prev-time">?</i>
 							<i class="fas icon" data-icon="angle_right" name="navigate-next-time">?</i>
@@ -160,30 +161,32 @@
 					<div name="content"></div>
 				</div>
 			</div>
-			<!-- bottom menu -->
 		</div>
-		<div id="bottom-menu" data-choice="active-tab" class="buttons">
-			<div name="payment-methods" data-choice-value="payment-methods" class="labeled-icon">
+		<!-- bottom menu -->
+		<div id="bottom-menu" data-choice="active-tab" class="buttons hidden">
+			<div name="payment-methods-tab" data-choice-value="payment-methods-tab" class="labeled-icon">
 				<i class="fas" data-icon="wallet">?</i>
 				<span class="cutoff">payment methods</span>
 			</div>
-			<div name="categories-list" data-choice-value="categories-list" class="labeled-icon">
+			<div name="categories-tab" data-choice-value="categories-tab" class="labeled-icon">
 				<i class="fas" data-icon="boxes">?</i>
 				<span class="cutoff">categories</span>
 			</div>
-			<div name="expenses-list" data-choice-value="expenses-list" class="labeled-icon">
+			<div name="expenses-tab" data-choice-value="expenses-tab" class="labeled-icon">
 				<i class="fas" data-icon="list_ul">?</i>
 				<span class="cutoff">expenses</span>
 			</div>
-			<div name="statistics" data-choice-value="statistics" class="labeled-icon">
+			<div name="statistics-tab" data-choice-value="statistics-tab" class="labeled-icon">
 				<i class="fas" data-icon="chart_bar">?</i>
 				<span>statistics</span>
 			</div>
-			<div data-choice-value="expense-editor" style="display: none">&#x00a0;</div>
-			<div data-choice-value="icon-editor" style="display: none">&#x00a0;</div>
+			<div data-choice-value="not-signed-in" style="display: none"></div>
+			<div data-choice-value="data-dummy" style="display: none"></div>
+			<div data-choice-value="expense-editor" style="display: none"></div>
+			<div data-choice-value="icon-editor" style="display: none"></div>
 		</div>
 
-		<div id="xhr-indicator" class="hidden">&#x00a0;</div>
+		<div id="xhr-indicator">&#x00a0;</div>
 
 		<script src="myx.dataindex.js"></script>
 		<script src="myx.pmt.js"></script>

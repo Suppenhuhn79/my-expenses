@@ -65,7 +65,7 @@
 	margin-left: 0.5em;
 }
 
-.menubox[data-menubox="months-selection"] .menuitem {
+.menubox[data-menubox="exp.months-selection"] .menuitem {
 	text-align: center;
 	padding: 1em 3em;
 	display: block;

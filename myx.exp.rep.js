@@ -14,7 +14,11 @@
  * @property {Date} nextDueDate
  */
 
-let repeatingExpenses = function ()
+/**
+ * @namespace myxRepeatingExpenses
+ * my-expenses repeating expenses functionality for the "expenses" module.
+ */
+let myxRepeatingExpenses = function ()
 {
 	const FILE_NAME = "rep.json";
 	const DEFAULTS = {

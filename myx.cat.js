@@ -15,7 +15,7 @@
  */
 let myxCategories = function ()
 {
-	const MODULE_NAME = "categories-list";
+	const MODULE_NAME = "categories-tab";
 	const FILE_NAME = "cat.json";
 	const DEFAULTS = {
 		order: ["f92921c5"],

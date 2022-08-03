@@ -128,6 +128,7 @@ body {
 }
 
 .fullscreen-msg {
+	color: #aaa;
 	display: flex;
 	flex-direction: column;
 	height: 100%;
@@ -135,12 +136,12 @@ body {
 	justify-content: center;
 }
 .fullscreen-msg div {
-	color: #aaa;
 	text-align: center;
 	margin-bottom: 1rem;
 }
 .fullscreen-msg .icon {
 	font-size: 6rem;
+	text-align: center;
 }
 
 .cat-icon,

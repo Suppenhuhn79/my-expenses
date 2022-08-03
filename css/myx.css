@@ -117,10 +117,10 @@
 	color: #777;
 }
 
-#expenses-list .content .item > div.amount {
+#expenses-tab .content .item > div.amount {
 	margin-right: 0;
 }
-#expenses-list [name="add-expense-button"] {
+#expenses-tab [name="add-expense-button"] {
 	height: 4rem;
 	width: 4rem;
 	font-size: 2rem;
@@ -135,12 +135,12 @@
 	box-shadow: 0.1rem 0.1rem 0.8rem 0.2rem #00000040;
 	border-radius: 100%;
 }
-#expenses-list div.spacer {
+#expenses-tab div.spacer {
 	height: 6rem;
 	border-top: 2px solid #aaa;
 }
 
-#expenses-list button {
+#expenses-tab button {
 	display: block;
 	margin: 1em auto;
 	padding: 0.5em 2em;
@@ -155,50 +155,55 @@
 	cursor: pointer;
 }
 
-#payment-methods .default-selected div {
+#payment-methods-tab .default-selected div {
 	font-weight: bold;
 }
-#payment-methods .pmt-def-flag {
+#payment-methods-tab .pmt-def-flag {
 	margin: 0 1rem;
 	font-size: 1rem;
 	font-weight: 900;
 }
-#payment-methods .default-selected .for-mode.pmt-def-flag {
+#payment-methods-tab .default-selected .for-mode.pmt-def-flag {
 	color: gold;
 	cursor: default;
 	padding-right: 0.5rem;
 }
 
-#categories-list .item > div {
+#categories-tab .item > div {
 	align-self: first baseline;
 }
-#categories-list .subcats {
+#categories-tab .subcats {
 	display: flex;
 	flex-wrap: wrap;
 }
-#categories-list .subcats .subcat {
+#categories-tab .subcats .subcat {
 	display: flex;
 	align-items: center;
 	margin: 0.5rem 0 0 0;
 }
-#categories-list .subcats .subcat .cat-icon {
+#categories-tab .subcats .subcat .cat-icon {
 	font-size: 0.7rem;
 	width: 2em;
 	min-width: 2em;
 	height: 2em;
 }
-#categories-list .subcats .subcat > span {
+#categories-tab .subcats .subcat > span {
 	margin: 0 0.5em 0 0.2em;
 }
 
-#statistics .button-group {
+#statistics-tab #statistics-buttons {
+	padding-top: 0;
+	border: none;
+}
+
+#statistics-tab .button-group {
 	--statisctcs-inline-button-border-color: var(--primary-color);
 	border: 2px solid var(--statisctcs-inline-button-border-color);
 	border-radius: 0.4em;
 	overflow: hidden;
 }
 
-#statistics .button-group .icon {
+#statistics-tab .button-group .icon {
 	display: flex;
 	color: var(--statisctcs-inline-button-border-color);
 	width: 2em;
@@ -209,42 +214,42 @@
 	overflow: hidden;
 }
 
-#statistics .button-group .icon + .icon {
+#statistics-tab .button-group .icon + .icon {
 	border-left: 2px solid var(--statisctcs-inline-button-border-color);
 }
-#statistics .button-group .icon.chosen {
+#statistics-tab .button-group .icon.chosen {
 	color: white;
 	background-color: var(--primary-color);
 }
 
-#statistics .button-group .icon.disabled {
+#statistics-tab .button-group .icon.disabled {
 	color: #ccc;
 	background-color: #f6f6f6;
 }
 
-#statistics .content .item {
+#statistics-tab .content .item {
 	padding-right: 0.8rem;
 }
-#statistics .zero-sum > * {
+#statistics-tab .zero-sum > * {
 	opacity: 0.35;
 }
-#statistics .subcat {
+#statistics-tab .subcat {
 	margin: 0.5em 0 0 0;
 }
-#statistics .subcat .cat-icon {
+#statistics-tab .subcat .cat-icon {
 	font-size: 0.7rem;
 	width: 2em;
 	min-width: 2em;
 	height: 2em;
 	margin-right: 0.5rem;
 }
-#statistics .percentbar {
+#statistics-tab .percentbar {
 	width: 100%;
 	height: 4px;
 	background-color: #eee;
 	margin: 0.5rem 0;
 }
-#statistics .percentbar .label {
+#statistics-tab .percentbar .label {
 	display: inline-block;
 	top: -1.05em;
 	background-color: #fff;
@@ -253,7 +258,7 @@
 	margin: 0 0.5em;
 }
 
-#statistics .dateitem {
+#statistics-tab .dateitem {
 	padding: 0.5em 0.8em;
 	border: 1px solid #ccc;
 	border-radius: 0.5em;
@@ -270,6 +275,7 @@
 	top: 0px;
 	height: 4px;
 	width: 100%;
+	background: none;
 	overflow: hidden;
 }
 #xhr-indicator.active {
