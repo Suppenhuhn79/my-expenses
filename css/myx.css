@@ -290,6 +290,7 @@
 	width: 100%;
 	background: none;
 	overflow: hidden;
+	z-index: 99;
 }
 #xhr-indicator.active {
 	background: repeating-linear-gradient(to right, #f0f 0%, #f0f 17%, #a0a 17%, #a0a 50%, #f0f 50%, #f0f 67%, #a0a 67%, #a0a 100%);
