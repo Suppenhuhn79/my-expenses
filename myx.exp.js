@@ -321,7 +321,7 @@ let myxExpenses = function ()
 	 * @param {HTMLDivElement} navElement HTML element to update
 	 * @param {Date} targetMonth Month to be represented by the nav element
 	 */
-	function _renderNavItem (navElement, targetMonth)
+	function renderNavItem (navElement, targetMonth)
 	{
 		navElement.parentElement.onclick = () =>
 		{
@@ -386,10 +386,12 @@ let myxExpenses = function ()
 		/** @type {date} */
 		let today = new Date();
 		/** @type {Date} */
-		let lastDateRendered;// = new Date();
+		let lastRenderedDate;// = new Date();
+		/** @type {MonthString} */
+		let lastRenderedMonth = "";
 		elements.navCurrent.innerText = getFullMonthText(selectedMonth);
-		_renderNavItem(elements.navPrevious, selectedMonth.shiftMonths(-1));
-		_renderNavItem(elements.navNext, selectedMonth.shiftMonths(+1));
+		renderNavItem(elements.navPrevious, selectedMonth.shiftMonths(-1));
+		renderNavItem(elements.navNext, selectedMonth.shiftMonths(+1));
 		htmlBuilder.removeAllChildren(elements.content);
 		elements.content.scrollTop = 0;
 		for (let month of filter.months.sort().reverse())
@@ -399,7 +401,7 @@ let myxExpenses = function ()
 			/** @type {HTMLElement} */
 			let headline;
 			/** @type {Array<Expense>} */
-			let repeatingExpenses = repeatings.get(month);
+			let repeatingExpenses = (modeHandler.currentMode === "default") ? repeatings.get(month) : [];
 			/** @type {Array<Expense>} */
 			let actualExpenses = data[month] || [];
 			/** @type {Array<Expense>} */
@@ -411,17 +413,6 @@ let myxExpenses = function ()
 				let item = items[i];
 				if (item.dat.getDate() !== currentDay)
 				{
-					if ((lastDateRendered > today) && (item.dat <= today))
-					{
-						let marker = htmlBuilder.newElement("div#previewmarker.headline.center",
-							{ onclick: () => { elements.content.scrollTo({ top: 0, behavior: "smooth" }); } },
-							htmlBuilder.newElement("i.fas", { 'data-icon': "angle-double-up" }),
-							"&#x00a0;Upcoming expenses preview&#x00a0;",
-							htmlBuilder.newElement("i.fas", { 'data-icon': "angle-double-up" })
-						);
-						doFontAwesome(marker);
-						renders.push(marker);
-					}
 					currentDay = item.dat.getDate();
 					headline = renderHeadline(item.dat);
 				}
@@ -430,12 +421,28 @@ let myxExpenses = function ()
 				{
 					if (!!headline)
 					{
+						if ((modeHandler.currentMode === "default") && (lastRenderedDate > today) && (item.dat <= today))
+						{
+							let marker = htmlBuilder.newElement("div#previewmarker.headline.center",
+								{ onclick: () => { elements.content.scrollTo({ top: 0, behavior: "smooth" }); } },
+								htmlBuilder.newElement("i.fas", { 'data-icon': "angle-double-up" }),
+								"&#x00a0;Upcoming expenses preview&#x00a0;",
+								htmlBuilder.newElement("i.fas", { 'data-icon': "angle-double-up" })
+							);
+							doFontAwesome(marker);
+							renders.push(marker);
+						}
+						if ((filter.months.length > 1) && (lastRenderedMonth !== item.dat.toMonthString()))
+						{
+							renders.push(htmlBuilder.newElement("div.headline.month", getFullMonthText(item.dat)));
+							lastRenderedMonth = item.dat.toMonthString();
+						}
 						renders.push(headline);
 						headline = null;
 					}
 					renders.push(renderItem(item, (i < actualCount) ? i : -1 /* actualCount - i - 1 */));
 				}
-				lastDateRendered = item.dat;
+				lastRenderedDate = item.dat;
 			}
 		}
 		if (renders.length > 0)
