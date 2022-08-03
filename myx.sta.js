@@ -313,7 +313,6 @@ const myxStatistics = function ()
 		let ratioAsPercentString = ((ratio > 0) && (ratioPercent < 1)) ? "< 1" : ratioPercent.toString();
 		let labelPosition = "left:" + ((ratio < 0.9) ? percentAsCssString : "calc(100% - 4.5em)") + ";";
 		return htmlBuilder.newElement("div." + baseClass,
-			{ style: "position:relative;" },
 			htmlBuilder.newElement("div",
 				{ style: "width:" + percentAsCssString + "height:100%;background-color:" + color + ";" }),
 			htmlBuilder.newElement("div.label",
