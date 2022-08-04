@@ -46,6 +46,7 @@
 }
 #client .headline.month {
 	font-weight: bold;
+	text-align: center;
 	text-decoration: underline;
 }
 #client .content {
