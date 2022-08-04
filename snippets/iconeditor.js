@@ -107,7 +107,7 @@ const iconEditor = function (targetElement)
 		// setLightness: setLightness,
 		// serSaturation: setSaturation
 	};
-	elements = getNames(pageSnippets.iconSelector.produce(psInterface));
+	elements = pageSnippets.iconSelector.produce(psInterface).getNames();
 	void colorSelector(elements.colorselectorBubbles, 27);
 	for (let icon of ICONS)
 	{

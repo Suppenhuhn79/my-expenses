@@ -39,7 +39,7 @@ let myxPaymentMethods = function ()
 	let disabledItems = [];
 	/** @type {IdString} */
 	let defaultId;
-	let elements = getNames(document.getElementById(MODULE_NAME));
+	let elements = document.getElementById(MODULE_NAME).getNames();
 
 	let sortable = new Sortable(elements.content, {
 		draggable: ".sortable",

@@ -29,7 +29,7 @@
 							</tr>
 							<tr>
 								<td colspan="5">
-									<input name="txt" type="text" placeholder="annotation..."/>
+									<input name="txt" type="text" autocomplete="off" placeholder="annotation..."/>
 								</td>
 							</tr>
 						</thead>

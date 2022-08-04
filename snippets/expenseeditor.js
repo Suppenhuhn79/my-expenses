@@ -1,6 +1,6 @@
 const expenseEditor = function (repeatingExpenses, targetElement)
 {
-	let elements = getNames(pageSnippets.expenseEditor.produce());
+	let elements = pageSnippets.expenseEditor.produce().getNames();
 	let originTabName;
 	let originalMonth;
 	let originalIndex;
@@ -15,6 +15,7 @@ const expenseEditor = function (repeatingExpenses, targetElement)
 			{ key: "cancel" }
 		]
 	}, onConfirmDelete);
+	let decimalSeparator = (1.2).toLocaleString().substring(1, 2);
 	let amountAsString = "0";
 
 	elements.clone.onclick = (mouseEvent) =>
@@ -121,7 +122,7 @@ const expenseEditor = function (repeatingExpenses, targetElement)
 	function setAmountText ()
 	{
 		let rexMatch = /([0-9]+)(\.([0-9]{0,2}))?/.exec(amountAsString);
-		elements.amt.innerText = formatIntegersLocale(amountAsString) + ((!!rexMatch[2]) ? localeSeparator.decimal + rexMatch[3] : "") + "\u00a0" + myx.currencySymbol;
+		elements.amt.innerText = Math.floor(amountAsString).toLocaleString() + ((!!rexMatch[2]) ? decimalSeparator + rexMatch[3] : "") + "\u00a0" + myx.currencySymbol;
 	}
 
 	function renderPmt ()
@@ -147,8 +148,6 @@ const expenseEditor = function (repeatingExpenses, targetElement)
 		originalIndex = dataIndex;
 		callbackFunc = callback;
 		renderPmt();
-		// elements.title.innerText = (typeof originalIndex === "number") ? "edit expense" : "add expense";
-		// elements.dat.value = currentItem.dat.toIsoFormatText("YMD");
 		let amountBits = currentItem.amt.toString().split(".");
 		amountAsString = amountBits[0] + (amountBits[1] ? "." + (amountBits[1] + "00").substring(0, 2) : "");
 		setAmountText();
@@ -185,7 +184,7 @@ const expenseEditor = function (repeatingExpenses, targetElement)
 			currentItem.amt = Number(amountAsString);
 			currentItem.txt = elements.txt.value || null;
 			let callbackMode = (typeof originalIndex === "number") ? "modify" : "append";
-			if ((stringHash(JSON.stringify(currentItem)) === stringHash(originalItem)) || (originalIndex < 0))
+			if ((JSON.stringify(currentItem).getHash() === originalItem.getHash()) || (originalIndex < 0))
 			{
 				callbackMode = "not_modified";
 			}
@@ -194,7 +193,7 @@ const expenseEditor = function (repeatingExpenses, targetElement)
 	};
 
 	/* =========== constructor =========== */
-	elements.decimalSeparator.innerText = localeSeparator.decimal;
+	elements.decimalSeparator.innerText = decimalSeparator;
 	targetElement.appendChild(elements._self);
 
 	return { // public interface

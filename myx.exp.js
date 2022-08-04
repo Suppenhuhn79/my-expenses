@@ -31,7 +31,7 @@ let myxExpenses = function ()
 	let filter = {};
 	/** @type {Array<MonthString>} */
 	let availibleMonths = [];
-	let elements = getNames(document.getElementById("expenses-tab"));
+	let elements = document.getElementById(MODULE_NAME).getNames();
 	let modeHandler = new ModuleModeHandler(elements._self);
 	let repeatings = myxRepeatingExpenses();
 	/** @type {expenseEditor} */
@@ -284,7 +284,7 @@ let myxExpenses = function ()
 			elements.searchHint.appendChild(htmlBuilder.newElement("div.cutoff", "\u00a0", searchHint));
 			if (filter.months.length === 1)
 			{
-				elements.searchHint.appendChild(htmlBuilder.newElement("div", "\u00a0", "in " + getShortMonthText(new Date(filter.months[0]))));
+				elements.searchHint.appendChild(htmlBuilder.newElement("div", "\u00a0", "in " + (new Date(filter.months[0])).format("mmm yyyy")));
 			}
 			modeHandler.setMode("search");
 			choices.set("active-tab", MODULE_NAME);
@@ -329,7 +329,7 @@ let myxExpenses = function ()
 			setFilter({ months: [selectedMonth.toMonthString()] });
 			renderList();
 		};
-		navElement.innerText = monthNames[targetMonth.getMonth()].substring(0, 3);
+		navElement.innerText = targetMonth.format("mmm");
 		navElement.parentElement.style.visibility = (hasActualData(selectedMonth) || hasActualData(targetMonth)) ? "visible" : "hidden";
 	}
 
@@ -342,7 +342,7 @@ let myxExpenses = function ()
 	{
 		return htmlBuilder.newElement("div.headline",
 			{ 'data-date': date.toIsoFormatText("YMD") },
-			weekdayNames[date.getDay()] + ", " + date.getDate() + ". " + monthNames[date.getMonth()] + " " + date.getFullYear()
+			date.format("dddd, d. mmmm yyyy")
 		);
 	}
 
@@ -389,7 +389,7 @@ let myxExpenses = function ()
 		let lastRenderedDate;// = new Date();
 		/** @type {MonthString} */
 		let lastRenderedMonth = "";
-		elements.navCurrent.innerText = getFullMonthText(selectedMonth);
+		elements.navCurrent.innerText = selectedMonth.format("mmmm yyyy");
 		renderNavItem(elements.navPrevious, selectedMonth.shiftMonths(-1));
 		renderNavItem(elements.navNext, selectedMonth.shiftMonths(+1));
 		htmlBuilder.removeAllChildren(elements.content);
@@ -434,7 +434,7 @@ let myxExpenses = function ()
 						}
 						if ((filter.months.length > 1) && (lastRenderedMonth !== item.dat.toMonthString()))
 						{
-							renders.push(htmlBuilder.newElement("div.headline.month", getFullMonthText(item.dat)));
+							renders.push(htmlBuilder.newElement("div.headline.month", item.dat.format("mmmm yyyy")));
 							lastRenderedMonth = item.dat.toMonthString();
 						}
 						renders.push(headline);
@@ -486,34 +486,34 @@ let myxExpenses = function ()
 		{
 			editorItem.interval = repeatings.intervalOf(editorItem.rep);
 		}
-		editor.popup(editorItem, dataMonth, dataIndex, (mode, item, originalMonth, originalIndex) =>
+		editor.popup(editorItem, dataMonth, dataIndex, (mode, editedItem, originalMonth, originalIndex) =>
 		{
-			console.log("got edited:", item, originalMonth, originalIndex);
-			let itemDate = item.dat.toIsoFormatText("YMD");
+			console.log("EDITOR:", "send:", editorItem, "got edited:", editedItem, originalMonth, originalIndex, mode);
+			let itemDate = editedItem.dat.toIsoFormatText("YMD");
 			let itemMonth = itemDate.substr(0, 7);
 			if (mode === "delete")
 			{
 				data[originalMonth].splice(originalIndex, 1);
-				repeatings.set(item.rep, null, null);
+				repeatings.set(editedItem.rep, null, null);
 			}
 			else
 			{
-				item.rep = repeatings.set(item.rep, item, item.interval);
+				editedItem.rep = repeatings.set(editedItem.rep, editedItem, editedItem.interval);
 				switch (mode)
 				{
 					case "append":
-						add(item);
+						add(editedItem);
 						break;
 					case "modify":
 						if (itemMonth === originalMonth)
 						{
-							data[originalMonth][originalIndex] = Object.assign({}, item);
+							data[originalMonth][originalIndex] = Object.assign({}, editedItem);
 							sortItems(originalMonth);
 						}
 						else
 						{
 							data[originalMonth].splice(originalIndex, 1);
-							add(item);
+							add(editedItem);
 						}
 						break;
 				}
@@ -551,7 +551,7 @@ let myxExpenses = function ()
 			}
 			menuItems.push({
 				key: month,
-				label: monthNames[monthAsDate.getMonth()] + "\u00a0" + monthYear
+				label: monthAsDate.format("mmmm yyyy")
 			});
 		}
 		let menubox = new Menubox("exp.months-selection", { items: menuItems }, (event) =>

@@ -158,7 +158,7 @@ const myxStatisticsTimerange = function ()
 const myxStatistics = function ()
 {
 	const MODULE_NAME = "statistics-tab";
-	let elements = getNames(document.getElementById(MODULE_NAME));
+	let elements = document.getElementById(MODULE_NAME).getNames();
 	let aggregator = myxStatisticAggregator();
 	let timerange = myxStatisticsTimerange(performAggregation);
 	/**
@@ -279,7 +279,7 @@ const myxStatistics = function ()
 		_refreshNavigatorButtons();
 		if (entering === false)
 		{
-			actualCalculatedMonths = [...timerange.selectedMonths]; // clone array
+			actualCalculatedMonths = timerange.selectedMonths.clone();
 			/* If calculating averages, exclude the current month (if not on the last day). */
 			if (calcMode !== "sum")
 			{
@@ -322,10 +322,10 @@ const myxStatistics = function ()
 
 	function getHeadline ()
 	{
-		let result = getSupershortMonthText(new Date(actualCalculatedMonths[0]));
+		let result = (new Date(actualCalculatedMonths[0])).format("mmmyy");
 		if (actualCalculatedMonths.length > 1)
 		{
-			result = getSupershortMonthText(new Date(actualCalculatedMonths[actualCalculatedMonths.length - 1])) + "-" + result;
+			result = (new Date(actualCalculatedMonths[actualCalculatedMonths.length - 1])).format("mmmyy") + "-" + result;
 		}
 		// TODO
 		result += ", all categories, all payment methods";
@@ -335,7 +335,7 @@ const myxStatistics = function ()
 	function getTitle ()
 	{
 		let result = "";
-		let timeRange = (choices.get("time-range-mode") === "all") ? "all time" : (choices.get("time-range-mode") === "month") ? getFullMonthText(myx.expenses.selectedMonth) : myx.expenses.selectedMonth.getFullYear();
+		let timeRange = (choices.get("time-range-mode") === "all") ? "all time" : myx.expenses.selectedMonth.format((choices.get("time-range-mode") === "month") ? "mmmm yyyy" : "yyyy");
 		let calculationMode = ((choices.get("calculation-mode") === "sum") ? "total" : (choices.get("time-range-mode") === "month") ? "average" : "monthly average");
 		result = [timeRange, calculationMode].join(" ");
 		return result[0].toUpperCase() + result.substring(1);

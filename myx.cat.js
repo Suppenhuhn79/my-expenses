@@ -31,7 +31,7 @@ let myxCategories = function ()
 	let data = {};
 	/** @type {Array<IdString>} */
 	let order = [];
-	let elements = getNames(document.getElementById(MODULE_NAME));
+	let elements = document.getElementById(MODULE_NAME).getNames();
 	let modeHandler = new ModuleModeHandler(elements._self,
 		/*getData*/() => { return { items: data, order: order }; },
 		/*revertData*/(revertData) => { data = revertData.items; order = revertData.order; });

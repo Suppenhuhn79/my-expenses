@@ -83,16 +83,18 @@ let myx = function ()
 		};
 	}
 
-	function newId ()
+	/**
+	 * Gives an identifier string.
+	 * @return {IdString} New identifier
+	 */
+	function newIdString ()
 	{
 		return (Math.floor((Math.random() * 1e12))).toString(16).substring(0, 8);
 	}
 
 	function formatAmountLocale (num)
 	{
-		let numAsString = Math.round(num).toString();
-		let integers = formatIntegersLocale(numAsString);
-		return integers + fa.space + currencySymbol;
+		return Math.max(Math.round(num), 1).toLocaleString() + fa.space + currencySymbol;
 	}
 
 	function onWindowFocus ()
@@ -176,7 +178,7 @@ let myx = function ()
 		getIconAttributes: getIconAttributes,
 		addExpense: expenses.edit,
 		setExpenseFilter: expenses.setFilter,
-		newId: newId,
+		newId: newIdString,
 		formatAmountLocale: formatAmountLocale,
 		xhrBegin: xhrBegin,
 		xhrSuccess: xhrSuccess,
@@ -240,4 +242,9 @@ googleappApi.isModified = function (name)
 		console.info("Not modified", name);
 	}
 	return isModified;
+};
+
+Date.locales = {
+	monthNames: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+	weekdayNames: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 };
