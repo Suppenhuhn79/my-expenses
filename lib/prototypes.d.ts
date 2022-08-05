@@ -17,20 +17,24 @@ interface Date {
 	 * **Requires** `Date.locales.monthNames: string[]` and `Date.locales.weekdayNames: string[]`
 	 *
 	 * Valid format tokens are:
-	 * - `D` - day of months (one or two digits)
-	 * - `DD` - day of months (two digits)
-	 * - `DDD` - weekday name (three letter abbreviation)
-	 * - `DDDD` - weekday name (full)
-	 * - `M` - month (one or two digits)
-	 * - `MM` - month (two digits)
-	 * - `MMM` - month name (three letter abbreviation)
-	 * - `MMMM` - month name (full)
-	 * - `YY` - year (last two digits)
-	 * - `YYYY` - year (full)
+	 * - `d` - day of months (one or two digits)
+	 * - `dd` - day of months (two digits)
+	 * - `ddd` - weekday name (three letter abbreviation)
+	 * - `dddd` - weekday name (full)
+	 * - `m` - month (one or two digits)
+	 * - `mm` - month (two digits)
+	 * - `mmm` - month name (three letter abbreviation)
+	 * - `mmmm` - month name (full)
+	 * - `yy` - year (last two digits)
+	 * - `yyyy` - year (full)
 	 */
 	format(): string;
 	/**
-	 * Numberic month string (`"YYYY-MM"`)
+	 * Numeric date string (`"YYYY-MM-DD"`)
+	 */
+	toIsoDate(): string;
+	/**
+	 * Numeric month string (`"YYYY-MM"`)
 	 */
 	toMonthString(): string;
 }

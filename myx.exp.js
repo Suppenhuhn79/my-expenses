@@ -25,6 +25,11 @@
 let myxExpenses = function ()
 {
 	const MODULE_NAME = "expenses-tab";
+	/**
+	 * Mapping of CSV columns to `Expense` object memebers
+	 * @type {Array<String>} */
+	const EXPENSE_KEYS = ["dat", "amt", "cat", "txt", "pmt", "rep"];
+	/** @type {Object<MonthString, Array<Expense>>} */
 	let data = {};
 	let dataIndex = myxExpensesDataindex();
 	/** @type {ExpensesFilter} */
@@ -104,10 +109,6 @@ let myxExpenses = function ()
 	function parseCsv (fileIndex, csvString)
 	{
 		/**
-		 * Mapping of CSV columns to `Expense` object memebers
-		 * @type {Array<String>} */
-		const KEYS = ["dat", "amt", "cat", "txt", "pmt", "rep"];
-		/**
 		 * Collection of already loaded months so we can clear the `data[<month>]` array.
 		 * @type {Array<MonthString>} */
 		let monthsLoaded = [];
@@ -124,9 +125,9 @@ let myxExpenses = function ()
 					dataIndex.register(month, fileIndex);
 					monthsLoaded.push(month);
 				}
-				for (let c = 0, cc = KEYS.length; c < cc; c += 1)
+				for (let c = 0, cc = EXPENSE_KEYS.length; c < cc; c += 1)
 				{
-					obj[KEYS[c]] = (c === 0) ? new Date(vals[c]) : ((c === 1) ? Number(vals[c]) : vals[c]);
+					obj[EXPENSE_KEYS[c]] = (c === 0) ? new Date(vals[c]) : ((c === 1) ? Number(vals[c]) : vals[c]);
 				}
 				add(obj, true);
 			}
@@ -212,6 +213,22 @@ let myxExpenses = function ()
 		}
 		availibleMonths = dataIndex.allAvailibleMonths.sort((a, b) => (a.localeCompare(b) * -1));
 	}
+
+	/**
+	 * Compares two expenses if they are equal (date, amount, category, etc.)
+	 * @param {Expense} expenseA First expense to compare
+	 * @param {Expense} expenseB Second expense to compare
+	 * @returns {Boolean} `true` if both expenses are equal, otherwise `false`
+	 */
+	function expensesAreEqual (expenseA, expenseB)
+	{
+		let result = true;
+		for (let key of EXPENSE_KEYS)
+		{
+			result &&= (expenseA[key].valueOf() === expenseB[key].valueOf());
+		}
+		return result;
+	};
 
 	/**
 	 * Sorts expenses of a month, descending by date.
@@ -329,14 +346,14 @@ let myxExpenses = function ()
 	/**
 	 * Provides a HTML element representing an expense.
 	 * @param {Expense} item Expense to render
-	 * @param {Number} dataIndex Array index (`0..x`) of the current month subset of `data`
+	 * @param {Number} itemIndex Array index (`0..x`) of the current month subset of `data`
 	 * @returns {HTMLDivElement} `<div>` element
 	 */
-	function renderItem (item, dataIndex)
+	function renderItem (item, itemIndex)
 	{
 		let catLabel = myx.categories.getLabel(item.cat);
 		let div = htmlBuilder.newElement("div.item.click" + ((item.dat > new Date()) ? ".preview" : ""),
-			{ onclick: () => popupEditor(item, item.dat.toMonthString(), dataIndex) },
+			{ onclick: () => popupEditor(item, itemIndex) },
 			// dataIndex,
 			myx.categories.renderIcon(item.cat),
 			htmlBuilder.newElement("div.flex-fill.cutoff",
@@ -358,8 +375,10 @@ let myxExpenses = function ()
 	 * Item elements will contain all functionality for all modes.
 	 * 
 	 * Also navigation items will be updated.
+	 * 
+	 * @param {Date} [scrollToDate] Date to be scrolled to.
 	 */
-	function renderList ()
+	function renderList (scrollToDate)
 	{
 		/** @type {Array<HTMLElement>} */
 		let renders = [];
@@ -409,6 +428,7 @@ let myxExpenses = function ()
 								"&#x00a0;Upcoming expenses preview&#x00a0;",
 								htmlBuilder.newElement("i.fas", { 'data-icon': "angle-double-up" })
 							);
+							scrollToDate ||= item.dat;
 							doFontAwesome(marker);
 							renders.push(marker);
 						}
@@ -441,7 +461,10 @@ let myxExpenses = function ()
 			{
 				elements.content.appendChild(htmlBuilder.newElement("div.spacer"));
 			}
-			document.getElementById("previewmarker")?.scrollIntoView({ block: "start", behavior: "auto" });
+			if (!!scrollToDate)
+			{
+				scrollTo(scrollToDate);
+			}
 		}
 		else
 		{
@@ -453,62 +476,100 @@ let myxExpenses = function ()
 	}
 
 	/**
+	 * Scrolls to a given date; or at last as as close as possible - if the given date does not have any entries,
+	 * it will scrol to the next (following) date with entries.
+	 * @param {Date} date Date to scroll to
+	 */
+	function scrollTo (date)
+	{
+		/**
+		 * Find the closest header element for a date.
+		 * @param {Date} forDate 
+		 * @returns {HTMLElement}
+		 */
+		function findClosestHeader (forDate)
+		{
+			/** @type {HTMLElement} */
+			let result = elements.content.querySelector("[data-date='" + forDate.toIsoDate() + "']");
+			if (!result)
+			{
+				for (let closestDate = forDate, lastOfMonth = forDate.endOfMonth(); closestDate < lastOfMonth; closestDate = closestDate.addDays(1))
+				{
+					result = elements.content.querySelector("[data-date='" + closestDate.toIsoDate() + "']");
+					if (!!result)
+					{
+						break;
+					}
+				}
+			}
+			return result;
+		}
+		if (date.toIsoDate() === (new Date()).toIsoDate())
+		{
+			scrollElement = document.getElementById("previewmarker") || findClosestHeader(date);
+		}
+		else
+		{
+			scrollElement = findClosestHeader(date);
+		}
+		scrollElement?.scrollIntoView({ block: "start", behavior: "auto" });
+	}
+
+	/**
 	 * Pops up an ExpenseEditor to modify an expense or create a new one. Renders the expenses list afterwards.
 	 * @param {Expense} item Expense to edit
-	 * @param {MonthString} [dataMonth] Month of the expense; required if editing existing data, otherwise prohibited
-	 * @param {Number} [dataIndex] Array index (`0..x`) of the current month subset of `data`; required if editing existing data, otherwise prohibited
+	 * @param {Number} [itemIndex] Array index (`0..x`) of the current month subset of `data`; required if editing existing data, otherwise prohibited
 	 */
-	function popupEditor (item, dataMonth, dataIndex)
+	function popupEditor (item, itemIndex)
 	{
 		/** @type {Expense}*/
-		let editorItem = Object.assign({}, item);
+		let originalItem = Object.assign({}, item);
+		/** @type {MonthString} */
+		let originalMonth = originalItem.dat.toMonthString();
+		/** @type {Date} */
+		let scrollToDate = item.dat;
 		if (!!item.rep)
 		{
-			editorItem.interval = repeatings.intervalOf(editorItem.rep);
+			originalItem.interval = repeatings.intervalOf(originalItem.rep);
 		}
-		editor.popup(editorItem, dataMonth, dataIndex, (mode, editedItem, originalMonth, originalIndex) =>
-		{
-			console.log("EDITOR:", "send:", editorItem, "got edited:", editedItem, originalMonth, originalIndex, mode);
-			/** @type {String} */
-			let itemDate = editedItem.dat.toIsoFormatText("YMD");
-			/** @type {String} */
-			let itemMonth = itemDate.substring(0, 7);
-			if (mode === "delete")
+		editor.popup(originalItem, itemIndex,
+			(/** @type {Expense} */ editedItem) =>
 			{
-				data[originalMonth].splice(originalIndex, 1);
-				repeatings.set(editedItem.rep, null, null);
-			}
-			else
-			{
-				editedItem.rep = repeatings.set(editedItem.rep, editedItem, editedItem.interval);
-				switch (mode)
+				if ((editedItem === null) || (editedItem === undefined))
 				{
-					case "append":
+					data[originalMonth].splice(itemIndex, 1);
+					repeatings.set(originalItem.rep, null, null);
+				}
+				else if (expensesAreEqual(originalItem, editedItem) === false)
+				{
+					/** @type {String} */
+					let itemMonth = editedItem.dat.toMonthString();
+					scrollToDate = editedItem.dat;
+					editedItem.rep = repeatings.set(editedItem.rep, editedItem, editedItem.interval);
+					if (itemIndex === undefined)
+					{
 						add(editedItem);
-						break;
-					case "modify":
+					}
+					else
+					{
 						if (itemMonth === originalMonth)
 						{
-							data[originalMonth][originalIndex] = Object.assign({}, editedItem);
+							data[originalMonth][itemIndex] = Object.assign({}, editedItem);
 							sortItems(originalMonth);
 						}
 						else
 						{
-							data[originalMonth].splice(originalIndex, 1);
+							data[originalMonth].splice(itemIndex, 1);
 							add(editedItem);
 						}
-						break;
+					}
+					saveToFile([originalMonth, itemMonth]);
+					setMonth(new Date(itemMonth));
 				}
+				choices.set("active-tab", MODULE_NAME);
+				renderList(scrollToDate);
 			}
-			if (mode !== "not_modified")
-			{
-				saveToFile([originalMonth, itemMonth]);
-			}
-			choices.set("active-tab", MODULE_NAME);
-			setMonth(new Date(itemMonth));
-			renderList();
-			elements.content.querySelector("[data-date='" + itemDate + "']")?.scrollIntoView({ block: "start", behavior: "auto" });
-		});
+		);
 	}
 
 	/**
@@ -585,6 +646,7 @@ let myxExpenses = function ()
 	return { // publish members
 		get data () { return data; }, // TODO: debug only
 		get index () { return dataIndex; }, // TODO: debug only
+		scrollTo: scrollTo, // TODO: debug only
 		getCsv: getCsv, // TODO: debug only
 		save: saveToFile, // TODO: debug only
 		get moduleName () { return MODULE_NAME; },

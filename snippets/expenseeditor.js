@@ -2,7 +2,6 @@ const expenseEditor = function (repeatingExpenses, targetElement)
 {
 	let elements = pageSnippets.expenseEditor.produce().getNames();
 	let originTabName;
-	let originalMonth;
 	let originalIndex;
 	let originalItem;
 	let currentItem;
@@ -134,7 +133,7 @@ const expenseEditor = function (repeatingExpenses, targetElement)
 		htmlBuilder.replaceContent(elements.pmt, div);
 	};
 
-	function popup (item, dataMonth, dataIndex, callback)
+	function popup (item, dataIndex, callback)
 	{
 		originTabName = choices.get("active-tab");
 		originalItem = JSON.stringify(item);
@@ -144,12 +143,11 @@ const expenseEditor = function (repeatingExpenses, targetElement)
 			cat: null,
 			pmt: myx.paymentMethods.defaultPmt
 		}, item);
-		originalMonth = dataMonth;
 		originalIndex = dataIndex;
 		callbackFunc = callback;
 		renderPmt();
 		let amountBits = currentItem.amt.toString().split(".");
-		amountAsString = amountBits[0] + (amountBits[1] ? "." + (amountBits[1] + "00").substring(0, 2) : "");
+		amountAsString = amountBits[0] + ((amountBits[1]) ? "." + (amountBits[1] + "00").substring(0, 2) : "");
 		setAmountText();
 		elements.txt.value = currentItem.txt || "";
 		choices.set("active-tab", "expense-editor");
@@ -167,7 +165,7 @@ const expenseEditor = function (repeatingExpenses, targetElement)
 	{
 		if (menuboxEvent.buttonKey === "delete")
 		{
-			callbackFunc("delete", currentItem, originalMonth, originalIndex);
+			callbackFunc(null);
 		}
 	};
 
@@ -182,13 +180,8 @@ const expenseEditor = function (repeatingExpenses, targetElement)
 			}
 			currentItem.dat = new Date(elements.dat.value);
 			currentItem.amt = Number(amountAsString);
-			currentItem.txt = elements.txt.value || null;
-			let callbackMode = (typeof originalIndex === "number") ? "modify" : "append";
-			if ((JSON.stringify(currentItem).getHash() === originalItem.getHash()) || (originalIndex < 0))
-			{
-				callbackMode = "not_modified";
-			}
-			callbackFunc(callbackMode, currentItem, originalMonth, originalIndex);
+			currentItem.txt = elements.txt.value;
+			callbackFunc(currentItem);
 		}
 	};
 
