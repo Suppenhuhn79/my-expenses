@@ -469,8 +469,10 @@ let myxExpenses = function ()
 		editor.popup(editorItem, dataMonth, dataIndex, (mode, editedItem, originalMonth, originalIndex) =>
 		{
 			console.log("EDITOR:", "send:", editorItem, "got edited:", editedItem, originalMonth, originalIndex, mode);
+			/** @type {String} */
 			let itemDate = editedItem.dat.toIsoFormatText("YMD");
-			let itemMonth = itemDate.substr(0, 7);
+			/** @type {String} */
+			let itemMonth = itemDate.substring(0, 7);
 			if (mode === "delete")
 			{
 				data[originalMonth].splice(originalIndex, 1);

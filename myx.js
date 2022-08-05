@@ -145,8 +145,8 @@ let myx = function ()
 	function getIconAttributes (iconCode)
 	{
 		return {
-			faScope: iconCode.substr(0, 3),
-			htmlEntity: "&#x" + iconCode.substr(4) + ";"
+			faScope: iconCode.substring(0, 3),
+			htmlEntity: "&#x" + iconCode.substring(4) + ";"
 		};
 	}
 
