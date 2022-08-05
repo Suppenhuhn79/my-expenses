@@ -62,27 +62,19 @@ let myxPaymentMethods = function ()
 
 	/**
 	 * Loads _payment methods_ from cache or remote file (if modified).
-	 * @returns {Promise<void>} Promise
+	 * @returns {Promise<void>}
 	 */
 	function fetchData ()
 	{
-		return new Promise((resolve) =>
+		return new Promise((resolve) => 
 		{
-			if (googleappApi.isModified(FILE_NAME))
+			myx.loadFile(FILE_NAME, DEFAULTS, (obj) =>
 			{
-				googleappApi.loadFileEx(FILE_NAME).then((obj = DEFAULTS) =>
-				{
-					data = obj.items;
-					order = obj.order;
-					disabledItems = obj.disabled || [];
-					defaultId = obj['default'] || Object.keys(obj.items)[0];
-					resolve();
-				});
-			}
-			else
-			{
-				resolve();
-			}
+				data = obj.items;
+				order = obj.order;
+				disabledItems = obj.disabled || [];
+				defaultId = obj.default || Object.keys(obj.items)[0];
+			}).then(resolve);
 		});
 	}
 
@@ -246,7 +238,7 @@ let myxPaymentMethods = function ()
 	{
 		modeHandler.setMode("__saving__"); // intermediate state 'cause going from "edit" to "default" mode triggers a data rollback
 		myx.xhrBegin();
-		googleappApi.saveToFile(FILE_NAME, {
+		googleAppApi.saveToFile(FILE_NAME, {
 			order: order,
 			items: data,
 			disabled: disabledItems,

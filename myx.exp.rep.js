@@ -33,32 +33,24 @@ let myxRepeatingExpenses = function ()
 
 	/**
 	* Loads _repeating expenses_ from cache or remote file (if modified).
-	* @returns {Promise<void>}
-	*/
+	 * @returns {Promise<void>}
+	 */
 	function fetchData ()
 	{
-		return new Promise((resolve) =>
+		return new Promise((resolve) => 
 		{
-			if (googleappApi.isModified(FILE_NAME))
+			myx.loadFile(FILE_NAME, DEFAULTS, (obj) =>
 			{
-				googleappApi.loadFileEx(FILE_NAME).then((obj = DEFAULTS) =>
+				data = obj.items;
+				order = obj.order;
+				for (let id in data)
 				{
-					data = obj.items;
-					order = obj.order;
-					for (let id in data)
-					{
-						/** @type {Expense} */
-						let expense = data[id].expense;
-						expense.dat = new Date(expense.dat); // convert String to Date
-						data[id].nextDueDate = new Date(data[id].nextDueDate); // convert String to Date
-					}
-					resolve();
-				});
-			}
-			else
-			{
-				resolve();
-			}
+					/** @type {Expense} */
+					let expense = data[id].expense;
+					expense.dat = new Date(expense.dat); // convert String to Date
+					data[id].nextDueDate = new Date(data[id].nextDueDate); // convert String to Date
+				}
+			}).then(resolve);
 		});
 	}
 
@@ -69,7 +61,7 @@ let myxRepeatingExpenses = function ()
 	async function saveToFile ()
 	{
 		myx.xhrBegin();
-		googleappApi.saveToFile(FILE_NAME, { order: order, items: data }).then(myx.xhrSuccess, myx.xhrError);
+		googleAppApi.saveToFile(FILE_NAME, { order: order, items: data }).then(myx.xhrSuccess, myx.xhrError);
 	}
 
 	/**

@@ -56,25 +56,17 @@ let myxCategories = function ()
 
 	/**
 	 * Loads _categories_ from cache or remote file (if modified).
-	 * @returns {Promise<void>} Promise
+	 * @returns {Promise<void>}
 	 */
 	function fetchData ()
 	{
-		return new Promise((resolve) =>
+		return new Promise((resolve) => 
 		{
-			if (googleappApi.isModified(FILE_NAME))
+			myx.loadFile(FILE_NAME, DEFAULTS, (obj) =>
 			{
-				googleappApi.loadFileEx(FILE_NAME).then((obj = DEFAULTS) =>
-				{
-					data = obj.items;
-					order = obj.order;
-					resolve();
-				});
-			}
-			else
-			{
-				resolve();
-			}
+				data = obj.items;
+				order = obj.order;
+			}).then(resolve);
 		});
 	}
 
@@ -322,7 +314,7 @@ let myxCategories = function ()
 	{
 		modeHandler.setMode("__saving__"); // intermediate state 'cause going from "edit" to "default" mode triggers a data rollback
 		myx.xhrBegin();
-		googleappApi.saveToFile(FILE_NAME, {
+		googleAppApi.saveToFile(FILE_NAME, {
 			order: order,
 			items: data
 		}).then(myx.xhrSuccess, myx.xhrError);

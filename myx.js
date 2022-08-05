@@ -25,6 +25,12 @@ let myx = function ()
 	let bottomMenu = document.getElementById("bottom-menu");
 	let xhrActivityIndicator = document.getElementById("xhr-indicator");
 
+	/**
+	 * Timestamps of when a file was loaded.
+	 * @type {Map<String, Date>} 
+	 */
+	let filesLoadTimestamps = new Map();
+
 	let paymentMethods = myxPaymentMethods();
 	let categories = myxCategories();
 	let expenses = myxExpenses();
@@ -46,6 +52,67 @@ let myx = function ()
 				window.iconEditor = iconEditor(document.getElementById("client"));
 				resolve();
 			});
+		});
+	}
+
+	/**
+	 * Loads data from a file. To reduce network traffic, files are cached in the localStorage.
+	 * 
+	 * If the file is cached and the remote file is not newer that the cached one, file content is loaded from cache.
+	 * Otherwiese, the file is fetched from remote.
+	 * 
+	 * If the file already has been loaded wasn't modified since then, nothing happens.
+	 * 
+	 * @async
+	 * @param {String} name Name of file to load
+	 * @param {any} defaults Default data if file does not exists or is empty
+	 * @param {Function} callback Function `f(data: any)` to call after the file has loaded
+	 * @returns {Promise<void>}
+	 */
+	function loadFile (name, defaults, callback)
+	{
+		return new Promise((resolve) =>
+		{
+			let file = googleAppApi.files.get(name);
+			if (file !== undefined)
+			{
+				let cacheName = "myx_" + name.substring(0, name.lastIndexOf(".")).replaceAll(/[^\w\d]/g, "_");
+				let cacheItem = JSON.parse(localStorage.getItem(cacheName));
+				if ((filesLoadTimestamps.get(name) || new Date(0)) < file.modifiedTime)
+				{
+					if (file.modifiedTime > new Date(cacheItem?.date || 0))
+					{
+						console.info("Fetching '" + name + "' from remote");
+						googleAppApi.loadFile(name).then(
+							(payload) =>
+							{
+								localStorage.setItem(cacheName, JSON.stringify({ data: payload, date: file.modifiedTime }));
+								filesLoadTimestamps.set(name, new Date());
+								callback(payload || defaults);
+								resolve();
+							}
+						);
+					}
+					else
+					{
+						console.info("Loading '" + name + "' from cache");
+						filesLoadTimestamps.set(name, new Date());
+						callback(cacheItem.data);
+						resolve();
+					}
+				}
+				else
+				{
+					console.info("Not modified '" + name + "'");
+					resolve();
+				}
+			}
+			else
+			{
+				console.info("File does not exist '" + name + "'");
+				callback(defaults);
+				resolve();
+			}
 		});
 	}
 
@@ -106,11 +173,11 @@ let myx = function ()
 		{
 			xhrBegin();
 		}
-		googleappApi.init().then(
+		googleAppApi.init().then(
 			() =>
 			{ // successfully signed in
 				localStorage.removeItem(AUTOSIGNIN_FLAG);
-				console.table(googleappApi.files);
+				console.table(Array.from(googleAppApi.files));
 				Promise.allSettled([
 					categories.fetchData(),
 					paymentMethods.fetchData(),
@@ -130,19 +197,19 @@ let myx = function ()
 			},
 			(reason) =>
 			{ // operation failed
-				googleappApi.tokenCookie.clear();
+				googleAppApi.tokenCookie.clear();
 				xhrActivityIndicator.classList = [];
 				console.warn("google login failed", reason, "AUTOSIGNIN_FLAG?", localStorage.getItem(AUTOSIGNIN_FLAG));
 				if ((reason?.status === 401 /* "unauthorized" */) && (localStorage.getItem(AUTOSIGNIN_FLAG) !== "true"))
 				{
 					localStorage.setItem(AUTOSIGNIN_FLAG, true);
 					console.warn("auto retry signin");
-					googleappApi.signIn();
+					googleAppApi.signIn();
 				}
 				else
 				{
 					choices.set("active-tab", "not-signed-in");
-					document.getElementById("signin-button").onclick = googleappApi.signIn;
+					document.getElementById("signin-button").onclick = googleAppApi.signIn;
 				}
 				localStorage.removeItem(AUTOSIGNIN_FLAG);
 			}
@@ -171,10 +238,11 @@ let myx = function ()
 
 	return { // publish members
 		statistics: statistics, // TODO: debug only
-		expenses: expenses, // TODO: debug only
+		expenses: expenses,
 		categories: categories,
 		paymentMethods: paymentMethods,
 		get currencySymbol () { return currencySymbol; },
+		loadFile: loadFile,
 		getIconAttributes: getIconAttributes,
 		addExpense: expenses.edit,
 		setExpenseFilter: expenses.setFilter,
@@ -185,64 +253,6 @@ let myx = function ()
 		xhrError: xhrError
 	};
 }();
-
-// inject caching method into googleappApi
-
-/**
- * @memberof googleappApi
- * @type {Map<String, Date>}
- */
-googleappApi.lastLoaded = new Map();
-
-/**
- * Loads a file from Google Drive but previously checks if the file is cached in LocalStorage.
- * @memberof googleappApi
- * @param {String} name File name to load
- * @returns {Promise<any>}
- */
-googleappApi.loadFileEx = function (name)
-{
-	return new Promise((resolve) =>
-	{
-		let cacheName = "myx_" + name.substring(0, name.lastIndexOf(".")).replaceAll(/[^\w\d]/g, "_");
-		let cache = JSON.parse(localStorage.getItem(cacheName));
-		if (googleappApi.files[name] !== undefined)
-		{
-			if ((!!cache) && !!cache.data && !(new Date(cache.date) < googleappApi.files[name].modifiedTime))
-			{
-				console.info("Loading " + name + " from cache");
-				googleappApi.lastLoaded.set(name, new Date());
-				resolve(cache.data);
-			}
-			else
-			{
-				console.info("Loading", name);
-				googleappApi.loadFile(name).then((payload) =>
-				{
-					localStorage.setItem(cacheName, JSON.stringify({ data: payload, date: googleappApi.files[name].modifiedTime }));
-					googleappApi.lastLoaded.set(name, new Date());
-					resolve(payload);
-				});
-			}
-		}
-		else
-		{
-			console.info("File does not exist", name);
-			resolve();
-		}
-	});
-};
-
-googleappApi.isModified = function (name)
-{
-	let lastLoaded = googleappApi.lastLoaded.get(name);
-	let isModified = ((lastLoaded === undefined) || (lastLoaded < googleappApi.files[name].modifiedTime));
-	if (isModified === false)
-	{
-		console.info("Not modified", name);
-	}
-	return isModified;
-};
 
 Date.locales = {
 	monthNames: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],

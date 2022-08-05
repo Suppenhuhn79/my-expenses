@@ -72,7 +72,7 @@ let myxExpenses = function ()
 
 	/**
 	 * Loads _expenses_ and _repeating expenses_ from cache or remote files (if modified).
-	 * @returns {Promise<void>} Promise
+	 * @returns {Promise<void>}
 	 */
 	function fetchData ()
 	{
@@ -83,78 +83,58 @@ let myxExpenses = function ()
 			 * @type {Array<Promise>} */
 			let asyncCalls = [];
 			asyncCalls.push(repeatings.fetchData());
-			for (let fileIndex = Object.keys(googleappApi.files).length; fileIndex > 0; fileIndex -= 1)
+			for (let fileIndex = googleAppApi.files.size; fileIndex > 0; fileIndex -= 1)
 			{
 				let fileName = "data-" + fileIndex + ".csv";
-				if (googleappApi.files[fileName] !== undefined)
+				if (googleAppApi.files.get(fileName) !== undefined)
 				{
-					asyncCalls.push(loadFromFile(fileIndex));
+					asyncCalls.push(myx.loadFile(fileName, "", (str) => parseCsv(fileIndex, str)));
 				}
 			}
-			Promise.allSettled(asyncCalls).then(() =>
-			{
-				resolve();
-			});
+			Promise.allSettled(asyncCalls).then(resolve);
 		});
 	};
 
 	/**
-	 * Loads data from a file. Converts the CSV data to an object and adds it to `data`.
-	 * @param {Number} fileIndex Index (`1..x`) of file to load
-	 * @returns {Promise<void>} Promise
+	 * Converts expenses from csv data to `Expense`-objects and adds them to `data`.
+	 * Also registers months and file numbers.
+	 * @param {Number} fileIndex Index (`1..x`) of the file where the data came from
+	 * @param {String} csvString Native csv data (as in a file)
 	 */
-	function loadFromFile (fileIndex = 1)
+	function parseCsv (fileIndex, csvString)
 	{
-		return new Promise((resolve) =>
+		/**
+		 * Mapping of CSV columns to `Expense` object memebers
+		 * @type {Array<String>} */
+		const KEYS = ["dat", "amt", "cat", "txt", "pmt", "rep"];
+		/**
+		 * Collection of already loaded months so we can clear the `data[<month>]` array.
+		 * @type {Array<MonthString>} */
+		let monthsLoaded = [];
+		for (let line of csvString.split("\n"))
 		{
-			/**
-			 * Mapping of CSV columns to `Expense` object memebers
-			 * @type {Array<String>} */
-			const KEYS = ["dat", "amt", "cat", "txt", "pmt", "rep"];
-			/**
-			 * Collection of already loaded months so we can clear the `data[<month>]` array.
-			 * @type {Array<MonthString>} */
-			let monthsLoaded = [];
-			let fileName = "data-" + fileIndex.toString() + ".csv";
-			if ((currentlyLoadingFiles.get(fileIndex) !== true) && (googleappApi.isModified(fileName)))
+			if (!!line)
 			{
-				currentlyLoadingFiles.set(fileIndex, true);
-				googleappApi.loadFileEx(fileName).then((result) =>
+				let vals = line.split("\t");
+				let obj = {};
+				let month = vals[0].substring(0, 7);
+				if (monthsLoaded.includes(month) === false)
 				{
-					for (let line of result.split("\n"))
-					{
-						if (!!line)
-						{
-							let vals = line.split("\t");
-							let obj = {};
-							let month = vals[0].substr(0, 7);
-							if (monthsLoaded.includes(month) === false)
-							{
-								dataIndex.register(month, fileIndex);
-								data[month] = [];
-								monthsLoaded.push(month);
-							}
-							for (let c = 0, cc = KEYS.length; c < cc; c += 1)
-							{
-								obj[KEYS[c]] = (c === 0) ? new Date(vals[c]) : ((c === 1) ? Number(vals[c]) : vals[c]);
-							}
-							dataIndex.register(obj.dat.toMonthString(), fileIndex);
-							add(obj, true);
-						}
-					}
-					for (let month of dataIndex.allMonthsInFile(fileIndex))
-					{
-						sortItems(month);
-					}
-					currentlyLoadingFiles.set(fileIndex, false);
-					resolve();
-				});
+					data[month] = [];
+					dataIndex.register(month, fileIndex);
+					monthsLoaded.push(month);
+				}
+				for (let c = 0, cc = KEYS.length; c < cc; c += 1)
+				{
+					obj[KEYS[c]] = (c === 0) ? new Date(vals[c]) : ((c === 1) ? Number(vals[c]) : vals[c]);
+				}
+				add(obj, true);
 			}
-			else
-			{
-				resolve();
-			}
-		});
+		}
+		for (let month of dataIndex.allMonthsInFile(fileIndex))
+		{
+			sortItems(month);
+		}
 	}
 
 	/**
@@ -202,7 +182,7 @@ let myxExpenses = function ()
 			{
 				csv += getCsv(month);
 			}
-			ops.push(googleappApi.saveToFile("data-" + fileIndex + ".csv", csv));
+			ops.push(googleAppApi.saveToFile("data-" + fileIndex + ".csv", csv));
 		}
 		Promise.allSettled(ops).then((results) =>
 		{

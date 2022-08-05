@@ -51,7 +51,7 @@
 			</div>
 		</div>
 		<script src="https://apis.google.com/js/client.js"></script>
-		<script src="lib/googleapp-api.js"></script>
+		<script src="lib/googleappapi.js"></script>
 		<script>
 			let hash = window.location;
 			let home = window.location.origin + window.location.pathname.substr(0, window.location.pathname.lastIndexOf("/") + 1);
@@ -62,9 +62,9 @@
 				gapi.load("client:auth2", () => {
 					gapi.client
 						.init({
-							apiKey: googleappApi.API_KEY,
-							clientId: googleappApi.CLIENT_ID,
-							scope: googleappApi.SCOPES,
+							apiKey: googleAppApi.API_KEY,
+							clientId: googleAppApi.CLIENT_ID,
+							scope: googleAppApi.SCOPES,
 						})
 						.then(() => {
 							let authInstance = gapi.auth2.getAuthInstance();
@@ -73,7 +73,7 @@
 							let expirationDate = new Date();
 							console.info(authInstance, token, expiresInSeconds);
 							expirationDate.setTime(expirationDate.getTime() + parseInt(expiresInSeconds) * 1000);
-							googleappApi.tokenCookie.set(token, expirationDate);
+							googleAppApi.tokenCookie.set(token, expirationDate);
 							/* continue */
 							window.location.replace(home);
 						});
