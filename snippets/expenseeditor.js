@@ -2,9 +2,8 @@ const expenseEditor = function (repeatingExpenses, targetElement)
 {
 	let elements = pageSnippets.expenseEditor.produce().getNames();
 	let originTabName;
-	let originalIndex;
-	let originalItem;
 	let currentItem;
+	let currentDataIndex;
 	let callbackFunc;
 	let confirmDeletePrompt = new Menubox("delete-expense", {
 		title: "Confirm delete expense",
@@ -19,7 +18,7 @@ const expenseEditor = function (repeatingExpenses, targetElement)
 
 	elements.clone.onclick = (mouseEvent) =>
 	{
-		originalIndex = null;
+		currentDataIndex = null;
 		currentItem.dat = new Date();
 		checkCapatibilities();
 	};
@@ -101,10 +100,10 @@ const expenseEditor = function (repeatingExpenses, targetElement)
 	{
 		for (let name of ["clone", "redo", "delete"])
 		{
-			(typeof originalIndex === "number") ? elements[name].classList.remove("disabled") : elements[name].classList.add("disabled");
+			(typeof currentDataIndex === "number") ? elements[name].classList.remove("disabled") : elements[name].classList.add("disabled");
 		}
 		(currentItem.cat) ? elements.apply.classList.remove("disabled") : elements.apply.classList.add("disabled");
-		elements.title.innerText = (typeof originalIndex === "number") ? "edit expense" : "add expense";
+		elements.title.innerText = (typeof currentDataIndex === "number") ? "edit expense" : "add expense";
 		elements.dat.value = currentItem.dat.toIsoFormatText("YMD");
 		if ((currentItem.interval?.months > 0) || (currentItem.interval?.weeks > 0))
 		{
@@ -136,14 +135,8 @@ const expenseEditor = function (repeatingExpenses, targetElement)
 	function popup (item, dataIndex, callback)
 	{
 		originTabName = choices.get("active-tab");
-		originalItem = JSON.stringify(item);
-		currentItem = Object.assign({
-			dat: new Date(),
-			amt: 0,
-			cat: null,
-			pmt: myx.paymentMethods.defaultPmt
-		}, item);
-		originalIndex = dataIndex;
+		currentItem = new Expense(item);
+		currentDataIndex = dataIndex;
 		callbackFunc = callback;
 		renderPmt();
 		let amountBits = currentItem.amt.toString().split(".");
@@ -181,7 +174,7 @@ const expenseEditor = function (repeatingExpenses, targetElement)
 			currentItem.dat = new Date(elements.dat.value);
 			currentItem.amt = Number(amountAsString);
 			currentItem.txt = elements.txt.value;
-			callbackFunc(currentItem);
+			callbackFunc(currentItem, currentDataIndex);
 		}
 	};
 

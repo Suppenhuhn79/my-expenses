@@ -6,8 +6,8 @@
  * @property {Number} amt Expense amount
  * @property {IdString} cat Expense category - id reference to categories
  * @property {IdString} pmt Used payment method - id reference to payment methods
- * @property {String} [txt] Additional text 
- * @property {IdString} [rep] Repeating expense - id reference to repeating expenses
+ * @property {String} txt Additional text 
+ * @property {IdString} rep Repeating expense - id reference to repeating expenses
  *
  * @typedef ExpensesFilter
  * Defines filter for listing expenses.
@@ -19,16 +19,75 @@
  */
 
 /**
+ * Creates an instance of an `Expense` object.
+ * @constructor
+ * @param {Expense|String} [src] Csv string to parse or expense to copy
+ * @returns {Expense} New expense object
+ */
+function Expense (src)
+{
+	/**
+	 * Order of keys for conversion from/to csv
+	 * @type {Array<String>}
+	 */
+	const KEY_ORDER = ["dat", "amt", "cat", "txt", "pmt", "rep"];
+
+	this.dat = new Date();
+	this.amt = 0;
+	this.cat = "";
+	this.txt = "";
+	this.pmt = (function () { return myx.paymentMethods.defaultPmt; })();
+	this.rep = "";
+
+	switch (typeof src)
+	{
+		case "string":
+			let vals = src.split("\t");
+			for (let c = 0, cc = KEY_ORDER.length; c < cc; c += 1)
+			{
+				this[KEY_ORDER[c]] = (c === 0) ? new Date(vals[c]) : ((c === 1) ? Number(vals[c]) : vals[c] || "");
+			}
+			break;
+		case "object":
+			for (let key of KEY_ORDER)
+			{
+				this[key] = src[key];
+			}
+			break;
+	}
+
+	/**
+	 * Compares two expenses if they are equal (date, amount, category, etc.)
+	 * @param {Expense} otherExpense Second expense to compare
+	 * @returns {Boolean} `true` if both expenses are equal, otherwise `false`
+	 */
+	this.equals = function (otherExpense)
+	{
+		let result = true;
+		for (let key of KEY_ORDER)
+		{
+			result &&= (this[key].valueOf() === otherExpense[key].valueOf());
+		}
+		return result;
+	};
+
+	/**
+	 * Gives a csv line for the expense.
+	 * @returns {String}
+	 */
+	this.toString = function ()
+	{
+		return [this.dat.format("yyyy-mm-dd"), this.amt, this.cat, this.txt, this.pmt, this.rep].join("\t");
+	};
+}
+
+/**
  * @namespace myxExpenses
  * my-expenses "expenses" module.
  */
 let myxExpenses = function ()
 {
 	const MODULE_NAME = "expenses-tab";
-	/**
-	 * Mapping of CSV columns to `Expense` object memebers
-	 * @type {Array<String>} */
-	const EXPENSE_KEYS = ["dat", "amt", "cat", "txt", "pmt", "rep"];
 	/** @type {Object<MonthString, Array<Expense>>} */
 	let data = {};
 	let dataIndex = myxExpensesDataindex();
@@ -43,10 +102,6 @@ let myxExpenses = function ()
 	let editor;
 	/** @type {Date} */
 	let selectedMonth = new Date();
-	/**
-	 * Memorizing currently loading file, so so file is loaded twice.
-	 * @type {Map<Number, Boolan>} */
-	let currentlyLoadingFiles = new Map();
 
 	elements.backSearchButton.onclick = () => { choices.set("active-tab", filter._origin); };
 	elements.cancelSearchButton.onclick = () => { resetFilter(); renderList(); };
@@ -93,7 +148,7 @@ let myxExpenses = function ()
 				let fileName = "data-" + fileIndex + ".csv";
 				if (googleAppApi.files.get(fileName) !== undefined)
 				{
-					asyncCalls.push(myx.loadFile(fileName, "", (str) => parseCsv(fileIndex, str)));
+					asyncCalls.push(myx.loadFile(fileName, "", (str) => importFileContent(fileIndex, str)));
 				}
 			}
 			Promise.allSettled(asyncCalls).then(resolve);
@@ -101,12 +156,12 @@ let myxExpenses = function ()
 	};
 
 	/**
-	 * Converts expenses from csv data to `Expense`-objects and adds them to `data`.
+	 * Imports the content of a _data-n.csv_ file. This does replace all data of the imported months.
 	 * Also registers months and file numbers.
 	 * @param {Number} fileIndex Index (`1..x`) of the file where the data came from
 	 * @param {String} csvString Native csv data (as in a file)
 	 */
-	function parseCsv (fileIndex, csvString)
+	function importFileContent (fileIndex, csvString)
 	{
 		/**
 		 * Collection of already loaded months so we can clear the `data[<month>]` array.
@@ -116,20 +171,15 @@ let myxExpenses = function ()
 		{
 			if (!!line)
 			{
-				let vals = line.split("\t");
-				let obj = {};
-				let month = vals[0].substring(0, 7);
+				let exp = new Expense(line);
+				let month = exp.dat.toMonthString();
 				if (monthsLoaded.includes(month) === false)
 				{
 					data[month] = [];
 					dataIndex.register(month, fileIndex);
 					monthsLoaded.push(month);
 				}
-				for (let c = 0, cc = EXPENSE_KEYS.length; c < cc; c += 1)
-				{
-					obj[EXPENSE_KEYS[c]] = (c === 0) ? new Date(vals[c]) : ((c === 1) ? Number(vals[c]) : vals[c]);
-				}
-				add(obj, true);
+				add(exp, true);
 			}
 		}
 		for (let month of dataIndex.allMonthsInFile(fileIndex))
@@ -148,7 +198,7 @@ let myxExpenses = function ()
 		let text = "";
 		for (let item of data[month])
 		{
-			text += [item.dat.toIsoFormatText("YMD"), item.amt, item.cat, item.txt, item.pmt, item.rep].join("\t") + "\n";
+			text += item.toString() + "\n";
 		}
 		return text;
 	}
@@ -181,6 +231,7 @@ let myxExpenses = function ()
 			let csv = "";
 			for (let month of dataIndex.allMonthsInFile(fileIndex))
 			{
+				console.log("saving " + month + " to '" + fileIndex + "'");
 				csv += getCsv(month);
 			}
 			ops.push(googleAppApi.saveToFile("data-" + fileIndex + ".csv", csv));
@@ -205,7 +256,7 @@ let myxExpenses = function ()
 	{
 		let month = expense.dat.toIsoFormatText("YM");
 		data[month] ||= [];
-		data[month].push(Object.assign({}, expense));
+		data[month].push(new Expense(expense));
 		if (bulk === false)
 		{
 			sortItems(month);
@@ -213,22 +264,6 @@ let myxExpenses = function ()
 		}
 		availibleMonths = dataIndex.allAvailibleMonths.sort((a, b) => (a.localeCompare(b) * -1));
 	}
-
-	/**
-	 * Compares two expenses if they are equal (date, amount, category, etc.)
-	 * @param {Expense} expenseA First expense to compare
-	 * @param {Expense} expenseB Second expense to compare
-	 * @returns {Boolean} `true` if both expenses are equal, otherwise `false`
-	 */
-	function expensesAreEqual (expenseA, expenseB)
-	{
-		let result = true;
-		for (let key of EXPENSE_KEYS)
-		{
-			result &&= (expenseA[key].valueOf() === expenseB[key].valueOf());
-		}
-		return result;
-	};
 
 	/**
 	 * Sorts expenses of a month, descending by date.
@@ -346,14 +381,14 @@ let myxExpenses = function ()
 	/**
 	 * Provides a HTML element representing an expense.
 	 * @param {Expense} item Expense to render
-	 * @param {Number} itemIndex Array index (`0..x`) of the current month subset of `data`
+	 * @param {Number} dataIndex Array index (`0..x`) of the current month subset of `data`
 	 * @returns {HTMLDivElement} `<div>` element
 	 */
-	function renderItem (item, itemIndex)
+	function renderItem (item, dataIndex)
 	{
 		let catLabel = myx.categories.getLabel(item.cat);
 		let div = htmlBuilder.newElement("div.item.click" + ((item.dat > new Date()) ? ".preview" : ""),
-			{ onclick: () => popupEditor(item, itemIndex) },
+			{ onclick: () => popupEditor(item, dataIndex) },
 			// dataIndex,
 			myx.categories.renderIcon(item.cat),
 			htmlBuilder.newElement("div.flex-fill.cutoff",
@@ -428,7 +463,7 @@ let myxExpenses = function ()
 								"&#x00a0;Upcoming expenses preview&#x00a0;",
 								htmlBuilder.newElement("i.fas", { 'data-icon': "angle-double-up" })
 							);
-							scrollToDate ||= item.dat;
+							scrollToDate ||= today;
 							doFontAwesome(marker);
 							renders.push(marker);
 						}
@@ -461,10 +496,7 @@ let myxExpenses = function ()
 			{
 				elements.content.appendChild(htmlBuilder.newElement("div.spacer"));
 			}
-			if (!!scrollToDate)
-			{
-				scrollTo(scrollToDate);
-			}
+			scrollTo(scrollToDate);
 		}
 		else
 		{
@@ -504,49 +536,59 @@ let myxExpenses = function ()
 			}
 			return result;
 		}
-		if (date.toIsoDate() === (new Date()).toIsoDate())
+		if (date instanceof Date)
 		{
-			scrollElement = document.getElementById("previewmarker") || findClosestHeader(date);
+			if (date.toIsoDate() === (new Date()).toIsoDate())
+			{
+				scrollElement = document.getElementById("previewmarker") || findClosestHeader(date);
+			}
+			else
+			{
+				scrollElement = findClosestHeader(date);
+			}
+			scrollElement?.scrollIntoView({ block: "start", behavior: "auto" });
 		}
-		else
-		{
-			scrollElement = findClosestHeader(date);
-		}
-		scrollElement?.scrollIntoView({ block: "start", behavior: "auto" });
 	}
 
 	/**
 	 * Pops up an ExpenseEditor to modify an expense or create a new one. Renders the expenses list afterwards.
-	 * @param {Expense} item Expense to edit
-	 * @param {Number} [itemIndex] Array index (`0..x`) of the current month subset of `data`; required if editing existing data, otherwise prohibited
+	 * @param {Expense} expense Expense to edit
+	 * @param {Number} [dataIndex] Array index (`0..x`) of the current month subset of `data`; required if editing existing data, otherwise empty
 	 */
-	function popupEditor (item, itemIndex)
+	function popupEditor (expense, dataIndex)
 	{
 		/** @type {Expense}*/
-		let originalItem = Object.assign({}, item);
+		let originalItem = new Expense(expense);
 		/** @type {MonthString} */
 		let originalMonth = originalItem.dat.toMonthString();
 		/** @type {Date} */
-		let scrollToDate = item.dat;
-		if (!!item.rep)
+		let scrollToDate = expense.dat;
+		if (!!expense.rep)
 		{
 			originalItem.interval = repeatings.intervalOf(originalItem.rep);
 		}
-		editor.popup(originalItem, itemIndex,
-			(/** @type {Expense} */ editedItem) =>
+		editor.popup(originalItem, dataIndex,
+			/**
+			 * Expense editor callback
+			 * @param {Expense} editedItem Edited expense
+			 * @param {Number} editedDataIndex Non-null if an existing expense was modified, `null` if editor returns a new (or a copied) expense
+			 */
+			(editedItem, editedDataIndex) =>
 			{
+				console.table([dataIndex, editedDataIndex]);
 				if ((editedItem === null) || (editedItem === undefined))
 				{
-					data[originalMonth].splice(itemIndex, 1);
+					data[originalMonth].splice(dataIndex, 1);
 					repeatings.set(originalItem.rep, null, null);
+					saveToFile(originalMonth);
 				}
-				else if (expensesAreEqual(originalItem, editedItem) === false)
+				else if (originalItem.equals(editedItem) === false)
 				{
 					/** @type {String} */
 					let itemMonth = editedItem.dat.toMonthString();
 					scrollToDate = editedItem.dat;
 					editedItem.rep = repeatings.set(editedItem.rep, editedItem, editedItem.interval);
-					if (itemIndex === undefined)
+					if (typeof editedDataIndex !== "number") // if its a new or copied expense, the editedDataIndex is `null` or `undefined`
 					{
 						add(editedItem);
 					}
@@ -554,12 +596,12 @@ let myxExpenses = function ()
 					{
 						if (itemMonth === originalMonth)
 						{
-							data[originalMonth][itemIndex] = Object.assign({}, editedItem);
+							data[originalMonth][dataIndex] = new Expense(editedItem);
 							sortItems(originalMonth);
 						}
 						else
 						{
-							data[originalMonth].splice(itemIndex, 1);
+							data[originalMonth].splice(dataIndex, 1);
 							add(editedItem);
 						}
 					}
