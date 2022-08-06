@@ -56,7 +56,8 @@ let myxCategories = function ()
 
 	/**
 	 * Loads _categories_ from cache or remote file (if modified).
-	 * @returns {Promise<void>}
+	 * @async
+	 * @returns {Promise<void>} Promise
 	 */
 	function fetchData ()
 	{

@@ -62,7 +62,8 @@ let myxPaymentMethods = function ()
 
 	/**
 	 * Loads _payment methods_ from cache or remote file (if modified).
-	 * @returns {Promise<void>}
+	 * @async
+	 * @returns {Promise<void>} Promise
 	 */
 	function fetchData ()
 	{

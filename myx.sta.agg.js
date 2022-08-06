@@ -165,8 +165,9 @@ const myxStatisticAggregator = function ()
 	/**
 	 * Sums up all expenses per category in the given month.
 	 * Target dataset is `_aggregates`.
+	 * @async
 	 * @param {MonthString} month Month to aggregate expenses
-	 * @returns {Promise} Resolves with no data
+	 * @returns {Promise} Promise
 	 */
 	function _calcMonth (month)
 	{
@@ -181,9 +182,10 @@ const myxStatisticAggregator = function ()
 
 	/**
 	 * 
+	 * @async
 	 * @param {Array<MonthString>} months Months to calculate
 	 * @param {"sum"|"avg"} sortKey Whether to sort results by sum (default) or average
-	 * @returns {Promise}
+	 * @returns {Promise} Promise
 	 */
 	function calc (months, sortKey)
 	{

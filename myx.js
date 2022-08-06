@@ -61,13 +61,13 @@ let myx = function ()
 	 * If the file is cached and the remote file is not newer that the cached one, file content is loaded from cache.
 	 * Otherwiese, the file is fetched from remote.
 	 * 
-	 * If the file already has been loaded wasn't modified since then, nothing happens.
+	 * If the file already has been loaded and wasn't modified since then, nothing happens.
 	 * 
 	 * @async
 	 * @param {String} name Name of file to load
 	 * @param {any} defaults Default data if file does not exists or is empty
 	 * @param {Function} callback Function `f(data: any)` to call after the file has loaded
-	 * @returns {Promise<void>}
+	 * @returns {Promise<void>} Promise
 	 */
 	function loadFile (name, defaults, callback)
 	{

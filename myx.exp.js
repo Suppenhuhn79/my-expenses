@@ -110,6 +110,7 @@ let myxExpenses = function ()
 
 	/**
 	 * Initializes the module.
+	 * @async
 	 * @returns {Promise<void>} Promise
 	 */
 	function init ()
@@ -132,7 +133,8 @@ let myxExpenses = function ()
 
 	/**
 	 * Loads _expenses_ and _repeating expenses_ from cache or remote files (if modified).
-	 * @returns {Promise<void>}
+	 * @async
+	 * @returns {Promise<void>} Promise
 	 */
 	function fetchData ()
 	{
