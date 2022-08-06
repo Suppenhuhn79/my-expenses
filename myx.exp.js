@@ -22,9 +22,10 @@
  * Creates an instance of an `Expense` object.
  * @constructor
  * @param {Expense|String} [src] Csv string to parse or expense to copy
+ * @param {Object} [override] Optional values to override default/source value
  * @returns {Expense} New expense object
  */
-function Expense (src)
+function Expense (src, override)
 {
 	/**
 	 * Order of keys for conversion from/to csv
@@ -36,7 +37,7 @@ function Expense (src)
 	this.amt = 0;
 	this.cat = "";
 	this.txt = "";
-	this.pmt = (function () { return myx.paymentMethods.defaultPmt; })();
+	this.pmt = "";
 	this.rep = "";
 
 	switch (typeof src)
@@ -49,9 +50,26 @@ function Expense (src)
 			}
 			break;
 		case "object":
+			if (typeof override === "object")
+			{
+				src = Object.assign({}, src, override);
+			}
 			for (let key of KEY_ORDER)
 			{
-				this[key] = src[key];
+				switch (key)
+				{
+					case "dat":
+						this.dat = new Date(src.dat || Date.now());
+						break;
+					case "amt":
+						this.amt = Number(src.amt) || 0;
+						break;
+					case "pmt":
+						this.pmt = src.pmt || myx.paymentMethods.defaultPmt;
+						break;
+					default:
+						this[key] = src[key] || "";
+				}
 			}
 			break;
 	}
@@ -565,10 +583,6 @@ let myxExpenses = function ()
 		let originalMonth = originalItem.dat.toMonthString();
 		/** @type {Date} */
 		let scrollToDate = expense.dat;
-		if (!!expense.rep)
-		{
-			originalItem.interval = repeatings.intervalOf(originalItem.rep);
-		}
 		editor.popup(originalItem, dataIndex,
 			/**
 			 * Expense editor callback
@@ -581,7 +595,6 @@ let myxExpenses = function ()
 				if ((editedItem === null) || (editedItem === undefined))
 				{
 					data[originalMonth].splice(dataIndex, 1);
-					repeatings.set(originalItem.rep, null, null);
 					saveToFile(originalMonth);
 				}
 				else if (originalItem.equals(editedItem) === false)
@@ -589,8 +602,7 @@ let myxExpenses = function ()
 					/** @type {String} */
 					let itemMonth = editedItem.dat.toMonthString();
 					scrollToDate = editedItem.dat;
-					editedItem.rep = repeatings.set(editedItem.rep, editedItem, editedItem.interval);
-					if (typeof editedDataIndex !== "number") // if its a new or copied expense, the editedDataIndex is `null` or `undefined`
+					if (typeof editedDataIndex !== "number") // if it's a new or copied expense, the editedDataIndex is `null` or `undefined`
 					{
 						add(editedItem);
 					}
@@ -684,7 +696,7 @@ let myxExpenses = function ()
 		{
 			itemDate = new Date();
 		}
-		popupEditor({ dat: itemDate });
+		popupEditor(new Expense(null, { dat: itemDate }));
 	}
 
 	return { // publish members
