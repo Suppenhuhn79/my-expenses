@@ -161,7 +161,7 @@ let myx = function ()
 
 	function formatAmountLocale (num)
 	{
-		return Math.max(Math.round(num), 1).toLocaleString() + fa.space + currencySymbol;
+		return ((num > 0) ? Math.max(Math.round(num), 1) : 0).toLocaleString() + fa.space + currencySymbol;
 	}
 
 	function onWindowFocus ()
