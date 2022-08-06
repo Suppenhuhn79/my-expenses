@@ -305,6 +305,25 @@
 	animation: xhr-indicator-error linear 1.2s infinite;
 }
 
+#previewmarker {
+	background: linear-gradient(to top, #aaa 0%, #fff 10%, #aaa 20%);
+	background-size: 100% 300%;
+	color: #000;
+	background-clip: text;
+	text-fill-color: transparent;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	animation: swipe-down 1s linear;
+	animation-delay: 2s;
+}
+@keyframes swipe-down {
+	0% {
+		background-position: 0 300%;
+	}
+	100% {
+		background-position: 0 0;
+	}
+}
 @keyframes xhr-indicator-active {
 	0% {
 		background-position: 200% 0%;
