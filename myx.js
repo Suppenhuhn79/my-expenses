@@ -167,7 +167,7 @@ let myx = function ()
 	function onWindowFocus ()
 	{
 		// console.clear();
-		console.debug("window focused");
+		console.debug("window focused", choices.get("active-tab"));
 		let currentChosenTab = choices.get("active-tab");
 		if (currentChosenTab !== "data-dummy")
 		{
@@ -177,7 +177,7 @@ let myx = function ()
 			() =>
 			{ // successfully signed in
 				localStorage.removeItem(AUTOSIGNIN_FLAG);
-				console.table(Array.from(googleAppApi.files));
+				console.table(Object.fromEntries(googleAppApi.files));
 				Promise.allSettled([
 					categories.fetchData(),
 					paymentMethods.fetchData(),
@@ -187,7 +187,10 @@ let myx = function ()
 					let currentContentElement = document.querySelector("#client .chosen .content");
 					let currentScrollPosition = currentContentElement?.scrollTop || 0;
 					xhrSuccess();
-					choices.set("active-tab", (currentChosenTab === "data-dummy") ? expenses.moduleName : currentChosenTab);
+					if (currentChosenTab === "data-dummy")
+					{
+						choices.set("active-tab", expenses.moduleName);
+					}
 					onTabChosen(choices.get("active-tab"), true);
 					if (!!currentContentElement)
 					{
