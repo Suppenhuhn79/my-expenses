@@ -4,7 +4,7 @@ interface Array<T> {
 	 */
 	clone(): Array<T>;
 	/**
-	 * Removes duplicate items from the array.
+	 * Removes duplicate items from the array. This affects the actual array.
 	 * Returns the array.
 	 */
 	removeDuplicates(): Array<T>;
