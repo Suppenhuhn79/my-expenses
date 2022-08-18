@@ -306,7 +306,7 @@
 }
 
 #previewmarker {
-	background: linear-gradient(to top, #aaa 0%, #fff 10%, #aaa 20%);
+	background: linear-gradient(to top, #888 0%, #fff 10%, #888 20%);
 	background-size: 100% 300%;
 	color: #000;
 	background-clip: text;
