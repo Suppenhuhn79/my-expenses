@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <ps:pagesnippets xmlns:ps="https://github.com/suppenhuhn79/pagesnippets">
-	<ps:script src="iconeditor.js"/>
-	<ps:script src="iconeditor-colors.js"/>
-	<ps:stylesheet src="iconeditor.css"/>
+	<ps:script src="iconeditor.js" />
+	<ps:script src="iconeditor-colors.js" />
+	<ps:stylesheet src="iconeditor.css" />
 	<ps:snippet name="iconSelector">
 		<div id="icon-editor" data-choice-client="icon-editor">
 			<div class="client-header">
@@ -39,25 +39,15 @@
 				</div>
 				<div class="high-flex flex-fill overflow-hidden">
 					<div data-choice-client="icon-selection" class="high-flex flex-fill overflow-hidden">
-						<div name="known-icons-list" data-choice="iconeditor-icon" class="autowrap-grid flex-fill overflow-scroll">
-						</div>
-						<div name="custom-icon-editor" class="wide-flex">
-							<select name="fa-scope" size="1" ps:onchange="onCustomIconEdited">
-								<option value="far">Regular</option>
-								<option value="fas">Solid</option>
-								<option value="fab">Brands</option>
-							</select>
-							<input name="unicode-codepoint" type="text" pattern="[0-9a-f]{4}" required="required" ps:onkeyup="onCustomIconEdited"/>
-						</div>
+						<div name="icon-list" data-choice="iconeditor-icon" class="autowrap-grid flex-fill overflow-scroll"></div>
 					</div>
 					<div data-choice-client="color-selection" name="color-selector" class="high-flex flex-fill overflow-hidden">
 
 						<!-- <div" class="high-flex flex-fill"> -->
-						<div name="colorselector-bubbles" class="autowrap-grid flex-fill overflow-scroll" data-choice="iconeditor-color">
-						</div>
+						<div name="colorselector-bubbles" class="autowrap-grid flex-fill overflow-scroll" data-choice="iconeditor-color"></div>
 						<div class="tuners">
-							<input name="lightness" type="range" min="0.2" max="0.7" step="0.1" ps:onchange="setLightness"/>
-							<input name="saturation" type="range" min="0.2" max="1" step="0.1" ps:onchange="setSaturation"/>
+							<input name="lightness" type="range" min="0.2" max="0.7" step="0.1" ps:onchange="setLightness" />
+							<input name="saturation" type="range" min="0.2" max="1" step="0.1" ps:onchange="setSaturation" />
 						</div>
 						<!-- </div> -->
 

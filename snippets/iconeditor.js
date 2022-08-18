@@ -1,40 +1,218 @@
-const iconEditor = function (targetElement)
+function IconEditor (targetElement)
 {
-	const ICONS = [
-		/*shopping */
-		"fas:f07a", "fas:f291", "fas:f290", "fas:f788",
-		/* symbols */
-		"fas:f541",
-		"fas:f118",
-		"fas:f004", "fas:f005",
-		"fas:f630", "fas:f3cd", "fas:f1e6", "fas:f0ac", "fas:f0fe", "fas:f015", "fas:f553", "fas:f5bb", "fas:f3ed",
-		/* objects */
-		"fas:f02d",
-		/* drinks */
-		"fas:f0fc", "fas:f57b", "fas:f7b6", "fas:f72f", "fas:f5ce", "fas:f7a0",
-		/* food */
-		"fas:f2e7", "fas:f805", "fas:f818", "fas:f80f", "fas:f816", "fas:f5d1", "fas:f7ef", "fas:f578", "fas:f810", "fas:f094",
-		/* car */
-		"fas:f1b9", "fas:f52f", "fas:f7d9",
-		/* payment */
-		"fas:f51e", "fas:f4d3", "fas:f555",
-		"fas:f0d6", "far:f3d1",
-		"fas:f53a", "far:f09d", "fab:f1f1", "fab:f1f0", "fab:f1ed",
-		"fas:f19c",
-		// AmazonPay, ApplePay, GooglePay "fab:f42c", "fab:f415", "fab:e079",
-		/* question mark */
-		"fas:f128"
-	];
-	const DEFAULT_ICON = "fas:f128";
-	const DEFAULT_COLOR = "#888";
-	let elements = {};
-	let currentObject = {};
-
-	function setIconData (iconCode)
+	const ICON_LIBRARAY =
 	{
-		elements.faScope.value = iconCode.substring(0, 3);
-		elements.unicodeCodepoint.value = iconCode.substring(4);
-		renderCustomIcon();
+		shopping: [
+			"fas:f07a",
+			"fas:f291",
+			"fas:f290",
+			"fas:f788",
+			"fas:f541"],
+		symbols: [
+			"fas:f005",
+			"fas:f004",
+			"fas:f7a9",
+			"fas:f0c2",
+			"fas:f007",
+			"fas:f0f3",
+			"fas:f0eb",
+			"fas:f0e7",
+			"fas:f4d6",
+			"fas:f562",
+			"fas:f0e9",
+			"fas:f0a3",
+			"fas:f118",
+			"fas:f119",
+			"fas:f11a",
+			"fas:f2b5",
+			"fas:f70e",
+			"fas:f06b",
+			"fas:f0c4",
+			"fas:f0e3",
+			"fas:f77c",
+			"fas:f77d",
+			"fas:f4c0",
+			"fas:f4be",
+			"fas:f12e",
+			"fas:f6cf",
+			"fas:f6d1",
+			"fas:f1f8",
+			"fas:f783",
+			"fas:f6ad",
+			"fas:f1b2",
+			"fas:f3ed",
+			"fas:f7e4",
+			"fas:f128",
+			"fas:f01e"
+		],
+		food: [
+			"fas:f2e7",
+			"fas:f7ec",
+			"fas:f6d7",
+			"fas:f578",
+			"fas:f7ef",
+			"fas:f805",
+			"fas:f80f",
+			"fas:f818",
+			"fas:f5d1",
+			"fas:f787",
+			"fas:f816",
+			"fas:f094",
+			"fas:f810",
+			"fas:f1fd",
+			"fas:f7b6",
+			"fas:f0fc",
+			"fas:f57b",
+			"fas:f5ce",
+			"fas:f7a0",
+			"fas:f72f",
+			"fas:f2dc"],
+		housing: [
+			"fas:f015",
+			"fas:f6f1",
+			"fas:f4b8",
+			"fas:f49e",
+			"fas:f5aa",
+			"fas:f084",
+			"fas:f2cd",
+			"fas:f7d8",
+			"fas:f71e"],
+		transportation: [
+			"fas:f018",
+			"fas:f1b9",
+			"fas:f1ba",
+			"fas:f55e",
+			"fas:f239",
+			"fas:f0d1",
+			"fas:f48b",
+			"fas:f4df",
+			"fas:f206",
+			"fas:f072",
+			"fas:f5b0",
+			"fas:f13d",
+			"fas:f52f",
+			"fas:f613",
+			"fas:f7d9"],
+		sports: [
+			"fas:f1e3",
+			"fas:f434",
+			"fas:f44e",
+			"fas:f5c4",
+			"fas:f44b",
+			"fas:f091",
+			"fas:f559",
+			"fas:f7a6",
+			"fas:f025",
+			"fas:f001",
+			"fas:f86d",
+			"fas:f630"],
+		electronics: [
+			"fas:f108",
+			"fas:f109",
+			"fas:f3cd",
+			"fas:f02f",
+			"fas:f095",
+			"fas:f1e6",
+			"fas:f1eb",
+			"fas:f02d",
+			"fas:f03e",
+			"fas:f518",
+			"fas:f0e0",
+			"fas:f5a1"],
+		health: [
+			"fas:f5bb",
+			"fas:f21e",
+			"fas:f7f2",
+			"fas:f0f8",
+			"fas:f0f0",
+			"fas:f0f1",
+			"fas:f469",
+			"fas:f0f9",
+			"fas:f5c9",
+			"fas:f06e",
+			"fas:f46b",
+			"fas:f490",
+			"fas:f610",
+			"fas:f621"],
+		travel_nature: [
+			"fas:f0ac",
+			"fas:f279",
+			"fas:f276",
+			"fas:f08d",
+			"fas:f3c5",
+			"fas:f124",
+			"fas:f0f2",
+			"fas:f1ad",
+			"fas:f11e",
+			"fas:f024",
+			"fas:f5ca",
+			"fas:f6fc",
+			"fas:f1bb",
+			"fas:f1e5",
+			"fas:f6d3",
+			"fas:f6be",
+			"fas:f1b0",
+			"fas:f6f0",
+			"fas:f7ab",
+			"fas:f520",
+			"fas:f52e",
+			"fas:f56b",
+			"fas:f06c",
+			"fas:f55f"],
+		clothing: [
+			"fas:f553",
+			"fas:f696",
+			"fas:f8c0",
+			"fas:f521"],
+		buildings: [
+			"fas:f66f",
+			"fas:f275",
+			"fas:f67f"],
+		payments: [
+			"fas:f555",
+			"fas:f3d1",
+			"fas:f53a",
+			"fas:f0d6",
+			"fas:f09d",
+			"fas:f53d",
+			"fas:f53c",
+			"fas:f51e",
+			"fas:f4d3",
+			"fas:f3a5",
+			"fab:f1f1", "fab:f1f0", "fab:f1ed", "fab:f42c", "fab:f415", "fab:e079"
+		]
+	};
+
+	const DEFAULT_ICON = "fas:f07a";
+	const DEFAULT_COLOR = "#888";
+	let currentObject = {};
+	let elements = pageSnippets.iconSelector.produce().getNames();
+	for (let iconCode of [].concat(...Object.values(ICON_LIBRARAY)))
+	{
+		let icon = myx.getIconAttributes(iconCode);
+		elements.iconList.appendChild(htmlBuilder.newElement("div.icon." + icon.faScope,
+			{ 'data-choice-value': iconCode },
+			icon.htmlEntity));
+	};
+	colorSelector(elements.colorselectorBubbles, 27);
+	targetElement.appendChild(elements._self);
+	choices.onChoose("iconeditor-icon", renderIcon);
+	choices.onChoose("iconeditor-color", setIconColor);
+
+	elements.objectLabel.onfocus = () =>
+	{
+		if (elements.objectLabel.value === elements.objectLabel.dataset.defaultvalue)
+		{
+			elements.objectLabel.value = "";
+		}
+	};
+
+	elements.objectLabel.onblur = () =>
+	{
+		if (elements.objectLabel.value.trim() === "")
+		{
+			elements.objectLabel.value = elements.objectLabel.dataset.initialvalue;
+		}
 	};
 
 	function setIconColor (color)
@@ -52,23 +230,15 @@ const iconEditor = function (targetElement)
 		currentObject.color = color;
 	};
 
-	function renderCustomIcon ()
+	function renderIcon (iconCode)
 	{
-		if (!elements._self.querySelector("input:invalid, select:invalid"))	
-		{
-			let faScope = elements.faScope.value;
-			let unicodeCodepoint = elements.unicodeCodepoint.value;
-			for (let c of elements.faScope.options)
-			{
-				elements.iconPreview.classList.remove(c.value);
-			}
-			elements.iconPreview.classList.add(faScope);
-			elements.iconPreview.innerHTML = "&#x" + unicodeCodepoint + ";";
-			currentObject.icon = faScope + ":" + unicodeCodepoint;
-		}
+		let icon = myx.getIconAttributes(iconCode);
+		elements.iconPreview.classList.add(icon.faScope);
+		elements.iconPreview.innerHTML = icon.htmlEntity;
+		currentObject.icon = icon.faScope + ":" + icon.unicodeCodepoint;
 	};
 
-	function popup (mode, obj, callback)
+	this.popup = function (obj, callback)
 	{
 		let originTabName = choices.get("active-tab");
 		currentObject = Object.assign({}, {
@@ -98,41 +268,7 @@ const iconEditor = function (targetElement)
 		choices.set("iconeditor-icon", currentObject.icon);
 		choices.set("iconeditor-color", currentObject.color);
 		choices.set("iconeditor-tab", "icon-selection");
-		elements.knownIconsList.querySelector("[data-choice-value='" + currentObject.icon + "']")?.scrollIntoView({ block: "center" });
+		elements.iconList.querySelector("[data-choice-value='" + currentObject.icon + "']")?.scrollIntoView({ block: "center" });
 	};
 
-	/* =========== constructor =========== */
-	const psInterface = {
-		onCustomIconEdited: renderCustomIcon
-		// setLightness: setLightness,
-		// serSaturation: setSaturation
-	};
-	elements = pageSnippets.iconSelector.produce(psInterface).getNames();
-	void colorSelector(elements.colorselectorBubbles, 27);
-	for (let icon of ICONS)
-	{
-		elements.knownIconsList.appendChild(htmlBuilder.newElement("div.icon." + icon.substring(0, 3),
-			{ 'data-choice-value': icon },
-			"&#x" + icon.substring(4) + ";"));
-	};
-	targetElement.appendChild(elements._self);
-	choices.onChoose("iconeditor-icon", setIconData);
-	choices.onChoose("iconeditor-color", setIconColor);
-	elements.objectLabel.onfocus = () =>
-	{
-		if (elements.objectLabel.value === elements.objectLabel.dataset.defaultvalue)
-		{
-			elements.objectLabel.value = "";
-		}
-	};
-	elements.objectLabel.onblur = () =>
-	{
-		if (elements.objectLabel.value.trim() === "")
-		{
-			elements.objectLabel.value = elements.objectLabel.dataset.initialvalue;
-		}
-	};
-	return { // public interface
-		popup: popup
-	};
 };

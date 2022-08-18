@@ -196,7 +196,7 @@ let myxPaymentMethods = function ()
 			header: (editorMode === EDIT_EXISTING) ? "Edit payment method" : "New payment method",
 			defaultlabel: "New payment method"
 		};
-		window.iconEditor.popup("pmt", itemToEdit, (editedObj, properties) =>
+		window.iconEditor.popup(itemToEdit, (editedObj, properties) =>
 		{
 			if (editorMode === ADD_NEW)
 			{

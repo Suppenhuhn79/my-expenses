@@ -280,7 +280,7 @@ let myxCategories = function ()
 			headline: (!!masterCategory) ? "Subcategory of " + data[masterCategory].label : "",
 			defaultlabel: "New category"
 		};
-		window.iconEditor.popup("cat", itemToEdit, (editedObj) =>
+		window.iconEditor.popup(itemToEdit, (editedObj) =>
 		{
 			if (editorMode === ADD_NEW)
 			{

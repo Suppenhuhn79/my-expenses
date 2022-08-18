@@ -60,7 +60,7 @@
 	padding: 0 0.5em;
 }
 
-[name="known-icons-list"],
+[name="icon-list"],
 [name="colorselector-bubbles"] {
 	padding: 0 1rem;
 	font-size: var(--icon-size);

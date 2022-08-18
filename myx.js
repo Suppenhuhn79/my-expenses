@@ -10,6 +10,13 @@
  * @typedef IconCode
  * Representing a FontAwesome icon as combination of a CSS style and unicode codepoint, e.g. `"fas:f100"`.
  * @type {String}
+ * 
+ * @typedef IconAttributes
+ * Parsed attributes of an FontAwesome icon (`IconCode`)
+ * @type {Object}
+ * @property {String} faScope FontAwesome scope (Solid `fas`, Regular `far`, Brands `fab`)
+ * @property {String} unicodeCodepoint Unicode codepoint in four digit hex notation
+ * @property {String} htmlEntity Unicode codepoint as a HTML entitiy
  */
 
 /**
@@ -49,7 +56,8 @@ let myx = function ()
 				expenses.init()
 			]).then(() =>
 			{
-				window.iconEditor = iconEditor(document.getElementById("client"));
+				// TODO: this should not go to `window`
+				window.iconEditor = new IconEditor(document.getElementById("client"));
 				resolve();
 			});
 		});
@@ -142,10 +150,16 @@ let myx = function ()
 		}
 	}
 
+	/**
+	 * Provides attributes of an icon code.
+	 * @param {IconCode} iconCode Icon code to parse
+	 * @returns {IconAttributes} Object providing the attributes of the icon
+	 */
 	function getIconAttributes (iconCode)
 	{
 		return {
 			faScope: iconCode.substring(0, 3),
+			unicodeCodepoint: iconCode.substring(4),
 			htmlEntity: "&#x" + iconCode.substring(4) + ";"
 		};
 	}
