@@ -42,9 +42,9 @@ interface Date {
 interface HTMLElement {
 	/**
 	 * Collects all named children of an element into an object.
-	 * Returns map with `camelCaseElementName: {HTMLElement}` with all named elements
+	 * Returns an object with all named children as `camelCaseElementName: {HTMLElement}`.
 	 */
-	getNames(): Object<String, HTMLElement>;
+	getNames(): Record<String, HTMLElement>;
 }
 
 interface String {
