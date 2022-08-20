@@ -79,13 +79,13 @@ const myxStatisticsTimerange = function ()
 		if (value === "*")
 		{
 			myx.expenses.selectedMonth = new Date();
-			selectedMonths = myx.expenses.availibleMonths;
+			selectedMonths = myx.expenses.allAvailibleMonths;
 		}
 		else if (/^\d{4}$/.test(value) === true)
 		{
 			selectedMonths = [];
 			selectedTime = value.substring(0, 4);
-			for (let month of myx.expenses.availibleMonths)
+			for (let month of myx.expenses.allAvailibleMonths)
 			{
 				if (month.substring(0, 4) === selectedTime)
 				{
@@ -438,9 +438,9 @@ const myxStatistics = function ()
 	choices.onChoose("calculation-mode", onCalculationmodeChosen);
 
 	return { // publish members
-		get aggregator () { return aggregator; }, // TODO: debug only
-		get timerange () { return timerange; }, // TODO: debug only
-		get elements () { return elements; }, // TODO: debug only
+		get aggregator () { return aggregator; }, // debug_only
+		get timerange () { return timerange; }, // debug_only
+		get elements () { return elements; }, // debug_only
 		get moduleName () { return MODULE_NAME; },
 		enter: enter
 		/*

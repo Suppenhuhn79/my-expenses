@@ -162,7 +162,6 @@ let myxPaymentMethods = function ()
 			}
 		}
 		htmlBuilder.removeAllChildren(elements.content);
-		console.log(order, disabledItems);
 		_renderList(order, true);
 		if (disabledItems.length > 0)
 		{

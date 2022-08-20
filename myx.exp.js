@@ -111,8 +111,6 @@ let myxExpenses = function ()
 	let dataIndex = myxExpensesDataindex();
 	/** @type {ExpensesFilter} */
 	let filter = {};
-	/** @type {Array<MonthString>} */
-	let availibleMonths = [];
 	let elements = document.getElementById(MODULE_NAME).getNames();
 	let modeHandler = new ModuleModeHandler(elements._self);
 	let repeatings = myxRepeatingExpenses();
@@ -140,10 +138,11 @@ let myxExpenses = function ()
 			]).then(() =>
 			{
 				editor = expenseEditor(repeatings, document.getElementById("client"));
+				window.exd = editor; // debug_only
 				doFontAwesome(document.getElementById("expense-editor"));
 				resetFilter();
-				window.r = repeatings; // TODO: debug only
-				console.log("Repeating expenses (`r`) have loaded.", window.r.data); // TODO: debug only
+				window.r = repeatings; // debug_only
+				console.log("Repeating expenses (`r`) have loaded.", window.r.data); // debug_only
 				resolve();
 			});
 		});
@@ -184,7 +183,7 @@ let myxExpenses = function ()
 	function importFileContent (fileIndex, csvString)
 	{
 		/**
-		 * Collection of already loaded months so we can clear the `data[<month>]` array.
+		 * Collection of already loaded months so we can clear the `data` for this month.
 		 * @type {Array<MonthString>} */
 		let monthsLoaded = [];
 		for (let line of csvString.split("\n"))
@@ -199,7 +198,7 @@ let myxExpenses = function ()
 					dataIndex.register(month, fileIndex);
 					monthsLoaded.push(month);
 				}
-				add(exp, true);
+				data[month].push(exp);
 			}
 		}
 		for (let month of dataIndex.allMonthsInFile(fileIndex))
@@ -225,20 +224,32 @@ let myxExpenses = function ()
 
 	/**
 	 * Saves expenses to a file.
-	 * More exactly: saves expenses of all months, that are in the same files as the given months.
-	 * @param {MonthString|Array<MonthString>} months Months to save data
+	 * More exactly: saves expenses of all months, that are in the same files as the given dates.
+	 * @param {Expense|Array<Expense>} expenses Months to save data
 	 * @async
 	 */
-	async function saveToFile (months)
+	async function saveToFile (expenses)
 	{
-		/** @type {Array<Number>} */
+		/** 
+		 * Months to be saved
+		 * @type {Array<MonthString>} */
+		let months = [];
+		/**
+		 * Indexes of affected files
+		 * @type {Array<Number>} */
 		let fileIndexes = [];
-		/** @type {Array<Promise>} */
+		/**
+		 * XHR operation promises
+		 * @type {Array<Promise>} */
 		let ops = [];
 		myx.xhrBegin();
-		if (typeof months === "string")
+		if (!(expenses instanceof Array))
 		{
-			months = [months];
+			expenses = [expenses];
+		}
+		for (let exp of expenses)
+		{
+			months.push(exp.dat.toMonthString());
 		}
 		months.removeDuplicates().sort();
 		for (let month of months)
@@ -268,21 +279,22 @@ let myxExpenses = function ()
 	}
 
 	/**
-	 * Adds an expense to `data`.
-	 * @param {Expense} expense Expense to add
-	 * @param {Boolean} [bulk] Whether this call is part of a bulk operation, or not. If bulk, then **you must** call sortItems() at the end of the bulk operation. Default `false`
+	 * Adds a expenses to `data`.
+	 * @param {Expense|Array<Expense>} expense Expense to add
 	 */
-	function add (expense, bulk = false)
+	function add (expense)
 	{
-		let month = expense.dat.toIsoFormatText("YM");
-		data[month] ||= [];
-		data[month].push(new Expense(expense));
-		if (bulk === false)
+		if ((expense instanceof Array) === false)
 		{
-			sortItems(month);
-			dataIndex.register(month);
+			expense = [expense];
 		}
-		availibleMonths = dataIndex.allAvailibleMonths.sort((a, b) => (a.localeCompare(b) * -1));
+		for (let item of expense)
+		{
+			let month = item.dat.toIsoFormatText("YM");
+			data[month] ||= [];
+			data[month].push(new Expense(item));
+		}
+		saveToFile(expense);
 	}
 
 	/**
@@ -319,7 +331,7 @@ let myxExpenses = function ()
 	{
 		filter.pmt = filterObj.pmt;
 		filter.cats = filterObj.cats || ((!!filterObj.cat) ? [filterObj.cat] : []);
-		filter.months = filterObj.months || availibleMonths;
+		filter.months = filterObj.months || dataIndex.allAvailibleMonths;
 		filter._origin = originModuleName;
 		htmlBuilder.removeAllChildren(elements.searchHint);
 		if ((filter.cats.length > 0) || !!filter.pmt)
@@ -455,7 +467,7 @@ let myxExpenses = function ()
 			/** @type {HTMLElement} */
 			let headline;
 			/** @type {Array<Expense>} */
-			let repeatingExpenses = (modeHandler.currentMode === "default") ? repeatings.get(month) : [];
+			let repeatingExpenses = (modeHandler.currentMode === "default") ? repeatings.process(month) : [];
 			/** @type {Array<Expense>} */
 			let actualExpenses = data[month] || [];
 			/** @type {Array<Expense>} */
@@ -483,6 +495,7 @@ let myxExpenses = function ()
 								"&#x00a0;Upcoming expenses preview&#x00a0;",
 								htmlBuilder.newElement("i.fas", { 'data-icon': "angle-double-up" })
 							);
+							// marker.addEventListener("animationend", () => { console.log("animation ended"); marker.style.animation = null; });
 							scrollToDate ||= today;
 							doFontAwesome(marker);
 							renders.push(marker);
@@ -506,7 +519,7 @@ let myxExpenses = function ()
 			{
 				elements.content.appendChild(render);
 			}
-			if (((filter.cats.length > 0) || (!!filter.pmt)) && (filter.months.length < availibleMonths.length))
+			if (((filter.cats.length > 0) || (!!filter.pmt)) && (filter.months.length < dataIndex.allAvailibleMonths.length))
 			{
 				elements.content.appendChild(htmlBuilder.newElement("button",
 					"Find more",
@@ -581,46 +594,46 @@ let myxExpenses = function ()
 		let originalItem = new Expense(expense);
 		/** @type {MonthString} */
 		let originalMonth = originalItem.dat.toMonthString();
-		/** @type {Date} */
-		let scrollToDate = expense.dat;
 		editor.popup(originalItem, dataIndex,
 			/**
 			 * Expense editor callback
 			 * @param {Expense} editedItem Edited expense
-			 * @param {Number} editedDataIndex Non-null if an existing expense was modified, `null` if editor returns a new (or a copied) expense
+			 * @param {ExpenseEditorAction} action
 			 */
-			(editedItem, editedDataIndex) =>
+			(editedItem, action) =>
 			{
-				console.table([dataIndex, editedDataIndex]);
-				if ((editedItem === null) || (editedItem === undefined))
+				/** @type {Date} */
+				let scrollToDate = (action !== ExpenseEditorAction.NONE) ? editedItem?.dat : originalItem.dat;
+				if (action === ExpenseEditorAction.ADD)
 				{
-					data[originalMonth].splice(dataIndex, 1);
-					saveToFile(originalMonth);
+					add(editedItem);
+					setMonth(editedItem.dat);
+					saveToFile(editedItem);
 				}
-				else if (originalItem.equals(editedItem) === false)
+				else if ((action === ExpenseEditorAction.MODIFY) && (originalItem.equals(editedItem) === false))
 				{
-					/** @type {String} */
-					let itemMonth = editedItem.dat.toMonthString();
-					scrollToDate = editedItem.dat;
-					if (typeof editedDataIndex !== "number") // if it's a new or copied expense, the editedDataIndex is `null` or `undefined`
+					if (editedItem.dat.toMonthString() === originalMonth)
 					{
-						add(editedItem);
+						data[originalMonth][dataIndex] = new Expense(editedItem);
+						sortItems(originalMonth);
 					}
 					else
 					{
-						if (itemMonth === originalMonth)
-						{
-							data[originalMonth][dataIndex] = new Expense(editedItem);
-							sortItems(originalMonth);
-						}
-						else
-						{
-							data[originalMonth].splice(dataIndex, 1);
-							add(editedItem);
-						}
+						data[originalMonth].splice(dataIndex, 1);
+						add(editedItem);
+						setMonth(editedItem.dat);
 					}
-					saveToFile([originalMonth, itemMonth]);
-					setMonth(new Date(itemMonth));
+					saveToFile([originalItem, editedItem]);
+				}
+				else if (action === ExpenseEditorAction.DELETE)
+				{
+					data[originalMonth].splice(dataIndex, 1);
+					scrollToDate = originalItem.dat;
+					saveToFile(originalItem);
+				}
+				else if (action === ExpenseEditorAction.REPEATING)
+				{
+					null; // nothing to do here; repeating expenses are saved on editor.apply() that does set() the rep changes.
 				}
 				choices.set("active-tab", MODULE_NAME);
 				renderList(scrollToDate);
@@ -638,11 +651,11 @@ let myxExpenses = function ()
 	{
 		let menuItems = [];
 		let currentYear = null;
-		for (let month of availibleMonths.sort().reverse())
+		for (let month of dataIndex.allAvailibleMonths.reverse())
 		{
 			let monthAsDate = new Date(month);
 			let monthYear = monthAsDate.getFullYear();
-			currentYear ||= (new Date(availibleMonths[0])).getFullYear();
+			currentYear ||= (new Date()).getFullYear();
 			if (monthYear !== currentYear)
 			{
 				menuItems.push({ separator: {} });
@@ -700,21 +713,22 @@ let myxExpenses = function ()
 	}
 
 	return { // publish members
-		get data () { return data; }, // TODO: debug only
-		get index () { return dataIndex; }, // TODO: debug only
-		scrollTo: scrollTo, // TODO: debug only
-		getCsv: getCsv, // TODO: debug only
-		save: saveToFile, // TODO: debug only
+		get data () { return data; }, // debug_only
+		get index () { return dataIndex; }, // debug_only
+		scrollTo: scrollTo, // debug_only
+		getCsv: getCsv, // debug_only
+		save: saveToFile, // debug_only
 		get moduleName () { return MODULE_NAME; },
 		init: init,
 		fetchData: fetchData,
-		get selectedMonth () { return selectedMonth; },
-		set selectedMonth (value) { setMonth(value); },
-		get availibleMonths () { return availibleMonths; },
-		hasActualData: hasActualData,
 		enter: renderList,
 		leave: resetFilter,
+		get selectedMonth () { return selectedMonth; },
+		set selectedMonth (value) { setMonth(value); },
+		get allAvailibleMonths () { return dataIndex.allAvailibleMonths; },
+		hasActualData: hasActualData,
 		setFilter: setFilter,
+		add: add,
 		edit: popupEditor
 	};
 };

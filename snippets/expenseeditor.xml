@@ -1,41 +1,48 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <ps:pagesnippets xmlns:ps="https://github.com/suppenhuhn79/pagesnippets">
-	<ps:script src="expenseeditor.js"/>
-	<ps:stylesheet src="expenseeditor.css"/>
+	<ps:script src="expenseeditor.js" />
+	<ps:stylesheet src="expenseeditor.css" />
+	<!-- <ps:script src="https://cdn.jsdelivr.net/npm/flatpickr"/> -->
+	<!-- <ps:stylesheet src="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" /> -->
 	<ps:snippet name="expenseEditor">
 		<div id="expense-editor" data-choice-client="expense-editor">
 			<div class="client-header">
-				<span name="title">add expense</span>
+				<span name="title">(title)</span>
 			</div>
 			<div class="wrapper sticky-bottom">
-				<div name="category-selector">
-				</div>
+				<div name="category-selector"></div>
 				<div>
 					<table name="inputs">
 						<thead>
-							<tr>
-								<td>[yday]</td>
+							<tr class="for-mode default-mode">
+								<td name="redo" ps:onclick="onRedoClick">
+									<i class="fas" data-icon="redo"></i>
+									<div class="button-overlay" name="repeating-button-overlay">/0n</div>
+								</td>
 								<td colspan="3">
-									<input name="dat" type="date" required="required" />
+									<input name="dat" type="date" required="required" ps:onchange="onDatChange" />
 								</td>
 								<td>[cal]</td>
+							</tr>
+							<tr class="for-mode repeat-mode">
+								<td colspan="5" name="repeating-text">(repeating-text)</td>
 							</tr>
 							<tr>
 								<td></td>
 								<td colspan="3">
 									<div name="amt">0</div>
 								</td>
-								<td name="pmt" class="click">[pmt]</td>
+								<td name="pmt" class="click" ps:onclick="onPmtClick">[pmt]</td>
 							</tr>
 							<tr>
 								<td colspan="5">
-									<input name="txt" type="text" autocomplete="off" placeholder="annotation..."/>
+									<input name="txt" type="text" autocomplete="off" placeholder="annotation..." />
 								</td>
 							</tr>
 						</thead>
-						<tbody name="keypad" class="click">
+						<tbody name="keypad" class="click" ps:onclick="onKeypadClick">
 							<tr>
-								<td name="clone">
+								<td name="clone" ps:onclick="onCloneClick">
 									<i class="far" data-icon="clone"></i>
 								</td>
 								<td data-keycode="7">7</td>
@@ -46,19 +53,18 @@
 								</td>
 							</tr>
 							<tr>
-								<td name="redo" style="position: relative;">
-									<i class="fas" data-icon="redo"></i>
-									<div class="button-overlay" name="repeating-button-overlay">0/n</div>
+								<td style="position: relative;">
+									<!-- <i class="fas" data-icon="redo"></i> -->
 								</td>
 								<td data-keycode="4">4</td>
 								<td data-keycode="5">5</td>
 								<td data-keycode="6">6</td>
-								<td name="apply" rowspan="3">
+								<td name="apply" rowspan="3" ps:onclick="onApplyClick">
 									<i class="fas" data-icon="check"></i>
 								</td>
 							</tr>
 							<tr>
-								<td name="delete">
+								<td name="delete" ps:onclick="onDeleteClick">
 									<i class="fas red" data-icon="trash-alt"></i>
 								</td>
 								<td data-keycode="1">1</td>
@@ -66,7 +72,7 @@
 								<td data-keycode="3">3</td>
 							</tr>
 							<tr>
-								<td name="cancel">
+								<td name="cancel" ps:onclick="onCancelClick">
 									<i class="fas" data-icon="times"></i>
 								</td>
 								<td data-keycode="__clearall__">CE</td>
@@ -79,4 +85,15 @@
 			</div>
 		</div>
 	</ps:snippet>
+	<ps:snippet-group name="expenseEditor">
+		<ps:snippet name="repeatmentLine">
+			<div class="center">
+				<span>repeats on</span>
+				<div class="code">{{dayOfMonth}}</div>
+				<span>, every</span>
+				<div class="code">{{months}}</div>
+				<span>months</span>
+			</div>
+		</ps:snippet>
+	</ps:snippet-group>
 </ps:pagesnippets>

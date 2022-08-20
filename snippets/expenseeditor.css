@@ -73,6 +73,11 @@
 	border-top: 1px solid #ddd;
 }
 
+#expense-editor table .disabled {
+	opacity: 20%;
+	cursor: not-allowed;
+}
+
 #expense-editor thead td[colspan="3"] {
 	width: 60%;
 }
@@ -91,18 +96,14 @@
 	border-left: 1px solid #aaa;
 }
 
-#expense-editor tbody .disabled {
-	opacity: 20%;
-	cursor: not-allowed;
-}
-
-#expense-editor tbody .button-overlay {
-	position: absolute;
+#expense-editor thead .button-overlay {
+	/* position: absolute; */
 	display: inline-block;
-	bottom: 0.2em;
-	text-align: center;
-	font-size: 0.7em;
-	margin-top: 1em;
-	width: 100%;
-	left: 0;
+	font-size: 0.8em;
+	/* bottom: 0.2em; */
+	/* text-align: center; */
+	/* font-size: 0.7em; */
+	/* margin-top: 1em; */
+	/* width: 100%; */
+	/* left: 0; */
 }
