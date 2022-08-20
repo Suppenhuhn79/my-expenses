@@ -16,7 +16,7 @@
  * A repeating interval; may be either a count of `weeks` or a count of `months`.
  * @constructor
  * @param {RepeatingInterval} [src] Repeating interval to copy. If ommitted, the interval is set to "every month"
- * @returns {RepeatingInterval} New repeating intervall object
+ * @returns {RepeatingInterval} New repeating interval object
  */
 function RepeatingInterval (src)
 {
