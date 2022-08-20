@@ -34,7 +34,7 @@ const myxExpensesDataindex = function ()
 
 	/**
 	 * Returns all registerd months.
-	 * @returns {Array<MonthString>} All registerd months
+	 * @returns {Array<MonthString>} All registered months in ascending order
 	 */
 	function getAllMonths ()
 	{
@@ -43,7 +43,7 @@ const myxExpensesDataindex = function ()
 		{
 			result = result.concat(item);
 		}
-		return result;
+		return result.sort();
 	}
 
 	/**
@@ -80,7 +80,7 @@ const myxExpensesDataindex = function ()
 	}
 
 	return { // public interface
-		get data () { return data; }, // TODO: debug only
+		get data () { return data; }, // debug_only
 		register: register,
 		allMonthsInFile: getAllMonthInFile,
 		fileindexOfMonth: getFileindexForMonth,
