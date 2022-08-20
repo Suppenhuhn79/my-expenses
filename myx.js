@@ -126,7 +126,6 @@ let myx = function ()
 
 	function onTabChosen (tabName, interactive)
 	{
-		console.log("onTabChosen", tabName, interactive);
 		(tabName.endsWith("-tab")) ? bottomMenu.classList.remove("hidden") : bottomMenu.classList.add("hidden");
 		if (interactive)
 		{
@@ -180,8 +179,6 @@ let myx = function ()
 
 	function onWindowFocus ()
 	{
-		// console.clear();
-		console.debug("window focused", choices.get("active-tab"));
 		let currentChosenTab = choices.get("active-tab");
 		if (currentChosenTab !== "data-dummy")
 		{

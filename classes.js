@@ -19,7 +19,6 @@ function ModuleModeHandler (element, dataGetter, dataSetter)
 	 */
 	this.setMode = function (newMode)
 	{
-		console.log("setMode", this.currentMode, "-->", newMode);
 		if ((typeof dataGetter === "function") && (typeof dataSetter === "function"))
 		{
 			if ((this.currentMode === "default") && (newMode === "edit"))
