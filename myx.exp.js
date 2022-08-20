@@ -290,7 +290,7 @@ let myxExpenses = function ()
 		}
 		for (let item of expense)
 		{
-			let month = item.dat.toIsoFormatText("YM");
+			let month = item.dat.toMonthString();
 			data[month] ||= [];
 			data[month].push(new Expense(item));
 		}
@@ -405,7 +405,7 @@ let myxExpenses = function ()
 	function renderHeadline (date)
 	{
 		return htmlBuilder.newElement("div.headline",
-			{ 'data-date': date.toIsoFormatText("YMD") },
+			{ 'data-date': date.toIsoDate() },
 			date.format("dddd, d. mmmm yyyy")
 		);
 	}
@@ -695,7 +695,7 @@ let myxExpenses = function ()
 	 */
 	function onAddExpenseClick ()
 	{
-		let nowMonth = (new Date()).toIsoFormatText("YM");
+		let nowMonth = (new Date()).toMonthString();
 		let itemDate;
 		if (selectedMonth.toMonthString() > nowMonth)
 		{

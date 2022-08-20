@@ -260,7 +260,7 @@ function myxRepeatingExpenses ()
 				}
 				if (itemPreviewDate < now)
 				{
-					console.warn("ADD:", id, itemPreviewDate.toIsoFormatText("YMD"), myx.categories.getLabel(item.expense.cat), item.expense.amt);
+					console.warn("ADD:", id, itemPreviewDate.toIsoDate(), myx.categories.getLabel(item.expense.cat), item.expense.amt);
 					item.expense.dat = itemPreviewDate;
 					triggeredExpenses.push(item.expense);
 					data.set(id, item);

@@ -12,10 +12,43 @@ interface Array<T> {
 
 interface Date {
 	/**
+	 * Returns a new date with a count of days added to the current date.
+	 * @param count Count of days to add
+	 */
+	addDays(count: number): Date;
+	/**
+	 * Returns a new date with a count of months added to the current date.
+	 * This may overflow to the next month, if the current day does not exist in the target month.
+	 *
+	 * See also `shiftMonths()`
+	 * @param count Count of months to add
+	 */
+	addMonths(count: number): Date;
+	/**
+	 * Returns a new date with a count of years added to the current date.
+	 * @param count Count of years to add
+	 */
+	addYears(count: number): Date;
+	/**
+	 * Shifts a date by a count of months.
+	 * In opposite to `addMonths()` it does not overflow to the next month but remains at the last possible day of the desired month.
+	 * @param count Count of months by which to shift the current date
+	 */
+	shiftMonths(count: number): Date;
+	/**
+	 * Returns a new date which is set to the end of the current dates month.
+	 */
+	endOfMonths(): date;
+	/**
+	 * Returns whether this dates day is the last day of this dates month.
+	 */
+	isLastDayOfMonth: boolean;
+	/**
 	 * Formats the date to a string, using locale names.
 	 *
 	 * **Requires** `Date.locales.monthNames: string[]` and `Date.locales.weekdayNames: string[]`
 	 *
+	 * @param formatString String containing format tokens.
 	 * Valid format tokens are:
 	 * - `d` - day of months (one or two digits)
 	 * - `dd` - day of months (two digits)
@@ -28,7 +61,7 @@ interface Date {
 	 * - `yy` - year (last two digits)
 	 * - `yyyy` - year (full)
 	 */
-	format(): string;
+	format(formatString: string): string;
 	/**
 	 * Numeric date string (`"YYYY-MM-DD"`)
 	 */

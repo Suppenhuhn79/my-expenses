@@ -110,7 +110,7 @@ const myxStatisticsTimerange = function ()
 		switch (mode)
 		{
 			case "month":
-				result = myx.expenses.selectedMonth.addMonths(direction);
+				result = myx.expenses.selectedMonth.shiftMonths(direction);
 				break;
 			case "year":
 				result = new Date(myx.expenses.selectedMonth.getFullYear() + direction, (direction > 0) ? 0 : 11, 1);
@@ -279,7 +279,7 @@ const myxStatistics = function ()
 		_refreshNavigatorButtons();
 		if (entering === false)
 		{
-			actualCalculatedMonths = timerange.selectedMonths.clone();
+			actualCalculatedMonths = timerange.selectedMonths.clone().reverse();
 			/* If calculating averages, exclude the current month (if not on the last day). */
 			if (calcMode !== "sum")
 			{
@@ -398,8 +398,6 @@ const myxStatistics = function ()
 
 	function enter ()
 	{
-		console.clear();
-		console.log("stats init");
 		entering = true;
 		choices.set("time-range-mode", "month");
 		choices.set("calculation-mode", "sum");
