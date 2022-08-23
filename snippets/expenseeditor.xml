@@ -36,7 +36,7 @@
 							</tr>
 							<tr>
 								<td colspan="5">
-									<input name="txt" type="text" autocomplete="off" placeholder="annotation..." />
+									<input name="txt" type="text" autocomplete="off" placeholder="annotation..." ps:onkeydown="onTxtKeydown" />
 								</td>
 							</tr>
 						</thead>
