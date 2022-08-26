@@ -65,7 +65,7 @@ function Expense (src, override)
 						this.amt = Number(src.amt) || 0;
 						break;
 					case "pmt":
-						this.pmt = src.pmt || myx.paymentMethods.defaultPmt;
+						this.pmt = src.pmt || myx.paymentMethods.default;
 						break;
 					default:
 						this[key] = src[key] || "";
@@ -73,6 +73,7 @@ function Expense (src, override)
 			}
 			break;
 	}
+	// TODO: this.pmt_ = new PaymentMethod(myx.paymentMethods.get(this.pmt));
 
 	/**
 	 * Compares two expenses if they are equal (date, amount, category, etc.)
@@ -343,7 +344,7 @@ let myxExpenses = function ()
 			}
 			else if (!!filter.pmt)
 			{
-				searchHint += myx.paymentMethods.getLabel(filter.pmt);
+				searchHint += myx.paymentMethods.get(filter.pmt).label;
 			}
 			elements.searchHint.appendChild(htmlBuilder.newElement("div.cutoff", "\u00a0", searchHint));
 			if (filter.months.length === 1)
@@ -427,12 +428,8 @@ let myxExpenses = function ()
 				htmlBuilder.newElement("div.cutoff.big", item.txt || catLabel),
 				htmlBuilder.newElement("div.cutoff.grey", (!!item.txt) ? catLabel : "")),
 			htmlBuilder.newElement("div.amount.right.big", myx.formatAmountLocale(item.amt)),
-			myx.paymentMethods.renderIcon(item.pmt)
+			myx.paymentMethods.get(item.pmt).renderIcon()
 		);
-		if (myx.paymentMethods.isExcluded(item.pmt))
-		{
-			div.classList.add("exclude");
-		}
 		return div;
 	}
 

@@ -1,5 +1,6 @@
 /**
  * Creates a new instance of ModuleModeHandler.
+ * @constructor
  * @param {HTMLElement} element Element that contains module items
  * @param {Function} dataGetter `function(): Object` to get the current module data before switching to "edit" mode
  * @param {Function} dataSetter `function(data: Object)` to call to reset modified data when cancelling "edit" mode
@@ -7,7 +8,7 @@
 function ModuleModeHandler (element, dataGetter, dataSetter)
 {
 	let dataBeforeEdit;
-	this.currentMode = "default";
+	this.currentMode = "default"; // TODO: this should be a private property
 
 	/**
 	 * Sets the current mode for the module. Hides all elements that have the class "for-mode"
@@ -17,7 +18,7 @@ function ModuleModeHandler (element, dataGetter, dataSetter)
 	 * is restored to backup via `dataSetter()`.
 	 * @param {String} newMode Mew mode to set
 	 */
-	this.setMode = function (newMode)
+	this.set = function (newMode) 
 	{
 		if ((typeof dataGetter === "function") && (typeof dataSetter === "function"))
 		{
@@ -42,4 +43,7 @@ function ModuleModeHandler (element, dataGetter, dataSetter)
 			}
 		}
 	};
+
+	this.setMode = this.set; // DEPRECATED
+	this.get = function () { return this.currentMode; };
 }

@@ -37,14 +37,14 @@
 	padding: 0.75rem 0.5rem;
 }
 
-#client .headline {
+.headline {
 	padding: 0.3rem 1rem;
 	color: #888;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
-#client .headline.month {
+.headline.month {
 	font-weight: bold;
 	text-align: center;
 	text-decoration: underline;
@@ -66,7 +66,7 @@
 	align-content: stretch;
 	align-items: baseline;
 	width: 100%;
-	padding: 0.7rem 0 0.7rem 1rem;
+	padding: 0.7rem 1rem 0.7rem 1rem;
 	background-color: white;
 	border-top: var(--item-border);
 }
@@ -83,13 +83,17 @@
 #client .content .item:last-of-type {
 	border-bottom: 2px solid #aaa;
 }
-#client .content .item > div {
-	margin-right: 0.5em;
-}
+
 #client .content .item .for-mode {
 	color: #ddd;
 	/* cursor: pointer; */
 	align-self: center;
+}
+#client .content .item i.for-mode {
+	padding-left: 1em;
+	display: inline-block;
+	width: 1em;
+	text-align: center;
 }
 
 #client .wrapper {
@@ -160,18 +164,12 @@
 	cursor: pointer;
 }
 
-#payment-methods-tab .default-selected div {
+#payment-methods-tab .pmt-icon {
+	margin-right: 0.5em;
+}
+#payment-methods-tab .default-flag.selected {
+	color: gold !important;
 	font-weight: bold;
-}
-#payment-methods-tab .pmt-def-flag {
-	margin: 0 1rem;
-	font-size: 1rem;
-	font-weight: 900;
-}
-#payment-methods-tab .default-selected .for-mode.pmt-def-flag {
-	color: gold;
-	cursor: default;
-	padding-right: 0.5rem;
 }
 
 #categories-tab .item > div {
@@ -408,15 +406,11 @@
 
 .dragger-ns {
 	cursor: ns-resize;
-	padding: 0 1em;
-	opacity: 1;
 }
 .dragger-ew {
 	transform: rotate(90deg);
 	cursor: ew-resize;
-	padding: 0;
 	margin-right: 1em;
-	opacity: 1;
 }
 .sortable-chosen {
 	box-shadow: 0 0 10px 5px #00000080;

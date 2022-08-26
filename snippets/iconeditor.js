@@ -1,7 +1,93 @@
-function IconEditor (targetElement)
+const EditableIconType = {
+	/** @enum {Number} */
+	COLOR_ON_WHITE: 1,
+	WHITE_ON_COLOR: 2
+};
+
+// TODO: refactor
+const colorSelector = function (element, bubbleCount, initialSat = 0.8, initalLight = 0.6, hueOffset = 0)
 {
-	const ICON_LIBRARAY =
+	let hueStep;
+	let hueStart = hueOffset;
+	let saturation = initialSat;
+	let lightness = initalLight;
+	let bubbleElements = [];
+
+	function hsl2rgb (h, s, l)
 	{
+		// based upon: https://stackoverflow.com/a/64090995/15919152
+		// input: h as an angle in [0,360] and s,l in [0,1] - output: r,g,b in [0,1]
+		let a = s * Math.min(l, 1 - l); let f = (n, k = (n + h / 30) % 12) => l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+		return ("#" + [f(0), f(8), f(4)].map((x) => Math.round(x * 255).toString(16).padStart(2, 0)).join(""));
+	};
+
+	function updateBubbles ()
+	{
+		function _styleElement (element, color)
+		{
+			element.dataset.choiceValue = color;
+			element.style.backgroundColor = color;
+		}
+		for (let h = 0, hh = bubbleElements.length - 1; h < hh; h += 1)
+		{
+			_styleElement(bubbleElements[h], hsl2rgb(h * hueStep + hueStart, saturation, lightness));
+		}
+		/* grey bubble */
+		_styleElement(bubbleElements[bubbleElements.length - 1], hsl2rgb(0, 0, lightness));
+		updateSelectedBubble();
+	};
+
+	function updateSelectedBubble (bubbleElement)
+	{
+		bubbleElement ||= element.querySelector(".chosen");
+		if (bubbleElement)
+		{
+			bubbleElement.style.boxShadow = "0 0 0 4px " + bubbleElement.dataset.choiceValue;
+		}
+	};
+
+	function onColorBubbleClick (event)
+	{
+		let bubbleElement = event.target.closest("[data-choice-value]");
+		if (!!bubbleElement)
+		{
+			for (let otherBubble of bubbleElements)
+			{
+				otherBubble.style.boxShadow = null;
+			}
+			updateSelectedBubble(bubbleElement);
+		}
+	};
+
+	// htmlBuilder.removeAllChildren(element);
+	hueStep = Math.round(360 / bubbleCount);
+	for (let h = 0; h <= bubbleCount; h += 1)
+	{
+		let bubbleElement = htmlBuilder.newElement("div.color-bubble",
+			{
+				name: "colorBubble",
+				onclick: onColorBubbleClick
+			});
+		bubbleElements.push(bubbleElement);
+		element.appendChild(bubbleElement);
+	}
+	updateBubbles();
+
+	// element.onclick = onColorBubbleClick;
+	// }
+
+	return { // publish members
+		get color () { return choices.get("iconeditor-color"); },
+		get saturation () { return saturation; },
+		set saturation (value) { saturation = value; updateBubbles(); },
+		get lightness () { return lightness; },
+		set lightness (value) { lightness = value; updateBubbles(); }
+	};
+};
+
+let iconEditor = new function ()
+{
+	const ICON_LIBRARAY = {
 		shopping: [
 			"fas:f07a",
 			"fas:f291",
@@ -173,7 +259,7 @@ function IconEditor (targetElement)
 			"fas:f3d1",
 			"fas:f53a",
 			"fas:f0d6",
-			"fas:f09d",
+			"far:f09d",
 			"fas:f53d",
 			"fas:f53c",
 			"fas:f51e",
@@ -183,92 +269,176 @@ function IconEditor (targetElement)
 		]
 	};
 
-	const DEFAULT_ICON = "fas:f07a";
-	const DEFAULT_COLOR = "#888";
-	let currentObject = {};
-	let elements = pageSnippets.iconSelector.produce().getNames();
-	for (let iconCode of [].concat(...Object.values(ICON_LIBRARAY)))
+	/**
+	 * Named child elements of the editor.
+	 * @type {Map<String, HTMLElement>}
+	 */
+	let elements = pageSnippets.iconSelector.produce({
+		onLabelFocus: onLabelFocus,
+		onLabelBlur: onLabelBlur,
+		onCancelClick: onCancelClick,
+		onOkClick: onConfirmClick,
+		onDeleteClick: onDeleteClick
+	}).getNamedChildren();
+
+	/**
+	 * Properties of the currently edited icon .
+	 * @type {EditableIcon}
+	 */
+	let editedIcon;
+
+	/**
+	 * Current editor options.
+	 * @type {IconEditorOptions}
+	 */
+	let _options;
+
+	/** @type {IconEditorCallback} */
+	let _callback;
+
+	/**
+	 * Name of tab which opend the editor.
+	 * @type {String}
+	 */
+	let _originTabName;
+
+	doFontAwesome(elements.get());
+	colorSelector(elements.get("colorselector-bubbles"), 27);
+	for (let glyphCode of [].concat(...Object.values(ICON_LIBRARAY)))
 	{
-		let icon = myx.getIconAttributes(iconCode);
-		elements.iconList.appendChild(htmlBuilder.newElement("div.icon." + icon.faScope,
-			{ 'data-choice-value': iconCode },
-			icon.htmlEntity));
+		let glyph = new FAGlyph(glyphCode);
+		elements.get("icon-list").appendChild(htmlBuilder.newElement("div.icon." + glyph.scope, { "data-choice-value": glyph.value }, glyph.htmlEntity));
 	};
-	colorSelector(elements.colorselectorBubbles, 27);
-	targetElement.appendChild(elements._self);
-	choices.onChoose("iconeditor-icon", renderIcon);
+	document.getElementById("client").appendChild(elements.get());
+	choices.onChoose("iconeditor-icon", renderGlyph);
 	choices.onChoose("iconeditor-color", setIconColor);
 
-	elements.objectLabel.onfocus = () =>
-	{
-		if (elements.objectLabel.value === elements.objectLabel.dataset.defaultvalue)
-		{
-			elements.objectLabel.value = "";
-		}
-	};
-
-	elements.objectLabel.onblur = () =>
-	{
-		if (elements.objectLabel.value.trim() === "")
-		{
-			elements.objectLabel.value = elements.objectLabel.dataset.initialvalue;
-		}
-	};
-
+	/**
+	 * Sets the color of the icon preview.
+	 * @param {String} color Color code of the icon
+	 */
 	function setIconColor (color)
 	{
-		if (currentObject.meta.type === "category")
+		if (_options.iconType === EditableIconType.WHITE_ON_COLOR)
 		{
-			elements.iconPreviewWrapper.style.backgroundColor = color;
-			elements.iconPreview.style.color = "#fff";
+			elements.get("icon-preview").setStyles({
+				backgroundColor: color,
+				color: "#fff",
+				fontSize: "1em"
+			});
 		}
 		else 
 		{
-			elements.iconPreviewWrapper.style.backgroundColor = "#fff";
-			elements.iconPreview.style.color = color;
+			elements.get("icon-preview").setStyles({
+				backgroundColor: "#fff",
+				color: color,
+				fontSize: "1.3em"
+			});
 		}
-		currentObject.color = color;
+		editedIcon.color = color;
 	};
 
-	function renderIcon (iconCode)
+	/**
+	 * Paints the icons glyph preview.
+	 * @param {FAGlyph|String} glyph Glyph either as an actual FontAwesome glyph or a glyph code
+	 */
+	function renderGlyph (glyph)
 	{
-		let icon = myx.getIconAttributes(iconCode);
-		elements.iconPreview.classList.add(icon.faScope);
-		elements.iconPreview.innerHTML = icon.htmlEntity;
-		currentObject.icon = icon.faScope + ":" + icon.unicodeCodepoint;
-	};
-
-	this.popup = function (obj, callback)
-	{
-		let originTabName = choices.get("active-tab");
-		currentObject = Object.assign({}, {
-			label: "?",
-			icon: DEFAULT_ICON,
-			color: DEFAULT_COLOR
-		}, obj);
-		console.log(obj);
-		elements.objectLabel.dataset.defaultvalue = obj.meta.defaultlabel;
-		elements.objectLabel.dataset.initialvalue = obj.label || obj.meta.defaultlabel;
-		elements.objectLabel.value = elements.objectLabel.dataset.initialvalue;
-		checks.setChecked(elements.checkDefault, obj.meta.isDefault);
-		checks.setChecked(elements.checkExclude, (obj.exclude === true));
-		checks.setChecked(elements.checkDisabled, obj.meta.isDisabled);
-		elements.ok.onclick = () =>
+		if ((glyph instanceof FAGlyph) === false)
 		{
-			currentObject.label = elements.objectLabel.value || "?";
-			delete currentObject.meta;
-			callback(currentObject, checks.getAllChecked(elements._self));
-			choices.set("active-tab", originTabName);
+			glyph = new FAGlyph(glyph);
+		}
+		htmlBuilder.replaceContent(elements.get("icon-preview"), glyph.render());
+		elements.get("icon-list").querySelector("[data-choice-value='" + glyph.value + "']")?.scrollIntoView({ block: "center" });
+		editedIcon.glyph = glyph;
+	};
+
+	/**
+	 * Event handler on focussing the label input.
+	 * Sets it empty if the label is the default label.
+	 */
+	function onLabelFocus ()
+	{
+		if (elements.get("icon-label").value === _options.defaultLabel)
+		{
+			elements.get("icon-label").value = "";
+		}
+	}
+
+	/**
+	 * Event handler for blurring the label input.
+	 * Sets it to the original value if it is left blank.
+	 */
+	function onLabelBlur ()
+	{
+		if (elements.get("icon-label").value.trim() === "")
+		{
+			elements.get("icon-label").value = _options.initialValue;
+		}
+		editedIcon.label = elements.get("icon-label").value;
+	}
+
+	/**
+	 * Event handler for clicking the "ok" button.
+	 * Returns to the original tab and call the callback function.
+	 */
+	function onConfirmClick ()
+	{
+		choices.set("active-tab", _originTabName);
+		_callback(editedIcon);
+	};
+
+	/**
+	 * Event handler for clicking the "cancel" button.
+	 * Returns to the original tab
+	 */
+	function onCancelClick ()
+	{
+		choices.set("active-tab", _originTabName);
+	}
+
+	/**
+	 * Event handler for clicking the "delete" button.
+	 * Calls the `deleteHandler`. If it does not return `true`, editor returns to the original tab.
+	 * @param {Event} event Triggering event
+	 */
+	function onDeleteClick (event)
+	{
+		if (typeof _options.deleteHandler === "function")
+		{
+			if (_options.deleteHandler(event, _options.context) !== true)
+			{
+				choices.set("active-tab", _originTabName);
+			}
+		}
+	}
+
+	/**
+	 * Pops up the icon editor, sets it the active tab.
+	 * @param {EditableIcon} icon Icon to edit
+	 * @param {IconEditorOptions} options Editor options
+	 * @param {IconEditorCallback} callback Callback function for applying edits
+	 */
+	this.popup = function (icon, options, callback)
+	{
+		editedIcon = {
+			label: icon.label.valueOf(),
+			glyph: new FAGlyph(icon.glyph.value),
+			color: icon.color.valueOf()
 		};
-		elements._self.classList = obj.meta.cssModifier;
-		elements.cancel.onclick = () => choices.set("active-tab", originTabName);
-		elements.title.innerText = obj.meta.header;
-		elements.headline.innerText = obj.meta.headline || "\u00a0";
+		_originTabName = choices.get("active-tab");
+		_options = options;
+		_options.initialValue = icon.label;
+		_callback = callback;
+		elements.get("icon-label").value = icon.label;
+		elements.get("title").innerText = _options.title;
+		elements.get("headline").innerText = _options.headline || "\u00a0";
+		elements.get("color-tab-button").style.display = (_options.canColor ?? true) ? null : "none";
+		elements.get("delete").style.display = (typeof _options.deleteHandler === "function") ? null : "none";
 		choices.set("active-tab", "icon-editor");
-		choices.set("iconeditor-icon", currentObject.icon);
-		choices.set("iconeditor-color", currentObject.color);
+		choices.set("iconeditor-icon", editedIcon.glyph.value);
+		choices.set("iconeditor-color", editedIcon.color);
 		choices.set("iconeditor-tab", "icon-selection");
-		elements.iconList.querySelector("[data-choice-value='" + currentObject.icon + "']")?.scrollIntoView({ block: "center" });
 	};
 
 };

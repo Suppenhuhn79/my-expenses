@@ -7,17 +7,32 @@
  * String used as identifier. Can be obtained via `myx.newId()`.
  * @type {String}
  * 
- * @typedef IconCode
- * Representing a FontAwesome icon as combination of a CSS style and unicode codepoint, e.g. `"fas:f100"`.
- * @type {String}
- * 
- * @typedef IconAttributes
+ * @typedef IconAttributes // DEPRECATED use `FAGlyph` instead
  * Parsed attributes of an FontAwesome icon (`IconCode`)
  * @type {Object}
  * @property {String} faScope FontAwesome scope (Solid `fas`, Regular `far`, Brands `fab`)
  * @property {String} unicodeCodepoint Unicode codepoint in four digit hex notation
  * @property {String} htmlEntity Unicode codepoint as a HTML entitiy
  */
+
+/**
+ * FontAwesome glyph.
+ * @constructor
+ * @param {String} glyphCode Code of the glyph to be created as combination of a CSS style and unicode codepoint, e.g. `"fas:f100"`
+ * @returns {FAGlyph} New FontAwesome glyph
+ */
+function FAGlyph (glyphCode)
+{
+	this.value = glyphCode;
+	this.scope = glyphCode.substring(0, 3);
+	this.unicodeCodepoint = glyphCode.substring(4);
+	this.htmlEntity = "&#x" + glyphCode.substring(4) + ";";
+
+	this.render = function ()
+	{
+		return htmlBuilder.newElement("i." + this.scope, this.htmlEntity);
+	};
+}
 
 /**
  * Application main module.
@@ -56,8 +71,6 @@ let myx = function ()
 				expenses.init()
 			]).then(() =>
 			{
-				// TODO: this should not go to `window`
-				window.iconEditor = new IconEditor(document.getElementById("client"));
 				resolve();
 			});
 		});
@@ -154,7 +167,7 @@ let myx = function ()
 	 * @param {IconCode} iconCode Icon code to parse
 	 * @returns {IconAttributes} Object providing the attributes of the icon
 	 */
-	function getIconAttributes (iconCode)
+	function getIconAttributes (iconCode) // DEPRECATED use `FAGlyph` instead
 	{
 		return {
 			faScope: iconCode.substring(0, 3),

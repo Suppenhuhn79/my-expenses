@@ -143,7 +143,7 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 
 	/**
 	 * Switches from _default_ mode to _repeat_ mode. In repeat mode the repeating expense is edited, no more the original actual expense.
-	 * This is a one way action.
+	 * This is an one way action.
 	 */
 	function switchToRepeatMode ()
 	{
@@ -170,9 +170,10 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 	*/
 	function renderPaymentmethod ()
 	{
+		let pmt = myx.paymentMethods.get(currentItem.pmt);
 		let div = htmlBuilder.newElement("div.labeled-icon",
-			myx.paymentMethods.renderIcon(currentItem.pmt),
-			htmlBuilder.newElement("div.label.cutoff", myx.paymentMethods.getLabel(currentItem.pmt))
+			pmt.renderIcon(),
+			htmlBuilder.newElement("div.label.cutoff", pmt.label)
 		);
 		htmlBuilder.replaceContent(elements.pmt, div);
 	};

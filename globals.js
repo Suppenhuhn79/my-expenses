@@ -41,6 +41,7 @@ const fa = {
 	star: "&#xf005;",
 	times: "&#xf00d;",
 	trash_alt: "&#xf2ed;",
+	trash_restore_alt: "&#xf82a;",
 	wallet: "&#xf555;"
 };
 

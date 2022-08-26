@@ -3,7 +3,7 @@
  * Category object. Represents a single category.
  * @type {Object}
  * @property {String} label
- * @property {IconCode} icon
+ * @property {IconCode} icon // DEPRECATED use `FAGlyph` instead
  * @property {String} color
  * @property {IdString} [masterCategory]
  * @property {Array<IdString>} [subCategories]
@@ -256,40 +256,34 @@ let myxCategories = function ()
 	 * Opens the IconEditor for modifing a category or creating a new one.
 	 * Changes are not saved until `applyEdits()` is called!
 	 * @param {IdString} [id] Id of category to edit; if empty, a new category will be created
-	 * @param {IdString} [masterCategory] Id of the categorys master category (if it's a subcategory)
+	 * @param {IdString} [masterId] Id of the categorys master category (if it's a subcategory)
 	 */
-	function promptEditor (id, masterCategory)
+	function promptEditor (id, masterId)
 	{
-		const ADD_NEW = 1;
-		const EDIT_EXISTING = 2;
-		let editorMode = (!!id) ? EDIT_EXISTING : ADD_NEW;
-		if (editorMode === ADD_NEW)
-		{
-			modeHandler.setMode("edit");
-		}
-		let itemToEdit = (editorMode === EDIT_EXISTING) ? Object.assign({}, data[id]) : {};
-		if (masterCategory)
-		{
-			itemToEdit.color = getColor(masterCategory); // in case its a subcategory
-			itemToEdit.masterCategory = masterCategory;
-		}
-		itemToEdit.meta = {
-			type: "category",
-			cssModifier: (!masterCategory) ? "mastercategory" : "",
-			header: (!!id) ? "Edit category" : "New category",
-			headline: (!!masterCategory) ? "Subcategory of " + data[masterCategory].label : "",
-			defaultlabel: "New category"
+		let creatingNewItem = !(!!id);
+		modeHandler.setMode("edit");
+		let itemToEdit = {
+			label: (creatingNewItem) ? "New category" : getLabel(id, false),
+			glyph: new FAGlyph(data[id]?.icon || "fas:f07a"),
+			color: ((!!id) || (!!masterId)) ? getColor(id || masterId) : "#808080"
 		};
-		window.iconEditor.popup(itemToEdit, (editedObj) =>
+		iconEditor.popup(itemToEdit,
+			{
+				iconType: EditableIconType.WHITE_ON_COLOR,
+				title: (creatingNewItem) ? "New category" : "Edit category",
+				headline: (!!masterId) ? "Subcategory of " + data[masterId].label : "",
+				defaultLabel: "New category",
+				canColor: !(!!masterId)
+			}, (editedObj) =>
 		{
-			if (editorMode === ADD_NEW)
+			if (creatingNewItem)
 			{
 				id = myx.newId();
-				data[id] = editedObj;
-				if (masterCategory)
+				data[id] = Object.assign({}, editedObj);
+				if (masterId)
 				{
-					data[masterCategory].subCategories ||= [];
-					data[masterCategory].subCategories.push(id);
+					data[masterId].subCategories ||= [];
+					data[masterId].subCategories.push(id);
 				}
 				else
 				{
@@ -299,9 +293,14 @@ let myxCategories = function ()
 			else
 			{
 				data[id].label = editedObj.label;
-				data[id].icon = editedObj.icon;
 			}
-			(data[id].masterCategory === undefined) ? data[id].color = editedObj.color : delete data[id].color;
+			data[id].icon = editedObj.glyph.value;
+			delete data[id].glyph;
+			if (!!masterId)
+			{
+				data[id].masterCategory = masterId;
+				delete data[id].color;
+			}
 			renderList();
 			elements.content.querySelector("[data-key='" + id + "']").scrollIntoView();
 		});
@@ -406,6 +405,7 @@ let myxCategories = function ()
 
 	return { // publish members
 		get moduleName () { return MODULE_NAME; },
+		get data () { return data; }, // debug_only
 		fetchData: fetchData,
 		enter: () => renderList("default"),
 		leave: () => modeHandler.setMode("default"),

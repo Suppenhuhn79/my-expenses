@@ -1,19 +1,6 @@
-#icon-editor {
-	--icon-size: 1.3rem;
-	position: relative;
-	/* top: 2rem; */
-	/* left: 2rem; */
-	/* bottom: 4rem; */
-	/* right: 2rem; */
-	/* background-color: white; */
-	/* box-shadow: 0.2rem 0.2rem 1rem #00000080; */
-	/* padding-top: 0.5rem; */
-	/* border-radius: 0.3rem; */
-	/* overflow: hidden; */
-	height: 100%;
-	/* z-index: 100; */
-	/* display: flex; */
-	/* flex-direction: column; */
+#icon-editor .headline {
+	padding-top: 0.5rem;
+	padding-bottom: 0.4rem;
 }
 
 #icon-editor .top [data-choice-value] {
@@ -24,6 +11,12 @@
 #icon-editor .top [data-choice-value].chosen {
 	border-top-color: #eee;
 	color: #000;
+}
+
+#icon-editor .buttons i {
+	display: inline-block;
+	width: 3em;
+	text-align: center;
 }
 
 #icon-editor .element-head-wrapper {
@@ -41,7 +34,7 @@
 	margin: 0 1em;
 	flex: 1;
 }
-.icon-preview-wrapper {
+#icon-editor .icon-preview-wrapper {
 	display: flex;
 	width: 2em;
 	min-width: 2em;
@@ -52,32 +45,20 @@
 	justify-content: center;
 	border-radius: 100%;
 }
-[name="icon-preview"] {
-	height: 100%;
+#icon-editor [name="icon-preview"] {
+	height: 2em;
+	width: 2em;
 	display: flex;
 	align-content: center;
 	align-items: center;
 	padding: 0 0.5em;
 }
 
-[name="icon-list"],
-[name="colorselector-bubbles"] {
+#icon-editor [name="icon-list"],
+#icon-editor [name="colorselector-bubbles"] {
 	padding: 0 1rem;
-	font-size: var(--icon-size);
+	font-size: 1.3rem;
 	color: #888;
-}
-
-[name="custom-icon-editor"] {
-	justify-content: center;
-	padding: 0.5rem;
-}
-input[name="unicode-codepoint"] {
-	font-family: monospace;
-	text-align: center;
-	font-size: 1rem;
-	letter-spacing: 0.3em;
-	padding: 0.2em;
-	width: 5rem;
 }
 
 #icon-editor .color-bubble,
@@ -94,54 +75,6 @@ input[name="unicode-codepoint"] {
 }
 #icon-editor .icon.chosen {
 	box-shadow: 0 0 0 4px #aaa;
-}
-
-#icon-editor .item-options {
-	padding-left: 2.2rem;
-	padding-top: 1rem;
-	flex-wrap: wrap;
-}
-
-#icon-editor .conditional {
-	display: none;
-}
-#icon-editor.paymentmethod .on-paymentmethod,
-#icon-editor.mastercategory .on-mastercategory {
-	display: flex;
-}
-
-#icon-editor .conditional > div {
-	margin-left: 1rem;
-}
-
-[data-check] {
-	align-items: center;
-}
-[data-check] i {
-	display: inline-block;
-	width: 1.5rem;
-	text-align: center;
-	margin-right: 0.2rem;
-	font-family: "Font Awesome 5 Free";
-	font-style: normal;
-	font-weight: 400;
-	color: #aaa;
-}
-[data-check] span {
-	color: #aaa;
-}
-[data-check].checked span {
-	color: #666;
-}
-[data-check].checked i {
-	font-weight: 900;
-	color: #888;
-}
-[data-check="default"].checked i {
-	color: gold;
-}
-[data-check="disable"].checked i {
-	color: #e00;
 }
 
 .autowrap-grid {
