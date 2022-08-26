@@ -9,6 +9,14 @@
  * @property {Array<IdString>} [subCategories]
  */
 
+const CategoriesTabMode = {
+	/** @enum {String} */
+	DEFAULT: "default",
+	EDIT: "edit",
+	SEARCH: "search",
+	SAVING: "__saving__"
+};
+
 /**
  * @namespace myxCategories
  * my-expenses "categories" module.
@@ -32,7 +40,7 @@ let myxCategories = function ()
 	/** @type {Array<IdString>} */
 	let order = [];
 	let elements = document.getElementById(MODULE_NAME).getNamedChildren();
-	let modeHandler = new ModuleModeHandler(elements.get(),
+	let tabMode = new ModuleModeHandler(elements.get(),
 		/*getData*/() => { return { items: data, order: order }; },
 		/*revertData*/(revertData) => { data = revertData.items; order = revertData.order; });
 
@@ -47,11 +55,11 @@ let myxCategories = function ()
 		onEnd: onSortEnd
 	});
 
-	elements.get("edit-button").onclick = () => modeHandler.setMode("edit");
+	elements.get("edit-button").onclick = () => tabMode.set(CategoriesTabMode.EDIT);
 	elements.get("apply-edits-button").onclick = () => applyEdits();
-	elements.get("cancel-edits-button").onclick = () => { modeHandler.setMode("default"); renderList(); };
-	elements.get("search-button").onclick = () => modeHandler.setMode("search");
-	elements.get("cancel-search-button").onclick = () => modeHandler.setMode("default");
+	elements.get("cancel-edits-button").onclick = () => { tabMode.set(CategoriesTabMode.DEFAULT); renderList(); };
+	elements.get("search-button").onclick = () => tabMode.set(CategoriesTabMode.SEARCH);
+	elements.get("cancel-search-button").onclick = () => tabMode.set(CategoriesTabMode.DEFAULT);
 	elements.get("add-button").onclick = () => promptEditor();
 
 	/**
@@ -128,7 +136,7 @@ let myxCategories = function ()
 	 * Item elements will contain all functionality for all modes.
 	 * @param {String} [mode] Mode to set for the list; default is the current mode
 	 */
-	function renderList (mode = modeHandler.currentMode)
+	function renderList (mode = tabMode.get())
 	{
 		htmlBuilder.removeAllChildren(elements.get("content"));
 		for (let id of order)
@@ -170,7 +178,7 @@ let myxCategories = function ()
 			});
 			elements.get("content").appendChild(div);
 		}
-		modeHandler.setMode(mode);
+		tabMode.set(mode);
 	}
 
 	/**
@@ -261,7 +269,7 @@ let myxCategories = function ()
 	function promptEditor (id, masterId)
 	{
 		let creatingNewItem = !(!!id);
-		modeHandler.setMode("edit");
+		tabMode.set(CategoriesTabMode.EDIT);
 		let itemToEdit = {
 			label: (creatingNewItem) ? "New category" : getLabel(id, false),
 			glyph: new FAGlyph(data[id]?.icon || "fas:f07a"),
@@ -312,13 +320,13 @@ let myxCategories = function ()
 	 */
 	async function applyEdits ()
 	{
-		modeHandler.setMode("__saving__"); // intermediate state 'cause going from "edit" to "default" mode triggers a data rollback
+		tabMode.set(CategoriesTabMode.SAVING); // intermediate state 'cause going from "edit" to "default" mode triggers a data rollback
 		myx.xhrBegin();
 		googleAppApi.saveToFile(FILE_NAME, {
 			order: order,
 			items: data
 		}).then(myx.xhrSuccess, myx.xhrError);
-		modeHandler.setMode("default");
+		tabMode.set(CategoriesTabMode.DEFAULT);
 	}
 
 	/**
@@ -376,7 +384,7 @@ let myxCategories = function ()
 	function onItemClick (mouseEvent)
 	{
 		let id = mouseEvent.target.dataset.key;
-		switch (modeHandler.currentMode)
+		switch (tabMode.get())
 		{
 			case "default":
 				myx.addExpense({ cat: id });
@@ -407,8 +415,8 @@ let myxCategories = function ()
 		get moduleName () { return MODULE_NAME; },
 		get data () { return data; }, // debug_only
 		fetchData: fetchData,
-		enter: () => renderList("default"),
-		leave: () => modeHandler.setMode("default"),
+		enter: () => renderList(CategoriesTabMode.DEFAULT),
+		leave: () => tabMode.set(CategoriesTabMode.DEFAULT),
 		get masterCategoryIds () { return order; },
 		getLabel: getLabel,
 		getColor: getColor,

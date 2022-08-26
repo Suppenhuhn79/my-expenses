@@ -100,12 +100,19 @@ function Expense (src, override)
 	};
 }
 
+const ExpensesTabMode = {
+	/** @enum {String} */
+	DEFAULT: "default",
+	SEARCH: "search"
+};
+
 /**
  * @namespace myxExpenses
  * my-expenses "expenses" module.
  */
 let myxExpenses = function ()
 {
+	// BUG: Leaving the tab in "search" mode remains the tab in search mode. Must set it to "default" mode.
 	const MODULE_NAME = "expenses-tab";
 	/** @type {Object<MonthString, Array<Expense>>} */
 	let data = {};
@@ -113,7 +120,7 @@ let myxExpenses = function ()
 	/** @type {ExpensesFilter} */
 	let filter = {};
 	let elements = document.getElementById(MODULE_NAME).getNamedChildren();
-	let modeHandler = new ModuleModeHandler(elements.get());
+	let tabMode = new ModuleModeHandler(elements.get());
 	let repeatings = myxRepeatingExpenses();
 	/** @type {expenseEditor} */
 	let editor;
@@ -351,13 +358,13 @@ let myxExpenses = function ()
 			{
 				elements.get("search-hint").appendChild(htmlBuilder.newElement("div", "\u00a0", "in " + (new Date(filter.months[0])).format("mmm yyyy")));
 			}
-			modeHandler.setMode("search");
+			tabMode.set(ExpensesTabMode.SEARCH);
 			choices.set("active-tab", MODULE_NAME);
 			renderList();
 		}
 		else
 		{
-			modeHandler.setMode("default");
+			tabMode.set(ExpensesTabMode.DEFAULT);
 		}
 	}
 
@@ -464,7 +471,7 @@ let myxExpenses = function ()
 			/** @type {HTMLElement} */
 			let headline;
 			/** @type {Array<Expense>} */
-			let repeatingExpenses = (modeHandler.currentMode === "default") ? repeatings.process(month) : [];
+			let repeatingExpenses = (tabMode.is(ExpensesTabMode.DEFAULT)) ? repeatings.process(month) : [];
 			/** @type {Array<Expense>} */
 			let actualExpenses = data[month] || [];
 			/** @type {Array<Expense>} */
@@ -484,7 +491,7 @@ let myxExpenses = function ()
 				{
 					if (!!headline)
 					{
-						if ((modeHandler.currentMode === "default") && (lastRenderedDate > today) && (item.dat <= today))
+						if ((tabMode.is(ExpensesTabMode.DEFAULT)) && (lastRenderedDate > today) && (item.dat <= today))
 						{
 							let marker = htmlBuilder.newElement("div#previewmarker.headline.center",
 								{ onclick: () => { elements.get("content").scrollTo({ top: 0, behavior: "smooth" }); } },
@@ -522,7 +529,7 @@ let myxExpenses = function ()
 					"Find more",
 					{ onclick: () => setFilter(Object.assign({}, filter, { months: null }), filter._origin) }));
 			}
-			if (modeHandler.currentMode === "default")
+			if (tabMode.is(ExpensesTabMode.DEFAULT))
 			{
 				elements.get("content").appendChild(htmlBuilder.newElement("div.spacer"));
 			}

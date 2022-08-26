@@ -59,7 +59,7 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 	 * Function to call when edits are applied.
 	 * @type {ExpenseEditorCallback} */
 	let callbackFunc;
-	let modeHandler = new ModuleModeHandler(elements.get());
+	let tabMode = new ModuleModeHandler(elements.get());
 	let confirmDeletePrompt = new Menubox("delete-expense", {
 		title: "Confirm delete expense",
 		items: [],
@@ -113,7 +113,7 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 			(enabled) ? element.classList.remove("disabled") : element.classList.add("disabled");
 		}
 		let isExisting = isExistingExpense();
-		let isRepeatingMode = (modeHandler.currentMode === ExpenseEditorMode.REPEATING);
+		let isRepeatingMode = (tabMode.is(ExpenseEditorMode.REPEATING));
 		_setElementEnabled(elements.get("clone"), isExisting);
 		_setElementEnabled(elements.get("redo"), isExisting);
 		_setElementEnabled(elements.get("delete"), (isExisting || isRepeatingMode));
@@ -147,7 +147,7 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 	 */
 	function switchToRepeatMode ()
 	{
-		modeHandler.setMode(ExpenseEditorMode.REPEATING);
+		tabMode.set(ExpenseEditorMode.REPEATING);
 		currentItem.dat = repeatingExpenses.lastExecutionDateOf(currentItem.rep) || currentItem.dat;
 		if (editedInterval.isValid() === false)
 		{
@@ -205,7 +205,7 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 		}
 		else
 		{
-			modeHandler.setMode(ExpenseEditorMode.DEFAULT);
+			tabMode.set(ExpenseEditorMode.DEFAULT);
 			refreshEditor();
 		}
 	};
@@ -298,7 +298,7 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 	{
 		if (menuboxEvent.buttonKey === "delete")
 		{
-			if (modeHandler.currentMode === ExpenseEditorMode.REPEATING)
+			if (tabMode.is(ExpenseEditorMode.REPEATING))
 			{
 				repeatingExpenses.set(currentItem.rep, null, null);
 				callbackFunc(null, ExpenseEditorAction.NONE);
@@ -362,7 +362,7 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 			{
 				returnType = ExpenseEditorAction.MODIFY;
 			}
-			else if (modeHandler.currentMode === ExpenseEditorMode.REPEATING)
+			else if (tabMode.is( ExpenseEditorMode.REPEATING))
 			{
 				returnType = ExpenseEditorAction.REPEATING;
 			}
