@@ -28,6 +28,11 @@ function FAGlyph (glyphCode)
 	this.unicodeCodepoint = glyphCode.substring(4);
 	this.htmlEntity = "&#x" + glyphCode.substring(4) + ";";
 
+	this.valueOf = function ()
+	{
+		return this.value;
+	};
+
 	this.render = function ()
 	{
 		return htmlBuilder.newElement("i." + this.scope, this.htmlEntity);
@@ -264,7 +269,7 @@ let myx = function ()
 	init().then(onWindowFocus);
 
 	return { // publish members
-		statistics: statistics, // TODO: debug only
+		statistics: statistics, // debug_only
 		expenses: expenses,
 		categories: categories,
 		paymentMethods: paymentMethods,
