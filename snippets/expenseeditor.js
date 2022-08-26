@@ -37,7 +37,7 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 		onPmtClick: onPmtClick,
 		onRedoClick: onRedoClick,
 		onTxtKeydown: onTxtKeydown
-	}).getNames();
+	}).getNamedChildren();
 	/**
 	 * Name of the tab that called the editor.
 	 * @type {String} */
@@ -59,7 +59,7 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 	 * Function to call when edits are applied.
 	 * @type {ExpenseEditorCallback} */
 	let callbackFunc;
-	let modeHandler = new ModuleModeHandler(elements._self);
+	let modeHandler = new ModuleModeHandler(elements.get());
 	let confirmDeletePrompt = new Menubox("delete-expense", {
 		title: "Confirm delete expense",
 		items: [],
@@ -71,13 +71,13 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 	let decimalSeparator = (1.2).toLocaleString().substring(1, 2);
 	let amountAsString = "0";
 
-	elements.decimalSeparator.innerText = decimalSeparator;
-	elements.dat.setAttribute("max", (new Date()).format("yyyy-mm-dd"));
+	elements.get("decimal-separator").innerText = decimalSeparator;
+	elements.get("dat").setAttribute("max", (new Date()).format("yyyy-mm-dd"));
 	vikb.addEventListener((event) =>
 	{
-		(event === "opened") ? elements.keypad.classList.add("hidden") : elements.keypad.classList.remove("hidden");
+		(event === "opened") ? elements.get("keypad").classList.add("hidden") : elements.get("keypad").classList.remove("hidden");
 	});
-	targetElement.appendChild(elements._self);
+	targetElement.appendChild(elements.get());
 
 	/**
 	 * Checks if an existing expense is being edited. For an existing expense `currentDataIndex` is a non-negative integer.
@@ -114,30 +114,30 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 		}
 		let isExisting = isExistingExpense();
 		let isRepeatingMode = (modeHandler.currentMode === ExpenseEditorMode.REPEATING);
-		_setElementEnabled(elements.clone, isExisting);
-		_setElementEnabled(elements.redo, isExisting);
-		_setElementEnabled(elements.delete, (isExisting || isRepeatingMode));
-		_setElementEnabled(elements.apply, (!!currentItem.cat));
-		elements.title.innerText = (isRepeatingMode) ? "set repeating expense" : ((isExisting) ? "edit expense" : "add expense");
-		elements.dat.value = currentItem.dat.format("yyyy-mm-dd");
+		_setElementEnabled(elements.get("clone"), isExisting);
+		_setElementEnabled(elements.get("redo"), isExisting);
+		_setElementEnabled(elements.get("delete"), (isExisting || isRepeatingMode));
+		_setElementEnabled(elements.get("apply"), (!!currentItem.cat));
+		elements.get("title").innerText = (isRepeatingMode) ? "set repeating expense" : ((isExisting) ? "edit expense" : "add expense");
+		elements.get("dat").value = currentItem.dat.format("yyyy-mm-dd");
 		if (editedInterval.isValid())
 		{
 			if (isRepeatingMode)
 			{
 				htmlBuilder.replaceContent(
-					elements.repeatingText,
+					elements.get("repeating-text"),
 					pageSnippets.expenseEditor.repeatmentLine.produce(expenseEditor, { dayOfMonth: editedInterval.dayOfMonth, months: editedInterval.months })
 				);
 			}
 			else
 			{
-				elements.repeatingButtonOverlay.innerHTML = "/" + editedInterval.getSupershortText();
-				elements.repeatingButtonOverlay.style.display = null;
+				elements.get("repeating-button-overlay").innerHTML = "/" + editedInterval.getSupershortText();
+				elements.get("repeating-button-overlay").style.display = null;
 			}
 		}
 		else
 		{
-			elements.repeatingButtonOverlay.style.display = "none";
+			elements.get("repeating-button-overlay").style.display = "none";
 		}
 	};
 
@@ -162,7 +162,7 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 	function renderAmountText ()
 	{
 		let rexMatch = /([0-9]+)(\.([0-9]{0,2}))?/.exec(amountAsString);
-		elements.amt.innerText = Math.floor(amountAsString).toLocaleString() + ((!!rexMatch[2]) ? decimalSeparator + rexMatch[3] : "") + "\u00a0" + myx.currencySymbol;
+		elements.get("amt").innerText = Math.floor(amountAsString).toLocaleString() + ((!!rexMatch[2]) ? decimalSeparator + rexMatch[3] : "") + "\u00a0" + myx.currencySymbol;
 	}
 
 	/**
@@ -175,7 +175,7 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 			pmt.renderIcon(),
 			htmlBuilder.newElement("div.label.cutoff", pmt.label)
 		);
-		htmlBuilder.replaceContent(elements.pmt, div);
+		htmlBuilder.replaceContent(elements.get("pmt"), div);
 	};
 
 	/**
@@ -196,9 +196,9 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 		let amountBits = currentItem.amt.toString().split(".");
 		amountAsString = amountBits[0] + ((amountBits[1]) ? "." + (amountBits[1] + "00").substring(0, 2) : "");
 		renderAmountText();
-		elements.txt.value = currentItem.txt || "";
+		elements.get("txt").value = currentItem.txt || "";
 		choices.set("active-tab", "expense-editor");
-		myx.categories.renderSelection(elements.categorySelector, currentItem.cat, onCategoryChosen);
+		myx.categories.renderSelection(elements.get("category-selector"), currentItem.cat, onCategoryChosen);
 		if ((!isExistingExpense()) && (repeatingExpenses.intervalOf(currentItem.rep).isValid()))
 		{
 			switchToRepeatMode();
@@ -236,7 +236,7 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 	function onDatChange (event)
 	{
 		event.stopPropagation();
-		currentItem.dat = new Date(elements.dat.value);
+		currentItem.dat = new Date(elements.get("dat").value);
 	};
 
 	/**
@@ -246,7 +246,7 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 	function onPmtClick (event) 
 	{
 		event.stopPropagation();
-		myx.paymentMethods.prompt(elements.pmt, (pmt) =>
+		myx.paymentMethods.prompt(elements.get("pmt"), (pmt) =>
 		{
 			currentItem.pmt = pmt;
 			renderPaymentmethod();
@@ -262,7 +262,7 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 		{
 			case 13:
 			case 27:
-				elements.txt.blur();
+				elements.get("txt").blur();
 				break;
 		};
 	};
@@ -273,7 +273,7 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 	 */
 	function onRedoClick () 
 	{
-		if (isEnabled(elements.redo))
+		if (isEnabled(elements.get("redo")))
 		{
 			switchToRepeatMode();
 		}
@@ -285,7 +285,7 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 	 */
 	function onDeleteClick (mouseEvent) 
 	{
-		if (isEnabled(elements.delete))
+		if (isEnabled(elements.get("delete")))
 		{
 			confirmDeletePrompt.popup(mouseEvent, null, mouseEvent.target.closest("td"), "start left, above bottom");
 		}
@@ -345,7 +345,7 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 	 */
 	function onApplyClick ()
 	{
-		if (isEnabled(elements.apply))
+		if (isEnabled(elements.get("apply")))
 		{
 			/** @type {ExpenseEditorAction} */
 			let returnType;
@@ -354,9 +354,9 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 				window.alert("Is NaN: " + amountAsString);
 				return 0;
 			}
-			currentItem.dat = new Date(elements.dat.value);
+			currentItem.dat = new Date(elements.get("dat").value);
 			currentItem.amt = Number(amountAsString);
-			currentItem.txt = elements.txt.value;
+			currentItem.txt = elements.get("txt").value;
 			currentItem.rep = repeatingExpenses.set(currentItem.rep, currentItem, editedInterval);
 			if (isExistingExpense())
 			{

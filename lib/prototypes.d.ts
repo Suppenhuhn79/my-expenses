@@ -85,13 +85,6 @@ interface HTMLElement {
 	/**
 	 * Collects all named children of an element into an object.
 	 * Returns an object with all named children as `camelCaseElementName: {HTMLElement}`.
-	 * @deprecated
-	 */
-	getNames(): Record<String, HTMLElement>; // DEPRECATED
-
-	/**
-	 * Collects all named children of an element into an object.
-	 * Returns an object with all named children as `camelCaseElementName: {HTMLElement}`.
 	 */
 	getNamedChildren(): Map<String, HTMLElement>;
 

@@ -31,12 +31,12 @@ let myxCategories = function ()
 	let data = {};
 	/** @type {Array<IdString>} */
 	let order = [];
-	let elements = document.getElementById(MODULE_NAME).getNames();
-	let modeHandler = new ModuleModeHandler(elements._self,
+	let elements = document.getElementById(MODULE_NAME).getNamedChildren();
+	let modeHandler = new ModuleModeHandler(elements.get(),
 		/*getData*/() => { return { items: data, order: order }; },
 		/*revertData*/(revertData) => { data = revertData.items; order = revertData.order; });
 
-	new Sortable(elements.content, {
+	new Sortable(elements.get("content"), {
 		draggable: ".item",
 		handle: ".dragger-ns",
 		dataIdAttr: "data-id",
@@ -47,12 +47,12 @@ let myxCategories = function ()
 		onEnd: onSortEnd
 	});
 
-	elements.editButton.onclick = () => modeHandler.setMode("edit");
-	elements.applyEditsButton.onclick = () => applyEdits();
-	elements.cancelEditsButton.onclick = () => { modeHandler.setMode("default"); renderList(); };
-	elements.searchButton.onclick = () => modeHandler.setMode("search");
-	elements.cancelSearchButton.onclick = () => modeHandler.setMode("default");
-	elements.addButton.onclick = () => promptEditor();
+	elements.get("edit-button").onclick = () => modeHandler.setMode("edit");
+	elements.get("apply-edits-button").onclick = () => applyEdits();
+	elements.get("cancel-edits-button").onclick = () => { modeHandler.setMode("default"); renderList(); };
+	elements.get("search-button").onclick = () => modeHandler.setMode("search");
+	elements.get("cancel-search-button").onclick = () => modeHandler.setMode("default");
+	elements.get("add-button").onclick = () => promptEditor();
 
 	/**
 	 * Loads _categories_ from cache or remote file (if modified).
@@ -130,7 +130,7 @@ let myxCategories = function ()
 	 */
 	function renderList (mode = modeHandler.currentMode)
 	{
-		htmlBuilder.removeAllChildren(elements.content);
+		htmlBuilder.removeAllChildren(elements.get("content"));
 		for (let id of order)
 		{
 			let category = data[id];
@@ -168,7 +168,7 @@ let myxCategories = function ()
 				swapThreshold: 0.65,
 				onEnd: onSortEnd
 			});
-			elements.content.appendChild(div);
+			elements.get("content").appendChild(div);
 		}
 		modeHandler.setMode(mode);
 	}
@@ -302,7 +302,7 @@ let myxCategories = function ()
 				delete data[id].color;
 			}
 			renderList();
-			elements.content.querySelector("[data-key='" + id + "']").scrollIntoView();
+			elements.get("content").querySelector("[data-key='" + id + "']").scrollIntoView();
 		});
 	}
 
@@ -327,7 +327,7 @@ let myxCategories = function ()
 	function onSortEnd ()
 	{
 		order = [];
-		for (let masterElement of elements.content.children)
+		for (let masterElement of elements.get("content").children)
 		{
 			let masterKey = masterElement.querySelector("[data-key]").dataset.key;
 			let subsKeys = [];

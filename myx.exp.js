@@ -112,18 +112,18 @@ let myxExpenses = function ()
 	let dataIndex = myxExpensesDataindex();
 	/** @type {ExpensesFilter} */
 	let filter = {};
-	let elements = document.getElementById(MODULE_NAME).getNames();
-	let modeHandler = new ModuleModeHandler(elements._self);
+	let elements = document.getElementById(MODULE_NAME).getNamedChildren();
+	let modeHandler = new ModuleModeHandler(elements.get());
 	let repeatings = myxRepeatingExpenses();
 	/** @type {expenseEditor} */
 	let editor;
 	/** @type {Date} */
 	let selectedMonth = new Date();
 
-	elements.backSearchButton.onclick = () => { choices.set("active-tab", filter._origin); };
-	elements.cancelSearchButton.onclick = () => { resetFilter(); renderList(); };
-	elements.addExpenseButton.onclick = onAddExpenseClick;
-	elements.navCurrent.onclick = onNavCurrentClick;
+	elements.get("back-search-button").onclick = () => { choices.set("active-tab", filter._origin); };
+	elements.get("cancel-search-button").onclick = () => { resetFilter(); renderList(); };
+	elements.get("add-expense-button").onclick = onAddExpenseClick;
+	elements.get("nav-current").onclick = onNavCurrentClick;
 
 	/**
 	 * Initializes the module.
@@ -334,7 +334,7 @@ let myxExpenses = function ()
 		filter.cats = filterObj.cats || ((!!filterObj.cat) ? [filterObj.cat] : []);
 		filter.months = filterObj.months || dataIndex.allAvailibleMonths;
 		filter._origin = originModuleName;
-		htmlBuilder.removeAllChildren(elements.searchHint);
+		htmlBuilder.removeAllChildren(elements.get("search-hint"));
 		if ((filter.cats.length > 0) || !!filter.pmt)
 		{
 			let searchHint = "";
@@ -346,10 +346,10 @@ let myxExpenses = function ()
 			{
 				searchHint += myx.paymentMethods.get(filter.pmt).label;
 			}
-			elements.searchHint.appendChild(htmlBuilder.newElement("div.cutoff", "\u00a0", searchHint));
+			elements.get("search-hint").appendChild(htmlBuilder.newElement("div.cutoff", "\u00a0", searchHint));
 			if (filter.months.length === 1)
 			{
-				elements.searchHint.appendChild(htmlBuilder.newElement("div", "\u00a0", "in " + (new Date(filter.months[0])).format("mmm yyyy")));
+				elements.get("search-hint").appendChild(htmlBuilder.newElement("div", "\u00a0", "in " + (new Date(filter.months[0])).format("mmm yyyy")));
 			}
 			modeHandler.setMode("search");
 			choices.set("active-tab", MODULE_NAME);
@@ -452,11 +452,11 @@ let myxExpenses = function ()
 		let lastRenderedDate;// = new Date();
 		/** @type {MonthString} */
 		let lastRenderedMonth = "";
-		elements.navCurrent.innerText = selectedMonth.format("mmmm yyyy");
-		renderNavItem(elements.navPrevious, selectedMonth.shiftMonths(-1));
-		renderNavItem(elements.navNext, selectedMonth.shiftMonths(+1));
-		htmlBuilder.removeAllChildren(elements.content);
-		elements.content.scrollTop = 0;
+		elements.get("nav-current").innerText = selectedMonth.format("mmmm yyyy");
+		renderNavItem(elements.get("nav-previous"), selectedMonth.shiftMonths(-1));
+		renderNavItem(elements.get("nav-next"), selectedMonth.shiftMonths(+1));
+		htmlBuilder.removeAllChildren(elements.get("content"));
+		elements.get("content").scrollTop = 0;
 		for (let month of filter.months.sort().reverse())
 		{
 			/** @type {Number} */
@@ -487,7 +487,7 @@ let myxExpenses = function ()
 						if ((modeHandler.currentMode === "default") && (lastRenderedDate > today) && (item.dat <= today))
 						{
 							let marker = htmlBuilder.newElement("div#previewmarker.headline.center",
-								{ onclick: () => { elements.content.scrollTo({ top: 0, behavior: "smooth" }); } },
+								{ onclick: () => { elements.get("content").scrollTo({ top: 0, behavior: "smooth" }); } },
 								htmlBuilder.newElement("i.fas", { 'data-icon': "angle-double-up" }),
 								"&#x00a0;Upcoming expenses preview&#x00a0;",
 								htmlBuilder.newElement("i.fas", { 'data-icon': "angle-double-up" })
@@ -514,23 +514,23 @@ let myxExpenses = function ()
 		{
 			for (let render of renders)
 			{
-				elements.content.appendChild(render);
+				elements.get("content").appendChild(render);
 			}
 			if (((filter.cats.length > 0) || (!!filter.pmt)) && (filter.months.length < dataIndex.allAvailibleMonths.length))
 			{
-				elements.content.appendChild(htmlBuilder.newElement("button",
+				elements.get("content").appendChild(htmlBuilder.newElement("button",
 					"Find more",
 					{ onclick: () => setFilter(Object.assign({}, filter, { months: null }), filter._origin) }));
 			}
 			if (modeHandler.currentMode === "default")
 			{
-				elements.content.appendChild(htmlBuilder.newElement("div.spacer"));
+				elements.get("content").appendChild(htmlBuilder.newElement("div.spacer"));
 			}
 			scrollTo(scrollToDate);
 		}
 		else
 		{
-			elements.content.appendChild(htmlBuilder.newElement("div.fullscreen-msg",
+			elements.get("content").appendChild(htmlBuilder.newElement("div.fullscreen-msg",
 				htmlBuilder.newElement("div.icon.far", fa.smiley_meh),
 				htmlBuilder.newElement("div.label", "Nothing here.")
 			));
@@ -552,12 +552,12 @@ let myxExpenses = function ()
 		function findClosestHeader (forDate)
 		{
 			/** @type {HTMLElement} */
-			let result = elements.content.querySelector("[data-date='" + forDate.toIsoDate() + "']");
+			let result = elements.get("content").querySelector("[data-date='" + forDate.toIsoDate() + "']");
 			if (!result)
 			{
 				for (let closestDate = forDate, lastOfMonth = forDate.endOfMonth(); closestDate < lastOfMonth; closestDate = closestDate.addDays(1))
 				{
-					result = elements.content.querySelector("[data-date='" + closestDate.toIsoDate() + "']");
+					result = elements.get("content").querySelector("[data-date='" + closestDate.toIsoDate() + "']");
 					if (!!result)
 					{
 						break;
@@ -679,7 +679,7 @@ let myxExpenses = function ()
 	 */
 	function onNavCurrentClick (mouseEvent)
 	{
-		popupAvalibleMonthsMenu(mouseEvent, elements.navCurrent, (month) =>
+		popupAvalibleMonthsMenu(mouseEvent, elements.get("nav-current"), (month) =>
 		{
 			selectedMonth = month;
 			resetFilter();

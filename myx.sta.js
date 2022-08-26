@@ -158,7 +158,7 @@ const myxStatisticsTimerange = function ()
 const myxStatistics = function ()
 {
 	const MODULE_NAME = "statistics-tab";
-	let elements = document.getElementById(MODULE_NAME).getNames();
+	let elements = document.getElementById(MODULE_NAME).getNamedChildren();
 	let aggregator = myxStatisticAggregator();
 	let timerange = myxStatisticsTimerange(performAggregation);
 	/**
@@ -197,9 +197,9 @@ const myxStatistics = function ()
 		]
 	});
 
-	elements.chartSelectButton.onclick = (mouseEvent) => chartMenu.popup(mouseEvent, null, elements.chartSelectButton, "below bottom, center");
+	elements.get("chart-select-button").onclick = (mouseEvent) => chartMenu.popup(mouseEvent, null, elements.get("chart-select-button"), "below bottom, center");
 
-	elements.navigatePrevTime.onclick = elements.navigateNextTime.onclick = (mouseEvent) =>
+	elements.get("navigate-prev-time").onclick = elements.get("navigate-next-time").onclick = (mouseEvent) =>
 	{
 		if (mouseEvent.target.classList.contains("disabled") === false)
 		{
@@ -216,11 +216,11 @@ const myxStatistics = function ()
 		const items = [
 			{
 				targetDate: timerange.nextTimerange,
-				element: elements.navigateNextTime
+				element: elements.get("navigate-next-time")
 			},
 			{
 				targetDate: timerange.prevTimerange,
-				element: elements.navigatePrevTime
+				element: elements.get("navigate-prev-time")
 			}
 		];
 		for (let item of items)
@@ -346,10 +346,10 @@ const myxStatistics = function ()
 		if (myx.expenses.hasActualData(myx.expenses.selectedMonth.toMonthString()))
 		{
 			let k = calcMode;
-			htmlBuilder.removeAllChildren(elements.content);
-			elements.headline.innerHTML = getHeadline();
-			elements.title.innerHTML = getTitle();
-			elements.amount.innerHTML = myx.formatAmountLocale(data[k]);
+			htmlBuilder.removeAllChildren(elements.get("content"));
+			elements.get("headline").innerHTML = getHeadline();
+			elements.get("title").innerHTML = getTitle();
+			elements.get("amount").innerHTML = myx.formatAmountLocale(data[k]);
 			for (let catAggr of data.totals)
 			{
 				let subCatDiv = htmlBuilder.newElement("div.hidden", { 'data-cat': catAggr.catId });
@@ -384,12 +384,12 @@ const myxStatistics = function ()
 						subCatDiv
 					)
 				);
-				elements.content.appendChild(div);
+				elements.get("content").appendChild(div);
 			}
 		}
 		else
 		{
-			htmlBuilder.replaceContent(elements.content, htmlBuilder.newElement("div.fullscreen-msg",
+			htmlBuilder.replaceContent(elements.get("content"), htmlBuilder.newElement("div.fullscreen-msg",
 				htmlBuilder.newElement("div.icon.far", fa.smiley_meh),
 				htmlBuilder.newElement("div.label", "Nothing here.")
 			));
@@ -412,7 +412,7 @@ const myxStatistics = function ()
 	 */
 	function toggleSubcategoryVisibility (catId)
 	{
-		elements._self.querySelector("[data-cat='" + catId + "']").classList.toggle("hidden");
+		elements.get().querySelector("[data-cat='" + catId + "']").classList.toggle("hidden");
 	};
 
 	/**
