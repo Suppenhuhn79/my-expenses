@@ -147,7 +147,6 @@ let myxExpenses = function ()
 			{
 				editor = expenseEditor(repeatings, document.getElementById("client"));
 				window.exd = editor; // debug_only
-				doFontAwesome(document.getElementById("expense-editor"));
 				resetFilter();
 				window.r = repeatings; // debug_only
 				console.log("Repeating expenses (`r`) have loaded.", window.r.data); // debug_only
@@ -501,7 +500,7 @@ let myxExpenses = function ()
 							);
 							// marker.addEventListener("animationend", () => { console.log("animation ended"); marker.style.animation = null; });
 							scrollToDate ||= today;
-							doFontAwesome(marker);
+							fa.applyOn(marker);
 							renders.push(marker);
 						}
 						if ((filter.months.length > 1) && (lastRenderedMonth !== item.dat.toMonthString()))

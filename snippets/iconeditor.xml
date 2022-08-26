@@ -45,7 +45,7 @@
 						<i class="fas" data-icon="times"></i>
 					</div>
 					<div name="delete" ps:onclick="onDeleteClick">
-						<i class="fas red" data-icon="trash_alt"></i>
+						<i class="fas red" data-icon="trash-alt"></i>
 					</div>
 				</div>
 			</div>

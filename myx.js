@@ -65,7 +65,7 @@ let myx = function ()
 
 	function init ()
 	{
-		doFontAwesome(document.body);
+		fa.applyOn(document.body);
 		choices.set("active-tab", "data-dummy");
 		choices.onChoose("active-tab", onTabChosen);
 		window.addEventListener("focus", onWindowFocus, false);

@@ -227,7 +227,7 @@ let myxPaymentMethods = function ()
 			elements.get("content").appendChild(htmlBuilder.newElement("div.headline", "Disabled payment methods"));
 			_renderList(disabledItems, false);
 		}
-		doFontAwesome(elements.get("content"));
+		fa.applyOn(elements.get("content"));
 		for (let e of elements.get("content").querySelectorAll("[data-id='" + defaultId + "'] .default-flag"))
 		{
 			e.classList.add("selected");

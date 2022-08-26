@@ -71,6 +71,7 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 	let decimalSeparator = (1.2).toLocaleString().substring(1, 2);
 	let amountAsString = "0";
 
+	fa.applyOn(elements.get());
 	elements.get("decimal-separator").innerText = decimalSeparator;
 	elements.get("dat").setAttribute("max", (new Date()).format("yyyy-mm-dd"));
 	vikb.addEventListener((event) =>
@@ -362,7 +363,7 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 			{
 				returnType = ExpenseEditorAction.MODIFY;
 			}
-			else if (tabMode.is( ExpenseEditorMode.REPEATING))
+			else if (tabMode.is(ExpenseEditorMode.REPEATING))
 			{
 				returnType = ExpenseEditorAction.REPEATING;
 			}

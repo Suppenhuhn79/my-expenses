@@ -302,7 +302,7 @@ let iconEditor = new function ()
 	 */
 	let _originTabName;
 
-	doFontAwesome(elements.get());
+	fa.applyOn(elements.get());
 	colorSelector(elements.get("colorselector-bubbles"), 27);
 	for (let glyphCode of [].concat(...Object.values(ICON_LIBRARAY)))
 	{
