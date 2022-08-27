@@ -101,9 +101,9 @@ function Expense (src, override)
 }
 
 const ExpensesTabMode = {
-	/** @enum {String} */
 	DEFAULT: "default",
-	SEARCH: "search"
+	SEARCH: "search",
+	MULTISELECT: "multiselect"
 };
 
 /**
@@ -128,7 +128,7 @@ let myxExpenses = function ()
 	let selectedMonth = new Date();
 
 	elements.get("back-search-button").onclick = () => { choices.set("active-tab", filter._origin); };
-	elements.get("cancel-search-button").onclick = () => { resetFilter(); renderList(); };
+	elements.get("cancel-search-button").onclick = resetFilter;
 	elements.get("add-expense-button").onclick = onAddExpenseClick;
 	elements.get("nav-current").onclick = onNavCurrentClick;
 
@@ -147,7 +147,7 @@ let myxExpenses = function ()
 			{
 				editor = expenseEditor(repeatings, document.getElementById("client"));
 				window.exd = editor; // debug_only
-				resetFilter();
+				// resetFilter();
 				window.r = repeatings; // debug_only
 				console.log("Repeating expenses (`r`) have loaded.", window.r.data); // debug_only
 				resolve();
@@ -359,12 +359,12 @@ let myxExpenses = function ()
 			}
 			tabMode.set(ExpensesTabMode.SEARCH);
 			choices.set("active-tab", MODULE_NAME);
-			renderList();
 		}
 		else
 		{
 			tabMode.set(ExpensesTabMode.DEFAULT);
 		}
+		renderList();
 	}
 
 	/**
@@ -689,7 +689,6 @@ let myxExpenses = function ()
 		{
 			selectedMonth = month;
 			resetFilter();
-			renderList();
 		});
 	};
 
@@ -724,7 +723,7 @@ let myxExpenses = function ()
 		get moduleName () { return MODULE_NAME; },
 		init: init,
 		fetchData: fetchData,
-		enter: renderList,
+		enter: resetFilter,
 		leave: resetFilter,
 		get selectedMonth () { return selectedMonth; },
 		set selectedMonth (value) { setMonth(value); },
