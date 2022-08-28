@@ -113,7 +113,10 @@ const ExpensesTabMode = {
 let myxExpenses = function ()
 {
 	const MODULE_NAME = "expenses-tab";
+	/** Time in milliseconds of mousedown hold to switch to "multiselect" mode */
 	const LONG_MOUSEDOWN_TIMEOUT_MS = 750;
+	/** Key in `data` where the preview expenses are stored temporary */
+	const PREVIEW = "preview";
 	/** @type {Record<MonthString, Array<Expense>>} */
 	let data = {};
 	let dataIndex = myxExpensesDataindex();
@@ -341,6 +344,23 @@ let myxExpenses = function ()
 	};
 
 	/**
+	 * Returns the expense that is bound to a list item.
+	 * @param {HTMLElement} element HTML element of the expenses list
+	 * @returns {Expense} Expense that is bound to the element
+	 */
+	function getExpenseOfElement (element)
+	{
+		let dataIndex = Number(element.dataset.index);
+		let dataMonth = element.dataset.month;
+		if (dataIndex < 0)
+		{
+			dataIndex = (dataIndex + 1) * -1;
+			dataMonth = PREVIEW;
+		}
+		return data[dataMonth][dataIndex];
+	}
+
+	/**
 	 * Sets the current filter and renders the list. Also the title will get a _seach hint_.
 	 * Mode will be set to `search` if there is at least a pmt or a cat filter. Otherwise the mode will be `default`.
 	 * 
@@ -504,11 +524,10 @@ let myxExpenses = function ()
 			/** @type {HTMLElement} */
 			let headline;
 			/** @type {Array<Expense>} */
-			let repeatingExpenses = (tabMode.is(ExpensesTabMode.DEFAULT)) ? repeatings.process(month) : [];
-			/** @type {Array<Expense>} */
 			let actualExpenses = data[month] || [];
+			data[PREVIEW] = (tabMode.is(ExpensesTabMode.DEFAULT)) ? repeatings.process(month) : [];
 			/** @type {Array<Expense>} */
-			let items = actualExpenses.concat(repeatingExpenses);
+			let items = actualExpenses.concat(data[PREVIEW]);
 			/** @type {Number} */
 			let actualCount = actualExpenses.length;
 			for (let i = items.length - 1; i >= 0; i -= 1)
@@ -545,7 +564,7 @@ let myxExpenses = function ()
 						renders.push(headline);
 						headline = null;
 					}
-					renders.push(renderItem(item, (i < actualCount) ? i : -1 /* actualCount - i - 1 */));
+					renders.push(renderItem(item, (i < actualCount) ? i : actualCount - i - 1));
 				}
 				lastRenderedDate = item.dat;
 			}
@@ -795,8 +814,7 @@ let myxExpenses = function ()
 	{
 		/** @type {HTMLElement} */
 		let itemElement = event.target.closest("[data-index][data-month]");
-		let dataIndex = Number(itemElement.dataset.index);
-		let expense = data[itemElement.dataset.month][dataIndex];
+		let expense = getExpenseOfElement(itemElement);
 		switch (tabMode.get())
 		{
 			case ExpensesTabMode.MULTISELECT:
@@ -806,7 +824,7 @@ let myxExpenses = function ()
 				for (let selectedElement of elements.get("content").querySelectorAll(".multiselect-chosen"))
 				{
 					selecteCount += 1;
-					selectedAmoutSum += data[selectedElement.dataset.month][selectedElement.dataset.index].amt;
+					selectedAmoutSum += getExpenseOfElement(selectedElement).amt;
 				}
 				if (selecteCount > 0)
 				{
