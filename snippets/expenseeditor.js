@@ -217,9 +217,13 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 	 */
 	function onCloneClick ()
 	{
-		currentDataIndex = null;
-		currentItem.dat = new Date();
-		refreshEditor();
+		if (isEnabled(elements.get("clone")))
+		{
+			currentDataIndex = null;
+			currentItem.dat = new Date();
+			refreshEditor();
+			myx.showNotification("Expense copied.");
+		}
 	};
 
 	/**
@@ -308,6 +312,7 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 			{
 				callbackFunc(null, ExpenseEditorAction.DELETE);
 			}
+			myx.showNotification("Expense deleted.");
 		}
 	};
 

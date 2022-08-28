@@ -432,6 +432,38 @@
 .multiselect-chosen .grey {
 	color: #68a;
 }
+
+.notification {
+	display: block;
+	position: fixed;
+	font-size: 0.9rem;
+	text-align: center;
+	bottom: 2rem;
+	left: 50%;
+	max-width: 75vw;
+	transform: translateX(-50%);
+	background-color: #000;
+	color: #fff;
+	border-radius: 1.5em;
+	padding: 1em 2em;
+	z-index: 9999;
+	opacity: 0.75;
+	animation: notification 3s linear;
+}
+@keyframes notification {
+	0% {
+		opacity: 0.25;
+	}
+	10% {
+		opacity: 0.75;
+	}
+	70% {
+		opacity: 0.75;
+	}
+	100% {
+		opacity: 0;
+	}
+}
 div.time_wrapper {
 	width: 100%;
 	overflow: scroll;

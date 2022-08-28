@@ -837,7 +837,7 @@ let myxExpenses = function ()
 				}
 				break;
 			default:
-				popupEditor(expense, dataIndex);
+				popupEditor(expense, Number(itemElement.dataset.index));
 		}
 	}
 

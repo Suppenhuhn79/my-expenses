@@ -190,10 +190,26 @@ let myx = function ()
 		return (Math.floor((Math.random() * 1e12))).toString(16).substring(0, 8);
 	}
 
+	/**
+	 * Formats an expense amount as a string with locale separators and currency symbol.
+	 * @param {Number} num Number to format as locale currency amount
+	 * @returns {String} Formated amount
+	 */
 	function formatAmountLocale (num)
 	{
 		return ((num > 0) ? Math.max(Math.round(num), 1) : 0).toLocaleString() + fa.space + currencySymbol;
 	}
+
+	/**
+	 * Pops up a notification bubble. This does vanish after a while through CSS animation.
+	 * @param {String} text Notification message
+	 */
+	function showNotification (text)
+	{
+		let element = htmlBuilder.newElement("div.notification", text);
+		element.addEventListener("animationend", (e) => { e.target.remove(); }, { once: true });
+		document.body.appendChild(element);
+	};
 
 	function onWindowFocus ()
 	{
@@ -280,6 +296,7 @@ let myx = function ()
 		setExpenseFilter: expenses.setFilter,
 		newId: newIdString,
 		formatAmountLocale: formatAmountLocale,
+		showNotification: showNotification,
 		xhrBegin: xhrBegin,
 		xhrSuccess: xhrSuccess,
 		xhrError: xhrError

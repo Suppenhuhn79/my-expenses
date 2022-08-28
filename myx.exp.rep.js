@@ -276,13 +276,14 @@ function myxRepeatingExpenses ()
 		if (triggeredExpenses.length > 0)
 		{
 			myx.expenses.add(triggeredExpenses);
+			myx.showNotification(triggeredExpenses.length + " expenses added automatically.");
 			saveToFile();
 		}
 		return result.sort((a, b) => (a.dat - b.dat));
 	}
 
 	/**
-	 * //TODO
+	 * // TODO: repeating interval editor
 	 * @param {Expense} expense Origin expense to set as repeating expense
 	 * @param {IdString} [id] Id of already exisintg repeating expense
 	 */
@@ -302,7 +303,6 @@ function myxRepeatingExpenses ()
 
 	return {
 		get data () { return data; }, // debug_only
-		// get: (id) => { return data.get(id); }, // debug_only
 		saveToFile: saveToFile, // debug_only
 		fetchData: fetchData,
 		promptEditor: promptEditor,
@@ -314,6 +314,11 @@ function myxRepeatingExpenses ()
 		 * @returns {RepeatingInterval} Interval of the repeating expense
 		 */
 		intervalOf: (id) => { return data.get(id)?.interval || new RepeatingInterval(); },
+		/**
+		 * Returns the last actual execution date of a repeating expense.
+		 * @param {IdString} id Repeating expense id
+		 * @returns {Date} Date of the last actual execution of the repeating expense
+		 */
 		lastExecutionDateOf: (id) => { return data.get(id)?.expense.dat; }
 	};
 };
