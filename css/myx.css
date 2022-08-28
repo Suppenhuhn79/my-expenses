@@ -414,7 +414,7 @@
 }
 .sortable-chosen {
 	box-shadow: 0 0 10px 5px #00000080;
-	background-color: #eee !important;
+	background-color: #f6f6f6 !important;
 	cursor: ns-resize !important;
 	z-index: 1;
 	position: relative;
@@ -423,6 +423,15 @@
 	opacity: 0 !important;
 }
 
+.multiselect-chosen {
+	outline: 4px solid #bdf;
+	outline-offset: -4px;
+	background-color: #f6faff !important;
+	color: #06a;
+}
+.multiselect-chosen .grey {
+	color: #68a;
+}
 div.time_wrapper {
 	width: 100%;
 	overflow: scroll;

@@ -112,9 +112,9 @@ const ExpensesTabMode = {
  */
 let myxExpenses = function ()
 {
-	// BUG: Leaving the tab in "search" mode remains the tab in search mode. Must set it to "default" mode.
 	const MODULE_NAME = "expenses-tab";
-	/** @type {Object<MonthString, Array<Expense>>} */
+	const LONG_MOUSEDOWN_TIMEOUT_MS = 750;
+	/** @type {Record<MonthString, Array<Expense>>} */
 	let data = {};
 	let dataIndex = myxExpensesDataindex();
 	/** @type {ExpensesFilter} */
@@ -126,9 +126,22 @@ let myxExpenses = function ()
 	let editor;
 	/** @type {Date} */
 	let selectedMonth = new Date();
+	/**
+	 * Tab mode that was active before multiselect.
+	 * @type {String} */
+	let preMultiselectTabMode;
+	/**
+	 * Id of the long-mousedown timeout.
+	 * @type {Number} */
+	let longMousedownTimeoutId;
+	/**
+	 * For ignoring mouseup on long-mousedown.
+	 * @type {Boolean} */
+	let ignoreMouseup = false;
 
 	elements.get("back-search-button").onclick = () => { choices.set("active-tab", filter._origin); };
 	elements.get("cancel-search-button").onclick = resetFilter;
+	elements.get("cancel-multiselect-button").onclick = exitMultiselectMode;
 	elements.get("add-expense-button").onclick = onAddExpenseClick;
 	elements.get("nav-current").onclick = onNavCurrentClick;
 
@@ -377,6 +390,21 @@ let myxExpenses = function ()
 	}
 
 	/**
+	 * Exits the "multiselect" mode back to the mode that was active before multiselect.
+	 * Deselects all selected items.
+	 */
+	function exitMultiselectMode ()
+	{
+		{
+			for (let selectedElement of elements.get("content").querySelectorAll(".multiselect-chosen"))
+			{
+				selectedElement.classList.remove("multiselect-chosen");
+			}
+			tabMode.set(preMultiselectTabMode);
+		}
+	}
+
+	/**
 	 * Sets the current Month with no further action.
 	 * @param {Date} month Month to set
 	 */
@@ -427,7 +455,13 @@ let myxExpenses = function ()
 	{
 		let catLabel = myx.categories.getLabel(item.cat);
 		let div = htmlBuilder.newElement("div.item.click" + ((item.dat > new Date()) ? ".preview" : ""),
-			{ onclick: () => popupEditor(item, dataIndex) },
+			{
+				"data-index": dataIndex,
+				"data-month": item.dat.toMonthString(),
+				onpointerdown: onItemPointerDown,
+				onpointermove: () => { window.clearTimeout(longMousedownTimeoutId); },
+				onpointerup: onItemPointerUp
+			},
 			// dataIndex,
 			myx.categories.renderIcon(item.cat),
 			htmlBuilder.newElement("div.flex-fill.cutoff",
@@ -712,6 +746,81 @@ let myxExpenses = function ()
 			itemDate = new Date();
 		}
 		popupEditor(new Expense(null, { dat: itemDate }));
+	}
+
+	/**
+	 * Event handler for pointer down-on list items.
+	 * 
+	 * Starts timeout for long-mousedown switching to "multiselect" mode.
+	 * 
+	 * @param {Event} event Triggering event
+	 */
+	function onItemPointerDown (event)
+	{
+		longMousedownTimeoutId = window.setTimeout(() =>
+		{
+			preMultiselectTabMode = tabMode.get();
+			tabMode.set(ExpensesTabMode.MULTISELECT);
+			onItemClick(event);
+			ignoreMouseup = true;
+		}, LONG_MOUSEDOWN_TIMEOUT_MS);
+	}
+
+	/**
+	 * Event handler for pointer-up on list items.
+	 * 
+	 * Redirects to `pnItemClick()` event handler if necessary.
+	 * 
+	 * @param {Event} event Triggering event
+	 */
+	function onItemPointerUp (event)
+	{
+		window.clearTimeout(longMousedownTimeoutId);
+		if (ignoreMouseup === false)
+		{
+			onItemClick(event);
+		}
+		ignoreMouseup = false;
+	}
+
+	/**
+	 * Event handler for clicks on lilst items. Actually it is triggered by the mouseup event.
+	 * 
+	 * - In "default" mode, it pops up the expensde editor.
+	 * - In "multiselect" mode, is selects/deselects the expense.
+	 * 
+	 * @param {Event} event Triggering event
+	 */
+	function onItemClick (event)
+	{
+		/** @type {HTMLElement} */
+		let itemElement = event.target.closest("[data-index][data-month]");
+		let dataIndex = Number(itemElement.dataset.index);
+		let expense = data[itemElement.dataset.month][dataIndex];
+		switch (tabMode.get())
+		{
+			case ExpensesTabMode.MULTISELECT:
+				itemElement.classList.toggle("multiselect-chosen");
+				let selecteCount = 0;
+				let selectedAmoutSum = 0;
+				for (let selectedElement of elements.get("content").querySelectorAll(".multiselect-chosen"))
+				{
+					selecteCount += 1;
+					selectedAmoutSum += data[selectedElement.dataset.month][selectedElement.dataset.index].amt;
+				}
+				if (selecteCount > 0)
+				{
+					elements.get("multiselect-hint").innerText = selecteCount + " items selected";
+					elements.get("multiselect-sum").innerHTML = myx.formatAmountLocale(selectedAmoutSum);
+				}
+				else
+				{
+					exitMultiselectMode();
+				}
+				break;
+			default:
+				popupEditor(expense, dataIndex);
+		}
 	}
 
 	return { // publish members
