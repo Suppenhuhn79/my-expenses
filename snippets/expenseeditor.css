@@ -33,7 +33,7 @@
 #expense-editor [name="pmt"] div {
 	margin: 0 1rem;
 }
-#expense-editor [name="pmt"] div .pmt-icon {
+#expense-editor [name="pmt"] div .pmt.icon {
 	font-size: 1.2rem;
 	height: auto;
 }

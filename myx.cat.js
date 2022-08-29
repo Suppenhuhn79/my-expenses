@@ -165,7 +165,7 @@ let myxCategories = function ()
 			let div = htmlBuilder.newElement("div.item",
 				renderIcon(id),
 				labelElement,
-				htmlBuilder.newElement("div.for-mode.edit-mode.dragger-ns.fas", fa.sort)
+				htmlBuilder.newElement("i.for-mode.edit-mode.dragger-ns.fas", fa.sort)
 			);
 			new Sortable(subCatDiv, {
 				group: "nested",
@@ -235,7 +235,7 @@ let myxCategories = function ()
 		if (currentCatId)
 		{
 			toElement.appendChild(htmlBuilder.newElement("div.item.labeled-icon.click",
-				htmlBuilder.newElement("div.cat-icon.back.fas",
+				htmlBuilder.newElement("div.cat.icon.back.fas",
 					{ 'data-choice-value': "__back__" },
 					fa.arrow_left)));
 		}

@@ -74,7 +74,7 @@
 	align-content: stretch;
 	align-items: baseline;
 	width: 100%;
-	padding: 0.7rem 1rem 0.7rem 1rem;
+	padding: 0.7rem 1.3rem 0.7rem 1rem;
 	background-color: white;
 	border-top: var(--item-border);
 }
@@ -159,6 +159,10 @@
 	height: 6rem;
 	border-top: 2px solid #aaa;
 }
+#expenses-tab .content .pmt.icon {
+	position: relative;
+	left: 0.3rem;
+}
 
 #expenses-tab button {
 	display: block;
@@ -173,6 +177,11 @@
 	font-family: var(--font);
 	font-size: 1rem;
 	cursor: pointer;
+}
+#expenses-tab [name="multiselect-sum"] {
+	font-size: 1.2em;
+	font-weight: bold;
+	margin: -0.18em 0;
 }
 
 #payment-methods-tab .default-flag.selected {
@@ -231,9 +240,6 @@
 	background-color: #f6f6f6;
 }
 
-#statistics-tab .content .item {
-	padding-right: 0.8rem;
-}
 #statistics-tab .content .header {
 	position: sticky;
 	top: -0.2rem; /* according to #client .content { padding-top } */
