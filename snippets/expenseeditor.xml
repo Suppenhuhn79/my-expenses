@@ -73,7 +73,7 @@
 							</tr>
 							<tr>
 								<td name="cancel" ps:onclick="onCancelClick">
-									<i class="fas" data-icon="times"></i>
+									<i class="fas" data-icon="backward"></i>
 								</td>
 								<td data-keycode="__clearall__">CE</td>
 								<td data-keycode="0">0</td>

@@ -38,7 +38,7 @@ function PaymentMethod (src, id)
 	 */
 	this.renderIcon = function ()
 	{
-		return htmlBuilder.newElement("div.pmt-icon", { style: "color:" + this.color }, this.glyph.render());
+		return htmlBuilder.newElement("div.pmt.icon", { style: "color:" + this.color }, this.glyph.render());
 	};
 
 	/**

@@ -126,7 +126,7 @@ let myxCategories = function ()
 		let icon = myx.getIconAttributes(data[id].icon || data[data[id].masterCategory].icon);
 		let color = getColor(id);
 		let style = "background-color:" + color;
-		return htmlBuilder.newElement("div.cat-icon",
+		return htmlBuilder.newElement("div.cat.icon",
 			{ style: style },
 			htmlBuilder.newElement("i." + icon.faScope, icon.htmlEntity));
 	}

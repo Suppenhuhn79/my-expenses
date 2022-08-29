@@ -145,8 +145,8 @@ body {
 	text-align: center;
 }
 
-.cat-icon,
-.pmt-icon {
+.cat.icon,
+.pmt.icon {
 	display: flex;
 	width: 2em;
 	min-width: 2em;
@@ -155,14 +155,12 @@ body {
 	align-items: center;
 	justify-content: center;
 	border-radius: 100%;
-	margin-right: 0.5em;
 }
-.pmt-icon {
+.pmt.icon {
 	font-size: 1.2rem;
-	margin: -0.2rem 0;
+	margin: -0.2rem;
 }
-.cat-icon i,
-.pmt-icon i {
+.icon i {
 	display: inline-flex;
 }
 

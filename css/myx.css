@@ -1,3 +1,11 @@
+.subcat .cat.icon {
+	font-size: 0.7rem;
+	width: 2em;
+	min-width: 2em;
+	height: 2em;
+	margin-right: 0.5em;
+}
+
 #header {
 	color: white;
 	background: linear-gradient(90deg, var(--primary-darkest-color) 0%, var(--primary-color) 35%, var(--primary-light-color) 100%);
@@ -70,11 +78,14 @@
 	background-color: white;
 	border-top: var(--item-border);
 }
+#client .content .item > div:first-child {
+	margin-right: 0.5rem;
+}
 #client .content .item.preview {
 	opacity: 0.55;
 	color: var(--primary-darkest-color);
 }
-#client .content .item.preview .cat-icon {
+#client .content .item.preview .icon {
 	opacity: 0.7;
 }
 #client .content .item + .headline {
@@ -127,7 +138,7 @@
 }
 
 #expenses-tab .content .item > div.amount {
-	margin-right: 0;
+	margin-left: 0.5em;
 }
 #expenses-tab [name="add-expense-button"] {
 	height: 4rem;
@@ -164,9 +175,6 @@
 	cursor: pointer;
 }
 
-#payment-methods-tab .pmt-icon {
-	margin-right: 0.5em;
-}
 #payment-methods-tab .default-flag.selected {
 	color: gold !important;
 	font-weight: bold;
@@ -184,14 +192,8 @@
 	align-items: center;
 	margin: 0.5rem 0 0 0;
 }
-#categories-tab .subcats .subcat .cat-icon {
-	font-size: 0.7rem;
-	width: 2em;
-	min-width: 2em;
-	height: 2em;
-}
 #categories-tab .subcats .subcat > span {
-	margin: 0 0.5em 0 0.2em;
+	margin-right: 0.5em;
 }
 
 #statistics-tab .button-group {
@@ -247,13 +249,6 @@
 }
 #statistics-tab .subcat {
 	margin: 0.5em 0 0 0;
-}
-#statistics-tab .subcat .cat-icon {
-	font-size: 0.7rem;
-	width: 2em;
-	min-width: 2em;
-	height: 2em;
-	margin-right: 0.5rem;
 }
 #statistics-tab .percentbar {
 	width: 100%;
