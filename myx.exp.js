@@ -484,7 +484,7 @@ let myxExpenses = function ()
 				'data-index': dataIndex,
 				'data-month': item.dat.toMonthString(),
 				onpointerdown: onItemPointerDown,
-				onpointermove: () => { window.clearTimeout(longMousedownTimeoutId); ignoreMouseup = true; },
+				onpointermove: () => { window.clearTimeout(longMousedownTimeoutId); },
 				onpointerup: onItemPointerUp
 			},
 			// dataIndex,
