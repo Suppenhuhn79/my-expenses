@@ -484,7 +484,7 @@ let myxExpenses = function ()
 				'data-index': dataIndex,
 				'data-month': item.dat.toMonthString(),
 				onpointerdown: onItemPointerDown,
-				onpointermove: () => { window.clearTimeout(longMousedownTimeoutId); },
+				onpointermove: () => { window.clearTimeout(longMousedownTimeoutId); ignoreMouseup = true; },
 				onpointerup: onItemPointerUp
 			},
 			// dataIndex,
@@ -846,7 +846,10 @@ let myxExpenses = function ()
 				}
 				break;
 			default:
-				popupEditor(expense, Number(itemElement.dataset.index));
+				window.setTimeout(() => // Prevents triggering the pointer-event at the expenses editor.
+				{
+					popupEditor(expense, Number(itemElement.dataset.index));
+				}, 1);
 		}
 	}
 
