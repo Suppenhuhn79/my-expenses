@@ -216,7 +216,7 @@ const myxStatisticAggregator = function ()
 	}
 
 	return { // public interface
-		get data () { return _aggregates; }, // TODO: debug only
+		get data () { return _aggregates; }, // debug_only
 		calc: calc
 	};
 };

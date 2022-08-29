@@ -15,7 +15,7 @@
  * @property {IdString} [pmt] Payment method id
  * @property {IdString} [cat] Category id (if sole)
  * @property {Array<IdString>} [cats] Category ids (if many)
- * @property {Array<MonthString>} [months] Months; set to all availibe months if ommited
+ * @property {Array<MonthString>} [months] Months; set to all availibe months if omitted
  */
 
 /**
@@ -163,7 +163,6 @@ let myxExpenses = function ()
 			{
 				editor = expenseEditor(repeatings, document.getElementById("client"));
 				window.exd = editor; // debug_only
-				// resetFilter();
 				window.r = repeatings; // debug_only
 				console.log("Repeating expenses (`r`) have loaded.", window.r.data); // debug_only
 				resolve();
@@ -248,8 +247,8 @@ let myxExpenses = function ()
 	/**
 	 * Saves expenses to a file.
 	 * More exactly: saves expenses of all months, that are in the same files as the given dates.
-	 * @param {Expense|Array<Expense>} expenses Months to save data
 	 * @async
+	 * @param {Expense|Array<Expense>} expenses Months to save data
 	 */
 	async function saveToFile (expenses)
 	{
@@ -302,27 +301,27 @@ let myxExpenses = function ()
 	}
 
 	/**
-	 * Adds a expenses to `data`.
-	 * @param {Expense|Array<Expense>} expense Expense to add
+	 * Adds expenses to `data` and saves files.
+	 * @param {Expense|Array<Expense>} expenses Expenses to add
 	 */
-	function add (expense)
+	function add (expenses)
 	{
-		if ((expense instanceof Array) === false)
+		if ((expenses instanceof Array) === false)
 		{
-			expense = [expense];
+			expenses = [expenses];
 		}
-		for (let item of expense)
+		for (let item of expenses)
 		{
 			let month = item.dat.toMonthString();
 			data[month] ||= [];
 			data[month].push(new Expense(item));
 		}
-		saveToFile(expense);
+		saveToFile(expenses);
 	}
 
 	/**
 	 * Sorts expenses of a month, descending by date.
-	 * @param {MonthString} month Months to sort expenses
+	 * @param {MonthString} month Month to get expenses sorted
 	 */
 	function sortItems (month)
 	{
@@ -332,7 +331,7 @@ let myxExpenses = function ()
 	/**
 	 * Checks whether there are actual expenses in a certain month or not.
 	 * @param {MonthString|Date} month Month to check for data
-	 * @returns {Boolean} `true` if there is any actual data for the month, `false` if there is no data
+	 * @returns {Boolean} `true` if there is any actual data for the month, `false` if there is no or only preview data
 	 */
 	function hasActualData (month)
 	{
@@ -344,7 +343,7 @@ let myxExpenses = function ()
 	};
 
 	/**
-	 * Returns the expense that is bound to a list item.
+	 * Returns the expense that is bound to a list element.
 	 * @param {HTMLElement} element HTML element of the expenses list
 	 * @returns {Expense} Expense that is bound to the element
 	 */
@@ -361,8 +360,10 @@ let myxExpenses = function ()
 	}
 
 	/**
-	 * Sets the current filter and renders the list. Also the title will get a _seach hint_.
-	 * Mode will be set to `search` if there is at least a pmt or a cat filter. Otherwise the mode will be `default`.
+	 * Sets the current filter and renders the list.
+	 * 
+	 * Mode will be set to "search" if there is at least a _pmt_ or a _cat_ filter. Also the title will get a seach hint.
+	 * Otherwise the mode will be "default".
 	 * 
 	 * @param {ExpensesFilter} filterObj Filters to set
 	 * @param {String} originModuleName Module name where the filter came from (where to return to)
@@ -402,6 +403,7 @@ let myxExpenses = function ()
 
 	/**
 	 * Resets the filter. Only filter criteria will be the currently selected month.
+	 * 
 	 * Calls `setFilter()`.
 	 */
 	function resetFilter ()
@@ -411,6 +413,7 @@ let myxExpenses = function ()
 
 	/**
 	 * Exits the "multiselect" mode back to the mode that was active before multiselect.
+	 * 
 	 * Deselects all selected items.
 	 */
 	function exitMultiselectMode ()
@@ -425,7 +428,7 @@ let myxExpenses = function ()
 	}
 
 	/**
-	 * Sets the current Month with no further action.
+	 * Sets the current month and also filters on the current month and renders the list via `setFilter()`.
 	 * @param {Date} month Month to set
 	 */
 	function setMonth (month)
@@ -436,7 +439,9 @@ let myxExpenses = function ()
 
 	/**
 	 * Updates a navigation element in the module's title.
+	 * 
 	 * If the current month has no data and the target month has no data, too, the element gets hidden.
+	 * 
 	 * @param {HTMLDivElement} navElement HTML element to update
 	 * @param {Date} targetMonth Month to be represented by the nav element
 	 */
@@ -476,8 +481,8 @@ let myxExpenses = function ()
 		let catLabel = myx.categories.getLabel(item.cat);
 		let div = htmlBuilder.newElement("div.item.click" + ((item.dat > new Date()) ? ".preview" : ""),
 			{
-				"data-index": dataIndex,
-				"data-month": item.dat.toMonthString(),
+				'data-index': dataIndex,
+				'data-month': item.dat.toMonthString(),
 				onpointerdown: onItemPointerDown,
 				onpointermove: () => { window.clearTimeout(longMousedownTimeoutId); },
 				onpointerup: onItemPointerUp
@@ -495,12 +500,13 @@ let myxExpenses = function ()
 
 	/**
 	 * Puts a list of all expenses matching the current filter to the "content"-element.
-	 * For each day with an expense there will be a _headline_ and an _item_ element fo each expense.
+	 * 
+	 * For each day with an expense there will be a _headline_.
 	 * Item elements will contain all functionality for all modes.
 	 * 
 	 * Also navigation items will be updated.
 	 * 
-	 * @param {Date} [scrollToDate] Date to be scrolled to.
+	 * @param {Date} [scrollToDate] Date to be scrolled to; if omitted, list will try to scroll to _today_
 	 */
 	function renderList (scrollToDate)
 	{
@@ -598,7 +604,7 @@ let myxExpenses = function ()
 
 	/**
 	 * Scrolls to a given date; or at last as as close as possible - if the given date does not have any entries,
-	 * it will scrol to the next (following) date with entries.
+	 * it will scrrol to the next (later) date with entries.
 	 * @param {Date} date Date to scroll to
 	 */
 	function scrollTo (date)
@@ -640,9 +646,12 @@ let myxExpenses = function ()
 	}
 
 	/**
-	 * Pops up an ExpenseEditor to modify an expense or create a new one. Renders the expenses list afterwards.
-	 * @param {Expense} expense Expense to edit
-	 * @param {Number} [dataIndex] Array index (`0..x`) of the current month subset of `data`; required if editing existing data, otherwise empty
+	 * Pops up an ExpenseEditor to modify an expense or create a new one.
+	 * 
+	 * Renders the expenses list afterwards.
+	 * 
+	 * @param {Expense} [expense] Expense to edit; if omitted, a new expense will be created
+	 * @param {Number} [dataIndex] Array index (`0..x`) of the current month subset of `data`; required if editing existing data, otherwise to be omitted
 	 */
 	function popupEditor (expense, dataIndex)
 	{
@@ -733,8 +742,8 @@ let myxExpenses = function ()
 	}
 
 	/**
-	 * Handler for clicks on the "current month" nav item.
-	 * @param {MouseEvent} mouseEvent Event that was fired by click/tap.
+	 * Event handler for clicks on the "current month" nav item.
+	 * @param {MouseEvent} mouseEvent Triggering event
 	 */
 	function onNavCurrentClick (mouseEvent)
 	{
@@ -746,7 +755,7 @@ let myxExpenses = function ()
 	};
 
 	/**
-	 * Handler for "add expense" button click. Pops up ExpenseEditor for new expense.
+	 * Event handler for clicking the "add expense" button. Pops up the ExpenseEditor for new expense.
 	 */
 	function onAddExpenseClick ()
 	{
@@ -768,7 +777,7 @@ let myxExpenses = function ()
 	}
 
 	/**
-	 * Event handler for pointer down-on list items.
+	 * Event handler for pointer-down on list items.
 	 * 
 	 * Starts timeout for long-mousedown switching to "multiselect" mode.
 	 * 
@@ -788,7 +797,7 @@ let myxExpenses = function ()
 	/**
 	 * Event handler for pointer-up on list items.
 	 * 
-	 * Redirects to `pnItemClick()` event handler if necessary.
+	 * Redirects to `onItemClick()` event handler if necessary.
 	 * 
 	 * @param {Event} event Triggering event
 	 */
@@ -803,9 +812,9 @@ let myxExpenses = function ()
 	}
 
 	/**
-	 * Event handler for clicks on lilst items. Actually it is triggered by the mouseup event.
+	 * Event handler for clicks on list items. Actually it is triggered by the pointer-up event.
 	 * 
-	 * - In "default" mode, it pops up the expensde editor.
+	 * - In "default" mode, it pops up the ExpenseEditor.
 	 * - In "multiselect" mode, is selects/deselects the expense.
 	 * 
 	 * @param {Event} event Triggering event

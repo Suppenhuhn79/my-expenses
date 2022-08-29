@@ -188,9 +188,9 @@ function myxRepeatingExpenses ()
 
 	/**
 	 * Adds or modifies a repeating expense.
-	 * @param {IdString} [id] Id of repeating expense; if ommited and an interval is given, an new repeating expense is added
+	 * @param {IdString} [id] Id of repeating expense; if omitted and an interval is given, an new repeating expense is added
 	 * @param {Expense} expense Expense data
-	 * @param {RepeatingInterval} [interval] New repeating interval for the expense; if ommited, the repeating expense is deleted
+	 * @param {RepeatingInterval} [interval] New repeating interval for the expense; if omitted, the repeating expense is deleted
 	 * @param {Boolean} [autosave] Whether to save repeating expenses to file, or not. Default `true`, set to `false` when performing bulk operations
 	 * @returns {IdString} Id of the modified/added expense; empty string if repeating expense has been deleted or does not exist
 	 */
