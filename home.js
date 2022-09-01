@@ -5,23 +5,19 @@ const myxHome = function ()
 	let elements = document.getElementById("home-tab").getNamedChildren();
 	let categorySelector = new CategorySelector(elements.get("category-selector"), onCategoryChosen, true);
 
-	// TODO: this must be smarter
 	document.getElementById("header").onclick = function onHeaderClick ()
 	{
-		choices.set("active-tab", MODULE_NAME);
-		enter();
+		choices.set("active-tab", MODULE_NAME, new Event("dummy, required for interactivity"));
 	};
 
 	elements.get("goto-expenses-button").onclick = function onGotoExpensesButtonClick ()
 	{
-		choices.set("active-tab", myx.expenses.moduleName);
-		myx.expenses.enter();
+		choices.set("active-tab", myx.expenses.moduleName, new Event("dummy, required for interactivity"));
 	};
 
 	elements.get("goto-categories-button").onclick = function onGotoCategoriesButtonClick ()
 	{
-		choices.set("active-tab", myx.categories.moduleName);
-		myx.categories.enter();
+		choices.set("active-tab", myx.categories.moduleName, new Event("dummy, required for interactivity"));
 	};
 
 	/**
@@ -47,7 +43,11 @@ const myxHome = function ()
 		let lastExpenseIndex = thisMonthsExpenses.length - 1;
 		let lastExpense = thisMonthsExpenses[lastExpenseIndex];
 		let lastExpenseElement = myx.expenses.renderItem(lastExpense, lastExpenseIndex);
-		lastExpenseElement.setStyles({ border: "none", padding: "0" });
+		lastExpenseElement.setStyles({
+			border: "none",
+			padding: "0",
+			backgroundColor: "transparent"
+		});
 		elements.get("last-expense-date").innerText = lastExpense.dat.format("dddd, d. mmmm");
 		htmlBuilder.replaceContent(elements.get("last-expense-item"), lastExpenseElement);
 		categorySelector.refresh();

@@ -143,31 +143,36 @@ let myx = function ()
 		});
 	}
 
+	/**
+	 * Event handler for choosing a tab or editor. Usually called by `choices`.
+	 * 
+	 * If the tab is a real tab (not an editor), it is set the `activeTab` and its `enter()` method is called.
+	 * 
+	 * If the tab is an editor, the bottom buttons are hidden.
+	 * 
+	 * @param {String} tabName Name of the chosen tab
+	 * @param {Boolean} interactive `true` the choice was set by a (user) event, otherwise `false`
+	 */
 	function onTabChosen (tabName, interactive)
 	{
+		console.trace(tabName, interactive);
+		let tabs = [home, paymentMethods, categories, expenses, statistics];
 		(tabName.endsWith("-tab")) ? bottomMenu.classList.remove("hidden") : bottomMenu.classList.add("hidden");
 		if (interactive)
 		{
-			activeTab?.leave?.(); // TODO: must be smarter
-			switch (tabName)
+			if ((!!activeTab) && (typeof activeTab.leave === "function"))
 			{
-				case home.moduleName:
-					activeTab = home;
-					break;
-				case paymentMethods.moduleName:
-					activeTab = paymentMethods;
-					break;
-				case categories.moduleName:
-					activeTab = categories;
-					break;
-				case expenses.moduleName:
-					activeTab = expenses;
-					break;
-				case statistics.moduleName:
-					activeTab = statistics;
-					break;
+				activeTab.leave();
 			}
-			activeTab?.enter?.();
+			for (let tab of tabs)
+			{
+				if (tab.moduleName === tabName)
+				{
+					activeTab = tab;
+					activeTab.enter();
+					break;
+				}
+			}
 		}
 	}
 
