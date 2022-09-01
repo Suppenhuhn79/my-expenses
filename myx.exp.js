@@ -1,14 +1,4 @@
 /** 
- * @typedef Expense
- * Expense object. Represents a single expense.
- * @type {Object}
- * @property {Date} dat Expense date
- * @property {Number} amt Expense amount
- * @property {IdString} cat Expense category - id reference to categories
- * @property {IdString} pmt Used payment method - id reference to payment methods
- * @property {String} txt Additional text 
- * @property {IdString} rep Repeating expense - id reference to repeating expenses
- *
  * @typedef ExpensesFilter
  * Defines filter for listing expenses.
  * @type {Object}
@@ -33,11 +23,40 @@ function Expense (src, override)
 	 */
 	const KEY_ORDER = ["dat", "amt", "cat", "txt", "pmt", "rep"];
 
+	/**
+	 * Expense date.
+	 * @type {Date}
+	 */
 	this.dat = new Date();
+
+	/**
+	 * Expense amount
+	 * @type {Number}
+	 */
 	this.amt = 0;
+
+	/**
+	 * Expense category - id reference to categories
+	 * @type {IdString}
+	 */
 	this.cat = "";
+
+	/**
+	 * Additional text
+	 * @type {String}
+	 */
 	this.txt = "";
+
+	/**
+	 * Used payment method - id reference to payment methods
+	 * @type {IdString}
+	 */
 	this.pmt = "";
+
+	/**
+	 * Repeating expense - id reference to repeating expenses
+	 * @type {IdString}
+	 */
 	this.rep = "";
 
 	switch (typeof src)
@@ -97,7 +116,7 @@ function Expense (src, override)
 	this.toJSON = function ()
 	{
 		let json = {
-			dat: this.dat.format("yyyy-mm-dd"),
+			dat: this.dat.toIsoDate(),
 			amt: this.amt,
 			cat: this.cat,
 			pmt: this.pmt
