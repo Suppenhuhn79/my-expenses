@@ -49,7 +49,7 @@
 					<div class="center flex-fill"><span class="dummy text w9"></span></div>
 					<div><span class="dummy text w2"></span></div>
 				</div>
-				<div class="content">
+				<div class="content list">
 					<div class="headline"><span class="dummy text w9"></span></div>
 					<div class="item">
 						<div class="cat icon dummy">&#x00a0;</div>
@@ -62,6 +62,42 @@
 					<div class="item">
 						<div class="cat icon dummy">&#x00a0;</div>
 						<span class="dummy text w9">&#x00a0;</span>
+					</div>
+				</div>
+			</div>
+			<div id="home-tab" data-choice-client="home-tab">
+				<div class="client-header">
+					<div>HOME</div>
+				</div>
+				<div name="content" class="content">
+					<div class="headline">Welcome</div>
+					<div class="white">
+						<div name="today-date" class="grey center" style="margin: 1rem 0; font-size: 0.9rem">(todays date)</div>
+						<div class="">Expenses this month so far:</div>
+						<div name="this-month-total" style="margin: 1rem; font-size: 3.5rem; padding-left: 1em; text-align: center; text-shadow: 0.05em 0.05em 0.3em #00000052"><i class="fas" data-icon="hourglass_half"></i></div>
+					</div>
+					<div class="white">
+						<div class="wide-flex grey" style="margin-bottom: 0.5em">
+							<div class="flex-fill">Latest expense:</div>
+							<div class="click hover" style="text-align: right" name="goto-expenses-button">
+								<i class="fas" data-icon="forward"></i>
+							</div>
+						</div>
+						<div style="border: var(--item-border); border-radius: 0.5rem; padding: 0.5rem; margin-bottom: 1rem">
+							<div name="last-expense-date" style="margin-bottom: 0.5em"></div>
+							<div name="last-expense-item" class="content list" style="padding: 0"></div>
+						</div>
+						<!-- </div> -->
+						<!-- <div class="white"> -->
+						<div>
+							<div class="wide-flex grey">
+								<div class="flex-fill">Add expense:</div>
+								<div class="click hover" style="text-align: right" name="goto-categories-button">
+									<i class="fas" data-icon="pen"></i>
+								</div>
+							</div>
+							<div name="category-selector" class="labled-icons-grid flex-fill" style="padding: 0.5rem 0"></div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -98,7 +134,7 @@
 					<i name="edit-multiselect-button" class="click fas" data-icon="pen">?</i>
 					<i name="cancel-multiselect-button" class="click fas" data-icon="times">?</i>
 				</div>
-				<div name="content" class="content">?</div>
+				<div name="content" class="content list">?</div>
 				<div name="add-expense-button" class="for-mode default-mode click">
 					<i class="fas" data-icon="plus">?</i>
 				</div>
@@ -114,7 +150,7 @@
 					<i name="apply-edits-button" class="click for-mode edit-mode fas" data-icon="check">?</i>
 					<i name="cancel-edits-button" class="click for-mode edit-mode fas" data-icon="times">?</i>
 				</div>
-				<div class="content">
+				<div class="content list">
 					<div class="for-mode default-mode headline">Tap category to add expense</div>
 					<div class="for-mode edit-mode headline">Edit categories or add sub-categories</div>
 					<div class="for-mode search-mode headline">Tap category to search for expenses</div>
@@ -132,7 +168,7 @@
 					<i name="apply-edits-button" class="click for-mode edit-mode fas" data-icon="check">?</i>
 					<i name="cancel-edits-button" class="click for-mode edit-mode fas" data-icon="times">?</i>
 				</div>
-				<div class="content" data-choice="default-payment-method">
+				<div class="content list" data-choice="default-payment-method">
 					<div class="for-mode default-mode edit-mode headline">Active payment methods</div>
 					<div class="for-mode search-mode headline">Tap payment method to search for expenses</div>
 					<div name="content">&#x00a0;</div>
@@ -145,9 +181,9 @@
 					<i name="filter-select-button" class="click fas" data-icon="filter">?</i>
 					<i name="chart-select-button" class="click fas" data-icon="chart-line">?</i>
 				</div>
-				<div class="content">
+				<div class="content list">
 					<div name="headline" class="headline">&#x00a0;</div>
-					<div class="header">
+					<div class="white">
 						<div class="wide-flex">
 							<div class="flex-fill big bold cutoff" name="title"></div>
 							<div class="amt big bold" name="amount"></div>
@@ -175,6 +211,12 @@
 		</div>
 		<!-- bottom menu -->
 		<div id="bottom-menu" data-choice="active-tab" class="buttons hidden">
+			<!--
+			<div name="home-tab" data-choice-value="home-tab" class="labeled-icon">
+				<i class="fas" data-icon="home">?</i>
+				<span class="cutoff">home</span>
+			</div>
+		-->
 			<div name="payment-methods-tab" data-choice-value="payment-methods-tab" class="labeled-icon">
 				<i class="fas" data-icon="wallet">?</i>
 				<span class="cutoff">payment methods</span>
@@ -193,12 +235,14 @@
 			</div>
 			<div data-choice-value="not-signed-in" style="display: none"></div>
 			<div data-choice-value="data-dummy" style="display: none"></div>
+			<div data-choice-value="home-tab" style="display: none"></div>
 			<div data-choice-value="expense-editor" style="display: none"></div>
 			<div data-choice-value="icon-editor" style="display: none"></div>
 		</div>
 
 		<div id="xhr-indicator">&#x00a0;</div>
 
+		<script src="home.js"></script>
 		<script src="myx.pmt.js"></script>
 		<script src="myx.cat.js"></script>
 		<script src="myx.sta.js"></script>
@@ -207,5 +251,6 @@
 		<script src="myx.exp.dix.js"></script>
 		<script src="myx.exp.rep.js"></script>
 		<script src="myx.js"></script>
+		<script src="debug.js" defer="defer" async="async"></script>
 	</body>
 </html>

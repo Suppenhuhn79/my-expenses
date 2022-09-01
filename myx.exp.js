@@ -911,6 +911,7 @@ let myxExpenses = function ()
 		hasActualData: hasActualData,
 		setFilter: setFilter,
 		add: add,
-		edit: popupEditor
+		edit: popupEditor,
+		renderItem: renderItem
 	};
 };

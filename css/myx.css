@@ -6,6 +6,34 @@
 	margin-right: 0.5em;
 }
 
+.white {
+	padding: 0.7rem 1rem;
+	background-color: white;
+	border-top: var(--item-border);
+}
+
+.white:last-of-type {
+	border-bottom: 2px solid #aaa;
+}
+.labled-icons-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, 5em);
+	justify-content: center;
+	justify-items: center;
+	align-content: start;
+}
+.labled-icons-grid .item {
+	padding: 0.5em 0.25em;
+	width: 100%;
+	border-radius: 0.3em;
+	overflow: hidden;
+}
+.labled-icons-grid .item .label {
+	overflow: hidden;
+	max-width: 100%;
+	text-overflow: ellipsis;
+}
+
 #header {
 	color: white;
 	background: linear-gradient(90deg, var(--primary-darkest-color) 0%, var(--primary-color) 35%, var(--primary-light-color) 100%);
@@ -66,7 +94,7 @@
 	overflow-x: hidden;
 }
 
-#client .content .item {
+#client .content.list .item {
 	display: flex;
 	flex-direction: row;
 	flex-wrap: nowrap;
@@ -78,30 +106,29 @@
 	background-color: white;
 	border-top: var(--item-border);
 }
-#client .content .item > div:first-child {
+#client .content.list .item > div:first-child {
 	margin-right: 0.5rem;
 }
-#client .content .item.preview {
+#client .content.list .item.preview {
 	opacity: 0.55;
 	color: var(--primary-darkest-color);
 }
-#client .content .item.preview .icon {
+#client .content.list .item.preview .icon {
 	opacity: 0.7;
 }
-#client .content .item + .headline {
+#client .content.list .item + .headline {
 	border-top: 2px solid #aaa;
 }
-#client .content .item:last-of-type {
+#client .content.list .item:last-of-type {
 	border-bottom: 2px solid #aaa;
 }
 
-#client .content .item .for-mode {
+#client .content.list .item .for-mode {
 	color: #ddd;
-	/* cursor: pointer; */
 	align-self: center;
 }
-#client .content .item i.for-mode {
-	padding-left: 1em;
+#client .content.list .item i.for-mode {
+	padding-left: 1em; /* TODO: must be centered */
 	display: inline-block;
 	width: 1em;
 	text-align: center;

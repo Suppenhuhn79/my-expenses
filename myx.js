@@ -58,6 +58,7 @@ let myx = function ()
 	 */
 	let filesLoadTimestamps = new Map();
 
+	let home = myxHome();
 	let paymentMethods = myxPaymentMethods();
 	let categories = myxCategories();
 	let expenses = myxExpenses();
@@ -147,9 +148,12 @@ let myx = function ()
 		(tabName.endsWith("-tab")) ? bottomMenu.classList.remove("hidden") : bottomMenu.classList.add("hidden");
 		if (interactive)
 		{
-			activeTab?.leave?.();
+			activeTab?.leave?.(); // TODO: must be smarter
 			switch (tabName)
 			{
+				case home.moduleName:
+					activeTab = home;
+					break;
 				case paymentMethods.moduleName:
 					activeTab = paymentMethods;
 					break;
@@ -197,7 +201,7 @@ let myx = function ()
 	 */
 	function formatAmountLocale (num)
 	{
-		return ((num > 0) ? Math.max(Math.round(num), 1) : 0).toLocaleString() + fa.space + currencySymbol;
+		return ((num > 0) ? Math.max(Math.round(num), 1) : 0).toLocaleString() + "\u00a0" + currencySymbol;
 	}
 
 	/**
@@ -234,7 +238,8 @@ let myx = function ()
 					xhrSuccess();
 					if (currentChosenTab === "data-dummy")
 					{
-						choices.set("active-tab", expenses.moduleName);
+						// choices.set("active-tab", expenses.moduleName);
+						choices.set("active-tab", home.moduleName);
 					}
 					onTabChosen(choices.get("active-tab"), true);
 					if (!!currentContentElement)
@@ -286,6 +291,7 @@ let myx = function ()
 
 	return { // publish members
 		statistics: statistics, // debug_only
+		home: home,
 		expenses: expenses,
 		categories: categories,
 		paymentMethods: paymentMethods,
