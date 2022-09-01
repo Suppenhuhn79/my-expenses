@@ -15,9 +15,10 @@ const myxStatisticsTimerange = function ()
 {
 	/** @type {TimerangeMode} */
 	let mode = "month";
-	/** @type {Array<MonthString>}
-	 * @readonly
-	 * To set use `setSelectedMonths()`
+	/**
+	 * 
+	 * @readonly To set use `setSelectedMonths()`
+	 * @type {Array<MonthString>}
 	 */
 	let selectedMonths;
 
@@ -171,7 +172,7 @@ const myxStatistics = function ()
 	 * @type {CalculationMode}
 	 */
 	let calcMode;
-	/** @type {Object} */
+	/** @type {Record<MonthString, MonthAggregate>} */
 	let data;
 	/** @type {Array<MonthString>} */
 	let actualCalculatedMonths;
@@ -182,17 +183,17 @@ const myxStatistics = function ()
 			{
 				key: "pie",
 				label: "Distribution by category",
-				iconHtml: htmlBuilder.newElement("i.fas.icon", fa.chart_pie)
+				iconHtml: htmlBuilder.newElement("i.fas.icon", fa.icon("chart-pie"))
 			},
 			{
 				key: "areat",
 				label: "Course over time",
-				iconHtml: htmlBuilder.newElement("i.fas.icon", fa.chart_area)
+				iconHtml: htmlBuilder.newElement("i.fas.icon", fa.icon("chart-area"))
 			},
 			{
 				key: "none",
 				label: "None",
-				iconHtml: htmlBuilder.newElement("i.fas.icon", fa.ban)
+				iconHtml: htmlBuilder.newElement("i.fas.icon", fa.icon("ban"))
 			}
 		]
 	});
@@ -316,7 +317,7 @@ const myxStatistics = function ()
 			htmlBuilder.newElement("div",
 				{ style: "width:" + percentAsCssString + "height:100%;background-color:" + color + ";" }),
 			htmlBuilder.newElement("div.label",
-				{ style: "position:relative;" + labelPosition }, ratioAsPercentString + fa.space + "%")
+				{ style: "position:relative;" + labelPosition }, ratioAsPercentString + "\u00a0" + "%")
 		);
 	}
 
@@ -327,7 +328,7 @@ const myxStatistics = function ()
 		{
 			result = (new Date(actualCalculatedMonths[actualCalculatedMonths.length - 1])).format("mmmyy") + "-" + result;
 		}
-		// TODO
+		// TODO: filters
 		result += ", all categories, all payment methods";
 		return result;
 	}
@@ -390,7 +391,7 @@ const myxStatistics = function ()
 		else
 		{
 			htmlBuilder.replaceContent(elements.get("content"), htmlBuilder.newElement("div.fullscreen-msg",
-				htmlBuilder.newElement("div.icon.far", fa.smiley_meh),
+				htmlBuilder.newElement("div.icon.far", fa.icon("smiley-meh")),
 				htmlBuilder.newElement("div.label", "Nothing here.")
 			));
 		}
@@ -423,11 +424,27 @@ const myxStatistics = function ()
 	function onSubcategoryClick (mouseEvent)
 	{
 		mouseEvent.stopPropagation();
+		let catId = mouseEvent.target.closest("[data-cat]").dataset.cat;
+		let masterId = myx.categories.data[catId].masterCategory || catId;
+		for (let aggregate of data.totals)
+		{
+			if (aggregate.catId === masterId)
+			{
+				for (let sub of aggregate.subs)
+				{
+					if (sub.catId === catId)
+					{
+						// console.log(sub, timerange.selectedMonths);
+						console.log(sub.count / timerange.selectedMonths.length + " times per month, " + sub.sum / sub.count + "€ per time, " + sub.mavg + "€ per month");
+						break;
+					}
+				}
+			}
+		}
 		return;
-		// TODO!
-		let id = mouseEvent.target.closest("[data-cat]").dataset.cat;
+		// TODO: on subcategory click
 		myx.setExpenseFilter({
-			cat: id,
+			cat: catId,
 			months: settings.selectedTime.months
 		}, MODULE_NAME);
 	}

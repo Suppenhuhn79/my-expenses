@@ -71,46 +71,55 @@ function ModuleModeHandler (element, dataGetter, dataSetter)
  * fontAwesome glyph codes and processing function.
  */
 const fa = {
-	angle_left: "&#xf104;",
-	angle_right: "&#xf105;",
-	angle_up: "&#xf106;",
-	angle_double_up: "&#xf102;",
-	arrow_left: "&#xf060;",
-	asterisk: "&#xf069;",
-	backspace: "&#xf55a;",
-	backward: "&#xf04a;",
-	ban: "&#xf05e;",
-	bars: "&#xf0c9;",
-	boxes: "&#xf468;",
-	calendar: "&#xf133;",
-	calendar_alt: "&#xf073;",
-	calendar_day: "&#xf783;",
-	calculator: "&#xf1ec;",
-	chart_area: "&#xf1fe;",
-	chart_bar: "&#xf080;",
-	chart_line: "&#xf201;",
-	chart_pie: "&#xf200;",
-	check: "&#xf00c;",
-	clone: "&#xf24d;",
-	divide: "&#xf529;",
-	filter: "&#xf0b0;",
-	hourglass_half: "&#xf252;",
-	infinite: "&#xf534;",
-	list_ul: "&#xf0ca;",
-	micoscope: "&#xf610;",
-	pen: "&#xf304;",
-	plus: "&#xf067;",
-	plus_square: "&#xf0fe;",
-	redo: "&#xf01e;",
-	search: "&#xf002;",
-	smiley_meh: "&#xf11a;",
-	sort: "&#xf0dc;",
-	space: "&#x00a0;",
-	star: "&#xf005;",
-	times: "&#xf00d;",
-	trash_alt: "&#xf2ed;",
-	trash_restore_alt: "&#xf82a;",
-	wallet: "&#xf555;",
+	ICONS: {
+		angle_left: "f104",
+		angle_right: "f105",
+		angle_up: "f106",
+		angle_double_up: "f102",
+		arrow_left: "f060",
+		asterisk: "f069",
+		backspace: "f55a",
+		backward: "f04a",
+		ban: "f05e",
+		bars: "f0c9",
+		boxes: "f468",
+		calendar: "f133",
+		calendar_alt: "f073",
+		calendar_day: "f783",
+		calculator: "f1ec",
+		chart_area: "f1fe",
+		chart_bar: "f080",
+		chart_line: "f201",
+		chart_pie: "f200",
+		check: "f00c",
+		clone: "f24d",
+		divide: "f529",
+		filter: "f0b0",
+		forward: "f04e",
+		home: "f015",
+		hourglass_half: "f252",
+		infinite: "f534",
+		list_ul: "f0ca",
+		micoscope: "f610",
+		pen: "f304",
+		plus: "f067",
+		plus_square: "f0fe",
+		redo: "f01e",
+		search: "f002",
+		smiley_meh: "f11a",
+		sort: "f0dc",
+		space: "00a0",
+		star: "f005",
+		times: "f00d",
+		trash_alt: "f2ed",
+		trash_restore_alt: "f82a",
+		wallet: "f555"
+	},
+
+	/**
+	 * @deprecated
+	 */
+	space: "\u00a0",
 
 	/**
 	 * On the given element, all `<i data-icon="...">` children will receive the desired icon as its content.
@@ -120,8 +129,19 @@ const fa = {
 	{
 		for (let e of element.querySelectorAll("i[data-icon]"))
 		{
-			let iconKey = e.dataset.icon.replaceAll(/-/g, "_");
-			e.innerHTML = fa[iconKey] || "[" + iconKey + "]";
+			e.innerHTML = fa.icon(e.dataset.icon);
 		}
+	},
+
+	/**
+	 * Returns the HTML entity for a known FontAwesome icon.
+	 * @param {String} name Name of desired FontAwesome icon
+	 * @returns {String} HTML entity of the requested icon; or icon name if it is not known
+	 */
+	icon: function (name)
+	{
+		name = name.replaceAll(/-/g, "_");
+		let result = fa.ICONS[name];
+		return (!!result) ? "&#x" + result + ";" : "[" + name + "]";
 	}
 };

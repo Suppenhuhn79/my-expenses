@@ -183,7 +183,7 @@ let myxExpenses = function ()
 	 * @type {Boolean} */
 	let ignoreMouseup = false;
 
-	elements.get("back-search-button").onclick = () => { choices.set("active-tab", filter._origin); };
+	elements.get("back-search-button").onclick = function onSearchButtonClick () { choices.set("active-tab", filter._origin); };
 	elements.get("cancel-search-button").onclick = resetFilter;
 	elements.get("cancel-multiselect-button").onclick = exitMultiselectMode;
 	elements.get("add-expense-button").onclick = onAddExpenseClick;
@@ -637,7 +637,7 @@ let myxExpenses = function ()
 		else
 		{
 			elements.get("content").appendChild(htmlBuilder.newElement("div.fullscreen-msg",
-				htmlBuilder.newElement("div.icon.far", fa.smiley_meh),
+				htmlBuilder.newElement("div.icon.far", fa.icon("smiley-meh")),
 				htmlBuilder.newElement("div.label", "Nothing here.")
 			));
 		}
