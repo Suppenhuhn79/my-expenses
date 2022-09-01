@@ -38,28 +38,35 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 		onRedoClick: onRedoClick,
 		onTxtKeydown: onTxtKeydown
 	}).getNamedChildren();
+
 	/**
 	 * Name of the tab that called the editor.
 	 * @type {String} */
 	let originTabName;
+
 	/**
 	 * Expense with in the editor currently set values.
 	 * @type {Expense} */
 	let currentItem;
+
 	/**
 	 * Current index of the expense in the expenses `data`. Does indicates whether an existing expense (a non-negative integer)
 	 * or a new/cloned expense (`null`) is being edited.
 	 * @type {Number?} */
 	let currentDataIndex;
+
 	/**
 	 * Repeating interval for the currently edited expense.
 	 * @type {RepeatingInterval} */
 	let editedInterval;
+
 	/**
 	 * Function to call when edits are applied.
 	 * @type {ExpenseEditorCallback} */
 	let callbackFunc;
+
 	let tabMode = new ModuleModeHandler(elements.get());
+	let categorySelector = new CategorySelector(elements.get("category-selector"), onCategoryChosen);
 	let confirmDeletePrompt = new Menubox("delete-expense", {
 		title: "Confirm delete expense",
 		items: [],
@@ -199,7 +206,7 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 		renderAmountText();
 		elements.get("txt").value = currentItem.txt || "";
 		choices.set("active-tab", "expense-editor");
-		myx.categories.renderSelection(elements.get("category-selector"), currentItem.cat, onCategoryChosen);
+		categorySelector.refresh(currentItem.cat);
 		if ((!isExistingExpense()) && (repeatingExpenses.intervalOf(currentItem.rep).isValid()))
 		{
 			switchToRepeatMode();

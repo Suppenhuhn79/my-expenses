@@ -7,6 +7,10 @@
  * @property {String} color
  * @property {IdString} [masterCategory]
  * @property {Array<IdString>} [subCategories]
+ * 
+ * @callback CategorySelectorCallback
+ * @param {IdString} catId Id of the selected category
+ * 
  */
 
 const CategoriesTabMode = {
@@ -16,6 +20,125 @@ const CategoriesTabMode = {
 	SEARCH: "search",
 	SAVING: "__saving__"
 };
+
+/**
+ * Puts a category selection element on an existing document node.
+ * @constructor
+ * @param {HTMLElement} element Element to render the selection on
+ * @param {CategorySelectorCallback} callback Callback on category selection
+ * @param {Boolean} [mastersOnly] Set if selection is limited to maste categories only, or if sub-categories can be selected (default)
+ */
+function CategorySelector (element, callback, mastersOnly = false)
+{
+	/**
+	 * This instance, to have it in event handlers where `this` is `window`.
+	 * @type {CategorySelector}
+	 */
+	let _instance = this;
+
+	/**
+	 * Callback on category selection
+	 * @type {CategorySelectorCallback}
+	 */
+	this.callback = callback;
+
+	/**
+	 * Element to render the selection on
+	 * @type {HTMLElement}
+	 */
+	this.element = element;
+
+	/**
+	 * Limit selection to master categories only (`true`) or allow selection of sub-categiroes (`false`)
+	 * @type {Boolean}
+	 */
+	this.mastersOnly = mastersOnly;
+
+	/**
+	 * Selects (highlights) a category within the selection.
+	 * @param {IdString} id Category id to select
+	 */
+	this._highlightSelection = function (id)
+	{
+		for (let otherElement of this.element.querySelectorAll("[data-catid]"))
+		{
+			otherElement.style.backgroundColor = null;
+			otherElement.style.color = null;
+		};
+		let selectedElement = this.element.querySelector("[data-catid='" + id + "']");
+		selectedElement.style.backgroundColor = myx.categories.getColor(id);
+		selectedElement.style.color = "#fff";
+		selectedElement.scrollIntoView({ inline: "center" });
+	};
+
+	/**
+	 * Event handler for clicking a category item (or the "back" button).
+	 * 
+	 * Calls the `callback` function.
+	 * 
+	 * @param {Event} event Triggering event
+	 */
+	function _onItemClick (event)
+	{
+		/**
+		 * Id of the clicked items.
+		 * @type {String} */
+		let id = event.target.closest("[data-catid]").dataset.catid;
+		if (id === "__back__")
+		{
+			_instance.refresh(null);
+		}
+		else
+		{
+			if (_instance.mastersOnly !== true)
+			{
+				_instance.refresh(id);
+			}
+			else
+			{
+				_instance._highlightSelection(id);
+				_instance.callback(id);
+			}
+		}
+	}
+
+	/**
+	 * Renders the category items as _labled icons_ on the given document element.
+	 * @param {IdString} [selectedId] Id of the pre-selected category; no selection if omitted
+	 */
+	this.refresh = function (selectedId)
+	{
+		htmlBuilder.removeAllChildren(element);
+		let headCat = (selectedId) ? (myx.categories.data[selectedId].masterCategory || selectedId) : null;
+		let catSet = (selectedId) ? [headCat].concat(myx.categories.data[headCat].subCategories || []) : myx.categories.masterCategoryIds;
+		if (selectedId)
+		{
+			element.appendChild(htmlBuilder.newElement("div.item.labeled-icon.click",
+				htmlBuilder.newElement("div.cat.icon.back.fas",
+					{ 'data-catid': "__back__", onclick: _onItemClick },
+					fa.arrow_left)));
+		}
+		for (let key of catSet)
+		{
+			if ((selectedId) || (!myx.categories.data[key].masterCategory))
+			{
+				element.appendChild(htmlBuilder.newElement("div.item.labeled-icon.click",
+					{ 'data-catid': key, onclick: _onItemClick },
+					myx.categories.renderIcon(key),
+					htmlBuilder.newElement("div.label", myx.categories.data[key].label)));
+			}
+		}
+		if (selectedId)
+		{
+			this._highlightSelection(selectedId);
+		}
+		else
+		{
+			element.scrollTo({ left: 0 });
+		}
+	};
+};
+
 
 /**
  * @namespace myxCategories
@@ -182,85 +305,6 @@ let myxCategories = function ()
 	}
 
 	/**
-	 * Puts a category selection element on an existing document node.
-	 * @param {HTMLElement} toElement Element to render the selection on
-	 * @param {IdString} [currentCatId] Id of the currently selected category; `null` if none selected
-	 * @param {Function} callback `function(selectedCategoryId: CatId)` to call on category selection
-	 */
-	function renderSelection (toElement, currentCatId, callback)
-	{
-		/**
-		 * Selects (highlights) a category within the selection.
-		 * @param {IdString} id Category id to select
-		 */
-		function _highlightSelection (id)
-		{
-			let catColor = getColor(id);
-			for (let otherElement of toElement.querySelectorAll("[data-choice-value]"))
-			{
-				otherElement.style.backgroundColor = null;
-				otherElement.style.color = null;
-			};
-			let element = toElement.querySelector("[data-choice-value='" + id + "']");
-			element.style.backgroundColor = catColor;
-			element.style.color = "#fff";
-			element.scrollIntoView({ inline: "center" });
-		}
-		/**
-		 * Handles selecting a category (or the "back" button).
-		 * Calls the callback function.
-		 * @param {IdString} id Id of the selected category
-		 */
-		function _onChoice (id)
-		{
-			if (id === "__back__")
-			{
-				renderSelection(toElement, null, callback);
-				id = null;
-			}
-			else
-			{
-				if (!currentCatId)
-				{
-					renderSelection(toElement, id, callback);
-				}
-				_highlightSelection(id);
-			}
-			callback(id);
-		}
-		htmlBuilder.removeAllChildren(toElement);
-		toElement.dataset.choice = "category-selection";
-		let headCat = (currentCatId) ? (data[currentCatId].masterCategory || currentCatId) : null;
-		let catSet = (currentCatId) ? [headCat].concat(data[headCat].subCategories || []) : order;
-		if (currentCatId)
-		{
-			toElement.appendChild(htmlBuilder.newElement("div.item.labeled-icon.click",
-				htmlBuilder.newElement("div.cat.icon.back.fas",
-					{ 'data-choice-value': "__back__" },
-					fa.arrow_left)));
-		}
-		for (let key of catSet)
-		{
-			if ((currentCatId) || (!data[key].masterCategory))
-			{
-				toElement.appendChild(htmlBuilder.newElement("div.item.labeled-icon.click",
-					{ 'data-choice-value': key },
-					renderIcon(key),
-					htmlBuilder.newElement("div.label", data[key].label)));
-			}
-		}
-		if (currentCatId)
-		{
-			_highlightSelection(currentCatId);
-		}
-		else
-		{
-			toElement.scrollTo({ left: 0 });
-		}
-		choices.onChoose("category-selection", _onChoice);
-	}
-
-	/**
 	 * Opens the IconEditor for modifing a category or creating a new one.
 	 * Changes are not saved until `applyEdits()` is called!
 	 * @param {IdString} [id] Id of category to edit; if empty, a new category will be created
@@ -421,7 +465,6 @@ let myxCategories = function ()
 		getLabel: getLabel,
 		getColor: getColor,
 		getSubCategories: getSubCategories,
-		renderIcon: renderIcon,
-		renderSelection: renderSelection
+		renderIcon: renderIcon
 	};
 };
