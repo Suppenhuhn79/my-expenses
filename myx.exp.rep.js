@@ -260,7 +260,6 @@ function myxRepeatingExpenses ()
 				}
 				if (itemPreviewDate < now)
 				{
-					console.warn("ADD:", id, itemPreviewDate.toIsoDate(), myx.categories.getLabel(item.expense.cat), item.expense.amt);
 					item.expense.dat = itemPreviewDate;
 					triggeredExpenses.push(item.expense);
 					data.set(id, item);
@@ -272,9 +271,9 @@ function myxRepeatingExpenses ()
 				itemPreviewDate = item.nextDate(itemPreviewDate);
 			}
 		}
-		console.log("triggered expenses:", triggeredExpenses);
 		if (triggeredExpenses.length > 0)
 		{
+			console.debug("Automatically added expenses:", triggeredExpenses);
 			myx.expenses.add(triggeredExpenses);
 			myx.showNotification(triggeredExpenses.length + " expenses added automatically.");
 			saveToFile();

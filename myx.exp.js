@@ -91,6 +91,28 @@ function Expense (src, override)
 	};
 
 	/**
+	 * Returns a serializable object of this expense.
+	 * @returns {Object} Serializable object
+	 */
+	this.toJSON = function ()
+	{
+		let json = {
+			dat: this.dat.format("yyyy-mm-dd"),
+			amt: this.amt,
+			cat: this.cat,
+			pmt: this.pmt
+		};
+		for (let nullableProp of ["txt", "rep"])
+		{
+			if (!!this[nullableProp])
+			{
+				json[nullableProp] = this[nullableProp];
+			}
+		}
+		return json;
+	};
+
+	/**
 	 * Gives a csv line for the expense.
 	 * @returns {String}
 	 */
@@ -284,7 +306,7 @@ let myxExpenses = function ()
 			let csv = "";
 			for (let month of dataIndex.allMonthsInFile(fileIndex))
 			{
-				console.log("saving " + month + " to '" + fileIndex + "'");
+				console.debug("Saving " + month + " to '" + fileIndex + "'");
 				csv += getCsv(month);
 			}
 			ops.push(googleAppApi.saveToFile("data-" + fileIndex + ".csv", csv));
@@ -525,13 +547,13 @@ let myxExpenses = function ()
 		elements.get("content").scrollTop = 0;
 		for (let month of filter.months.sort().reverse())
 		{
+			data[PREVIEW] = (tabMode.is(ExpensesTabMode.DEFAULT)) ? repeatings.process(month) : [];
 			/** @type {Number} */
 			let currentDay = 0;
 			/** @type {HTMLElement} */
 			let headline;
 			/** @type {Array<Expense>} */
 			let actualExpenses = data[month] || [];
-			data[PREVIEW] = (tabMode.is(ExpensesTabMode.DEFAULT)) ? repeatings.process(month) : [];
 			/** @type {Array<Expense>} */
 			let items = actualExpenses.concat(data[PREVIEW]);
 			/** @type {Number} */
