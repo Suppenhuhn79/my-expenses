@@ -22,10 +22,7 @@ const myxExpensesDataindex = function ()
 	function register (month, fileNumber = null)
 	{
 		let arrayIndex = ((fileNumber > 0) ? fileNumber : getFileindexForMonth(month)) - 1;
-		if (data[arrayIndex] === undefined)
-		{
-			data[arrayIndex] = [];
-		}
+		data[arrayIndex] ||= [];
 		if (data[arrayIndex].includes(month) === false)
 		{
 			data[arrayIndex].push(month);
@@ -58,8 +55,11 @@ const myxExpensesDataindex = function ()
 
 	/**
 	 * Provides the index of the file that contains a certain month.
+	 * 
+	 * If the month does not exist in any file yet, it will be assigned automatically to eithter the lastest or a new file.
+	 * 
 	 * @param {MonthString} month Month to find it's containing file
-	 * @returns {Number} Number of the file that does contain the month; If the month does not exist in any file yet, it will be assigned automatically to eithter the lastest or a new file.
+	 * @returns {Number} Number of the file that does contain the month
 	 */
 	function getFileindexForMonth (month)
 	{
@@ -74,7 +74,12 @@ const myxExpensesDataindex = function ()
 		}
 		if (result === null)
 		{
-			result = (data[data.length - 1].length < MAX_MONTHS_PER_FILE) ? data.length : data.length + 1;
+			if (data[data.length - 1].length >= MAX_MONTHS_PER_FILE)
+			{
+				data.push([month]);
+			}
+			result = data.length;
+			console.debug("Registered new month", month, "in file #", result);
 		}
 		return result;
 	}
