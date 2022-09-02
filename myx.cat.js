@@ -97,8 +97,8 @@ function CategorySelector (element, callback, mastersOnly = false)
 			else
 			{
 				_instance._highlightSelection(id);
-				_instance.callback(id);
 			}
+			_instance.callback(id);
 		}
 	}
 
