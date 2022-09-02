@@ -888,7 +888,7 @@ let myxExpenses = function ()
 				window.setTimeout(() => // Prevents triggering the pointer-event at the expenses editor.
 				{
 					popupEditor(expense, Number(itemElement.dataset.index));
-				}, 1);
+				}, 100);
 		}
 	}
 
