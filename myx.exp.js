@@ -714,7 +714,6 @@ let myxExpenses = function ()
 				{
 					add(editedItem);
 					setMonth(editedItem.dat);
-					saveToFile(editedItem);
 				}
 				else if ((action === ExpenseEditorAction.MODIFY) && (originalItem.equals(editedItem) === false))
 				{
@@ -729,7 +728,6 @@ let myxExpenses = function ()
 						add(editedItem);
 						setMonth(editedItem.dat);
 					}
-					saveToFile([originalItem, editedItem]);
 				}
 				else if (action === ExpenseEditorAction.DELETE)
 				{
