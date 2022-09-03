@@ -63,11 +63,10 @@ let myx = function ()
 			icon: "tags"
 		}
 	];
-	let tabButtons = document.getElementById("bottom-menu").getNamedChildren();
 	/** @type {HTMLElement} */
 	let activeTab = null;
 	let currencySymbol = "€";
-	let bottomMenu = document.getElementById("bottom-menu");
+	let bottomButtonElements = document.getElementById("bottom-menu").getNamedChildren();
 	let xhrActivityIndicator = document.getElementById("xhr-indicator");
 
 	/**
@@ -102,9 +101,9 @@ let myx = function ()
 	 * Action for clicking the data-selection button in the bottom menu.
 	 * Switches to the recently selected data tab and also pops up a menu to select another data tab.
 	 */
-	tabButtons.get("data-selection-button").onclick = function onDataSelectionButtonClick (event)
+	bottomButtonElements.get("data-selection-button").onclick = function onDataSelectionButtonClick (event)
 	{
-		let dataChoiceButton = tabButtons.get("data-selection-button");
+		let dataChoiceButton = bottomButtonElements.get("data-selection-button");
 		choices.set("active-tab", dataChoiceButton.dataset.current + "-tab", event);
 		dataChoiceButton.classList.add("chosen");
 		dataSelectionMenu.popup(event, null, dataChoiceButton, "start left, above top");
@@ -202,7 +201,7 @@ let myx = function ()
 	function onTabChosen (tabName, interactive)
 	{
 		let tabs = [home, paymentMethods, categories, expenses, statistics];
-		(tabName.endsWith("-tab")) ? bottomMenu.classList.remove("hidden") : bottomMenu.classList.add("hidden");
+		(tabName.endsWith("-tab")) ? bottomButtonElements.get().classList.remove("hidden") : bottomButtonElements.get().classList.add("hidden");
 		if (interactive)
 		{
 			if ((!!activeTab) && (typeof activeTab.leave === "function"))
@@ -230,7 +229,7 @@ let myx = function ()
 	 */
 	function dataSelectionMenuItemCallback (menuItemData)
 	{
-		let dataChoiceButton = tabButtons.get("data-selection-button");
+		let dataChoiceButton = bottomButtonElements.get("data-selection-button");
 		for (let dataTab of DATA_TABS)
 		{
 			if (dataTab.key === menuItemData.itemKey)
