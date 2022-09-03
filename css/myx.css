@@ -167,6 +167,7 @@
 #home-tab .latest-expense {
 	border: var(--item-border);
 	border-radius: 0.5rem;
+	border-bottom-color: #ddd;
 	padding: 0.5rem;
 	margin-bottom: 1rem;
 	background: linear-gradient(170deg, white 50%, #f4f4f4);

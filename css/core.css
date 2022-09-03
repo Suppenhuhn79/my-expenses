@@ -194,6 +194,9 @@ body {
 .grey {
 	color: #888;
 }
+.light-grey {
+	color: #ccc;
+}
 .red {
 	color: #f00;
 }
