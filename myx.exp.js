@@ -188,6 +188,7 @@ let myxExpenses = function ()
 	elements.get("cancel-multiselect-button").onclick = exitMultiselectMode;
 	elements.get("add-expense-button").onclick = onAddExpenseClick;
 	elements.get("nav-current").onclick = onNavCurrentClick;
+	elements.get("edit-multiselect-button").onclick = function onEditMultiselectButtonClick () { myx.showNotification("Not implemented yet."); };
 
 	/**
 	 * Initializes the module.
