@@ -357,8 +357,15 @@ let myxCategories = function ()
 				data[id].masterCategory = masterId;
 				delete data[id].color;
 			}
+			else
+			{
+				data[id].color = editedObj.color;
+			}
 			renderList();
-			elements.get("content").querySelector("[data-key='" + id + "']").scrollIntoView();
+			if (creatingNewItem)
+			{
+				elements.get("content").querySelector("[data-key='" + id + "']").scrollIntoView();
+			}
 		});
 	}
 
