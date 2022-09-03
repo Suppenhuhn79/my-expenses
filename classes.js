@@ -110,6 +110,8 @@ const fa = {
 		sort: "f0dc",
 		space: "00a0",
 		star: "f005",
+		tag: "f02b",
+		tags: "f02c",
 		times: "f00d",
 		trash_alt: "f2ed",
 		trash_restore_alt: "f82a",

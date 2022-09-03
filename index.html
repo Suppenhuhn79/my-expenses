@@ -210,17 +210,21 @@
 		</div>
 		<!-- bottom menu -->
 		<div id="bottom-menu" data-choice="active-tab" class="buttons hidden">
-			<!--
 			<div name="home-tab" data-choice-value="home-tab" class="labeled-icon">
 				<i class="fas" data-icon="home">?</i>
 				<span class="cutoff">home</span>
 			</div>
-		-->
-			<div name="payment-methods-tab" data-choice-value="payment-methods-tab" class="labeled-icon">
-				<i class="fas" data-icon="wallet">?</i>
-				<span class="cutoff">payment methods</span>
-			</div>
-			<div name="categories-tab" data-choice-value="categories-tab" class="labeled-icon">
+			<!--
+				<div name="payment-methods-tab" data-choice-value="payment-methods-tab" class="labeled-icon">
+					<i class="fas" data-icon="wallet">?</i>
+					<span class="cutoff">payment methods</span>
+				</div>
+				<div name="categories-tab" data-choice-value="categories-tab" class="labeled-icon">
+					<i class="fas" data-icon="boxes">?</i>
+					<span class="cutoff">categories</span>
+				</div>
+			-->
+			<div name="data-selection-button" class="labeled-icon" data-current="categories">
 				<i class="fas" data-icon="boxes">?</i>
 				<span class="cutoff">categories</span>
 			</div>
@@ -234,7 +238,10 @@
 			</div>
 			<div data-choice-value="not-signed-in" style="display: none"></div>
 			<div data-choice-value="data-dummy" style="display: none"></div>
-			<div data-choice-value="home-tab" style="display: none"></div>
+			<!-- <div data-choice-value="home-tab" style="display: none"></div> -->
+			<div data-choice-value="payment-methods-tab" style="display: none"></div>
+			<div data-choice-value="categories-tab" style="display: none"></div>
+			<div data-choice-value="labels-tab" style="display: none"></div>
 			<div data-choice-value="expense-editor" style="display: none"></div>
 			<div data-choice-value="icon-editor" style="display: none"></div>
 		</div>

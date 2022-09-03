@@ -46,6 +46,24 @@ function FAGlyph (glyphCode)
 let myx = function ()
 {
 	const AUTOSIGNIN_FLAG = "myx_autosignin";
+	const DATA_TABS = [
+		{
+			key: "categories",
+			label: "Categories",
+			icon: "boxes"
+		},
+		{
+			key: "payment-methods",
+			label: "Payment methods",
+			icon: "wallet"
+		},
+		{
+			key: "labels",
+			label: "Labels",
+			icon: "tags"
+		}
+	];
+	let tabButtons = document.getElementById("bottom-menu").getNamedChildren();
 	/** @type {HTMLElement} */
 	let activeTab = null;
 	let currencySymbol = "€";
@@ -63,6 +81,34 @@ let myx = function ()
 	let categories = myxCategories();
 	let expenses = myxExpenses();
 	let statistics = myxStatistics();
+
+	let dataSelectionMenu = new Menubox("data-selection", {
+		items: (function _buildDataMenuboxItems ()
+		{
+			let _items = [];
+			for (let dataTab of DATA_TABS)
+			{
+				_items.push({
+					key: dataTab.key,
+					label: dataTab.label,
+					iconHtml: htmlBuilder.newElement("i.fas.icon", fa.icon(dataTab.icon))
+				});
+			}
+			return _items;
+		})()
+	}, dataSelectionMenuItemCallback);
+
+	/**
+	 * Action for clicking the data-selection button in the bottom menu.
+	 * Switches to the recently selected data tab and also pops up a menu to select another data tab.
+	 */
+	tabButtons.get("data-selection-button").onclick = function onDataSelectionButtonClick (event)
+	{
+		let dataChoiceButton = tabButtons.get("data-selection-button");
+		choices.set("active-tab", dataChoiceButton.dataset.current + "-tab", event);
+		dataChoiceButton.classList.add("chosen");
+		dataSelectionMenu.popup(event, null, dataChoiceButton, "start left, above top");
+	};
 
 	function init ()
 	{
@@ -174,6 +220,30 @@ let myx = function ()
 			}
 		}
 	}
+
+	/**
+	 * Callback for selecting an item of the data tab selection menubox.
+	 * 
+	 * Switches to the selected tab.
+	 * 
+	 * @param {Object} menuItemData Data provided by the menubox
+	 */
+	function dataSelectionMenuItemCallback (menuItemData)
+	{
+		let dataChoiceButton = tabButtons.get("data-selection-button");
+		for (let dataTab of DATA_TABS)
+		{
+			if (dataTab.key === menuItemData.itemKey)
+			{
+				choices.set("active-tab", dataTab.key + "-tab", menuItemData.originalEvent);
+				dataChoiceButton.classList.add("chosen");
+				dataChoiceButton.dataset.current = dataTab.key;
+				dataChoiceButton.getElementsByTagName("i")[0].innerHTML = fa.icon(dataTab.icon);
+				dataChoiceButton.getElementsByTagName("span")[0].innerHTML = dataTab.label;
+				break;
+			}
+		}
+	};
 
 	/**
 	 * Provides attributes of an icon code.

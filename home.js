@@ -5,11 +5,6 @@ const myxHome = function ()
 	let elements = document.getElementById("home-tab").getNamedChildren();
 	let categorySelector = new CategorySelector(elements.get("category-selector"), onCategoryChosen, true);
 
-	document.getElementById("header").onclick = function onHeaderClick ()
-	{
-		choices.set("active-tab", MODULE_NAME, new Event("dummy, required for interactivity"));
-	};
-
 	/**
 	 * Action for clicking the this months total filter icon.
 	 * Switches to statistics tab.
