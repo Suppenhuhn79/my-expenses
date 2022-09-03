@@ -10,11 +10,37 @@ const myxHome = function ()
 		choices.set("active-tab", MODULE_NAME, new Event("dummy, required for interactivity"));
 	};
 
-	elements.get("goto-expenses-button").onclick = function onGotoExpensesButtonClick ()
+	/**
+	 * Action for clicking the this months total filter icon.
+	 * Switches to statistics tab.
+	 */
+	elements.get("filter-sum-button").onclick = function onFilterSumButtonClick ()
+	{
+		myx.showNotification("Not implemented yet.");
+	};
+
+	/**
+	 * Action for clicking the this months total number.
+	 * Switches to statistics tab.
+	 */
+	elements.get("this-month-total").onclick = function onThisMonthTotalClick ()
+	{
+		choices.set("active-tab", myx.statistics.moduleName, new Event("dummy, required for interactivity"));
+	};
+
+	/**
+	 * Action for clicking the "forward to expenses" icon.
+	 * Switches to expenses tab.
+	 */
+	elements.get("goto-expenses-button").onclick = elements.get("latest-expense-wrapper").onclick = function onGotoExpensesButtonClick ()
 	{
 		choices.set("active-tab", myx.expenses.moduleName, new Event("dummy, required for interactivity"));
 	};
 
+	/**
+	 * Action for clicking the "edit categories" icon.
+	 * Switches to categories tab.
+	 */
 	elements.get("goto-categories-button").onclick = function onGotoCategoriesButtonClick ()
 	{
 		choices.set("active-tab", myx.categories.moduleName, new Event("dummy, required for interactivity"));
@@ -48,12 +74,17 @@ const myxHome = function ()
 			padding: "0",
 			backgroundColor: "transparent"
 		});
+		console.log(lastExpenseElement.onclick);
+		lastExpenseElement.assginProperties({
+			onpointerdown: null,
+			onpointerup: null
+		});
 		let lastExpenseDaysAgo = Date.daysBetween(lastExpense.dat, new Date());
-		elements.get("last-expense-date").innerText = Date.locales.relativeDayNames[lastExpenseDaysAgo] || lastExpense.dat.format("dddd, d. mmmm");
-		htmlBuilder.replaceContent(elements.get("last-expense-item"), lastExpenseElement);
+		elements.get("latest-expense-date").innerText = Date.locales.relativeDayNames[lastExpenseDaysAgo] || lastExpense.dat.format("dddd, d. mmmm");
+		htmlBuilder.replaceContent(elements.get("latest-expense-item"), lastExpenseElement);
 		categorySelector.refresh();
 		elements.get("content").scrollTo({ top: 0 });
-	}
+	};
 
 	/**
 	 * Event handler for selecting a category.

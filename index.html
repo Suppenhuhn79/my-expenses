@@ -73,28 +73,27 @@
 				<div name="content" class="content">
 					<div class="headline cutoff" name="headline"></div>
 					<div class="white">
-						<div class="grey">Expenses this month so far:</div>
-						<div name="this-month-total" style="margin: 1rem; font-size: 3.5rem; padding-left: 0.35em; text-align: center; text-shadow: 0.05em 0.05em 0.3em #00000052"><i class="fas" data-icon="hourglass_half"></i></div>
+						<div class="wide-flex grey">
+							<div class="flex-fill">Expenses this month so far:</div>
+							<i class="fas click hover" data-icon="filter" name="filter-sum-button"></i>
+						</div>
+						<div name="this-month-total" class="click" style="margin: 1rem; font-size: 3.5rem; padding-left: 0.35em; text-align: center; text-shadow: 0.05em 0.05em 0.3em #00000052"><i class="fas" data-icon="hourglass_half"></i></div>
 					</div>
 					<div class="white">
 						<div class="wide-flex grey" style="margin-bottom: 0.5em">
 							<div class="flex-fill">Latest expense:</div>
-							<div class="click hover" style="text-align: right" name="goto-expenses-button">
-								<i class="fas" data-icon="forward"></i>
-							</div>
+							<i class="fas click hover" data-icon="forward" name="goto-expenses-button"></i>
 						</div>
-						<div class="latest-expense">
-							<div name="last-expense-date" style="margin-bottom: 0.5em"></div>
-							<div name="last-expense-item" class="content list" style="padding: 0"></div>
+						<div class="latest-expense click" name="latest-expense-wrapper">
+							<div name="latest-expense-date" style="margin-bottom: 0.5em"></div>
+							<div name="latest-expense-item" class="content list" style="padding: 0; overflow: hidden"></div>
 						</div>
 						<!-- </div> -->
 						<!-- <div class="white"> -->
 						<div>
 							<div class="wide-flex grey">
 								<div class="flex-fill">Add expense:</div>
-								<div class="click hover" style="text-align: right" name="goto-categories-button">
-									<i class="fas" data-icon="pen"></i>
-								</div>
+								<i class="fas click hover" data-icon="pen" name="goto-categories-button"></i>
 							</div>
 							<div name="category-selector" class="labled-icons-grid flex-fill" style="padding: 0.5rem 0"></div>
 						</div>
