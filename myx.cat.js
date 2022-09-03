@@ -57,8 +57,9 @@ function CategorySelector (element, callback, mastersOnly = false)
 	/**
 	 * Selects (highlights) a category within the selection.
 	 * @param {IdString} id Category id to select
+	 * @param {Boolean} [scrollIntoView] Wheter to scroll the selected item into view (`true`) or not (`false`, default)
 	 */
-	this._highlightSelection = function (id)
+	this._highlightSelection = function (id, scrollIntoView)
 	{
 		for (let otherElement of this.element.querySelectorAll("[data-catid]"))
 		{
@@ -68,7 +69,10 @@ function CategorySelector (element, callback, mastersOnly = false)
 		let selectedElement = this.element.querySelector("[data-catid='" + id + "']");
 		selectedElement.style.backgroundColor = myx.categories.getColor(id);
 		selectedElement.style.color = "#fff";
-		selectedElement.scrollIntoView({ inline: "center" });
+		if (scrollIntoView)
+		{
+			selectedElement.scrollIntoView({ inline: "center" });
+		}
 	};
 
 	/**
@@ -90,7 +94,7 @@ function CategorySelector (element, callback, mastersOnly = false)
 		}
 		else
 		{
-			if (_instance.mastersOnly !== true)
+			if ((_instance.mastersOnly !== true) && (myx.categories.masterCategoryIds.includes(id)))
 			{
 				_instance.refresh(id);
 			}
@@ -130,7 +134,7 @@ function CategorySelector (element, callback, mastersOnly = false)
 		}
 		if (selectedId)
 		{
-			this._highlightSelection(selectedId);
+			this._highlightSelection(selectedId, true);
 		}
 		else
 		{
