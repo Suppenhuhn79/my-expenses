@@ -155,7 +155,6 @@ let myx = function ()
 	 */
 	function onTabChosen (tabName, interactive)
 	{
-		console.trace(tabName, interactive);
 		let tabs = [home, paymentMethods, categories, expenses, statistics];
 		(tabName.endsWith("-tab")) ? bottomMenu.classList.remove("hidden") : bottomMenu.classList.add("hidden");
 		if (interactive)
@@ -316,5 +315,6 @@ let myx = function ()
 
 Date.locales = {
 	monthNames: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-	weekdayNames: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+	weekdayNames: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+	relativeDayNames: ["Today", "Yesterday"]
 };

@@ -893,12 +893,12 @@ let myxExpenses = function ()
 	}
 
 	return { // publish members
-		get data () { return data; }, // debug_only
 		get index () { return dataIndex; }, // debug_only
 		scrollTo: scrollTo, // debug_only
 		getCsv: getCsv, // debug_only
 		save: saveToFile, // debug_only
 		get moduleName () { return MODULE_NAME; },
+		get data () { return data; },
 		init: init,
 		fetchData: fetchData,
 		enter: resetFilter,

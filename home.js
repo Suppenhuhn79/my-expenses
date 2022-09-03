@@ -33,7 +33,7 @@ const myxHome = function ()
 	 */
 	function enter ()
 	{
-		elements.get("headline").innerHTML = "Today is " + (new Date()).format("dddd, d. mmmm yyyy");
+		elements.get("headline").innerHTML = (new Date()).format("dddd, d. mmmm yyyy");
 		myx.statistics.aggregator.calc([(new Date()).toMonthString()]).then((aggs) =>
 		{
 			elements.get("this-month-total").innerText = myx.formatAmountLocale(aggs.sum);
@@ -48,7 +48,8 @@ const myxHome = function ()
 			padding: "0",
 			backgroundColor: "transparent"
 		});
-		elements.get("last-expense-date").innerText = lastExpense.dat.format("dddd, d. mmmm");
+		let lastExpenseDaysAgo = Date.daysBetween(lastExpense.dat, new Date());
+		elements.get("last-expense-date").innerText = Date.locales.relativeDayNames[lastExpenseDaysAgo] || lastExpense.dat.format("dddd, d. mmmm");
 		htmlBuilder.replaceContent(elements.get("last-expense-item"), lastExpenseElement);
 		categorySelector.refresh();
 		elements.get("content").scrollTo({ top: 0 });
