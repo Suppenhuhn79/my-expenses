@@ -33,7 +33,7 @@ const myxHome = function ()
 	 */
 	function enter ()
 	{
-		elements.get("today-date").innerHTML = (new Date()).format("dddd, d. mmmm yyyy");
+		elements.get("headline").innerHTML = "Today is " + (new Date()).format("dddd, d. mmmm yyyy");
 		myx.statistics.aggregator.calc([(new Date()).toMonthString()]).then((aggs) =>
 		{
 			elements.get("this-month-total").innerText = myx.formatAmountLocale(aggs.sum);
