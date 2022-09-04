@@ -14,10 +14,11 @@ interface Array<T> {
 interface Date {
 	/**
 	 * Returs the count of days between two dates.
-	 * @param d1 First date (earlier)
-	 * @param d2 Seccond date (later)
+	 * @param start Start date (earlier) of time period
+	 * @param end End date (later) of time period
 	 */
-	static daysBetween(d1: Date, d2: Date): Number;
+	static daysBetween(start: Date, end: Date): Number;
+
 	/**
 	 * Returns a new date with a count of days added to the current date.
 	 * @param count Count of days to add

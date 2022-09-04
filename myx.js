@@ -48,17 +48,17 @@ let myx = function ()
 	const AUTOSIGNIN_FLAG = "myx_autosignin";
 	const DATA_TABS = [
 		{
-			key: "categories",
+			tab: "categories-tab",
 			label: "Categories",
 			icon: "boxes"
 		},
 		{
-			key: "payment-methods",
+			tab: "payment-methods-tab",
 			label: "Payment methods",
 			icon: "wallet"
 		},
 		{
-			key: "labels",
+			tab: "labels-tab",
 			label: "Labels",
 			icon: "tags"
 		}
@@ -88,7 +88,7 @@ let myx = function ()
 			for (let dataTab of DATA_TABS)
 			{
 				_items.push({
-					key: dataTab.key,
+					key: dataTab.tab,
 					label: dataTab.label,
 					iconHtml: htmlBuilder.newElement("i.fas.icon", fa.icon(dataTab.icon))
 				});
@@ -104,17 +104,18 @@ let myx = function ()
 	bottomButtonElements.get("data-selection-button").onclick = function onDataSelectionButtonClick (event)
 	{
 		let dataChoiceButton = bottomButtonElements.get("data-selection-button");
-		choices.set("active-tab", dataChoiceButton.dataset.current + "-tab", event);
+		choices.set("active-tab", dataChoiceButton.dataset.current, event);
 		dataChoiceButton.classList.add("chosen");
 		dataSelectionMenu.popup(event, null, dataChoiceButton, "start left, above top");
 	};
+	bottomButtonElements.get("data-selection-button").dataset.current = DATA_TABS[0].tab;
 
 	function init ()
 	{
 		fa.applyOn(document.body);
 		choices.set("active-tab", "data-dummy");
 		choices.onChoose("active-tab", onTabChosen);
-		window.addEventListener("focus", onWindowFocus, false);
+		// window.addEventListener("focus", onWindowFocus, false);
 		return new Promise((resolve) =>
 		{
 			Promise.allSettled([
@@ -202,6 +203,21 @@ let myx = function ()
 	{
 		let tabs = [home, paymentMethods, categories, expenses, statistics];
 		(tabName.endsWith("-tab")) ? bottomButtonElements.get().classList.remove("hidden") : bottomButtonElements.get().classList.add("hidden");
+		// Let's see, if the chosen tab is one of the dynamic data tabs
+		for (let dataTab of DATA_TABS)
+		{
+			tabs.push(dataTab.tab);
+			if (dataTab.tab === tabName)
+			{
+				let dataChoiceButton = bottomButtonElements.get("data-selection-button");
+				dataChoiceButton.classList.add("chosen");
+				dataChoiceButton.dataset.current = dataTab.tab;
+				dataChoiceButton.getElementsByTagName("i")[0].innerHTML = fa.icon(dataTab.icon);
+				dataChoiceButton.getElementsByTagName("span")[0].innerHTML = dataTab.label;
+				break;
+			}
+		}
+		// continue
 		if (interactive)
 		{
 			if ((!!activeTab) && (typeof activeTab.leave === "function"))
@@ -229,19 +245,7 @@ let myx = function ()
 	 */
 	function dataSelectionMenuItemCallback (menuItemData)
 	{
-		let dataChoiceButton = bottomButtonElements.get("data-selection-button");
-		for (let dataTab of DATA_TABS)
-		{
-			if (dataTab.key === menuItemData.itemKey)
-			{
-				choices.set("active-tab", dataTab.key + "-tab", menuItemData.originalEvent);
-				dataChoiceButton.classList.add("chosen");
-				dataChoiceButton.dataset.current = dataTab.key;
-				dataChoiceButton.getElementsByTagName("i")[0].innerHTML = fa.icon(dataTab.icon);
-				dataChoiceButton.getElementsByTagName("span")[0].innerHTML = dataTab.label;
-				break;
-			}
-		}
+		choices.set("active-tab", menuItemData.itemKey, menuItemData.originalEvent);
 	};
 
 	/**
@@ -385,5 +389,5 @@ let myx = function ()
 Date.locales = {
 	monthNames: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
 	weekdayNames: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-	relativeDayNames: ["Today", "Yesterday"]
+	relativeDayNames: ["Today", "Yesterday", "Two days ago"]
 };

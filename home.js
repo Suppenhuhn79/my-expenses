@@ -69,7 +69,6 @@ const myxHome = function ()
 			padding: "0",
 			backgroundColor: "transparent"
 		});
-		console.log(lastExpenseElement.onclick);
 		lastExpenseElement.assginProperties({
 			onpointerdown: null,
 			onpointerup: null
