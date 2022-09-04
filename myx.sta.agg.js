@@ -6,8 +6,8 @@
  * @property {Number} count Sount of expenses
  *
  * @typedef MonthAggregate
- * Object having a key for each master category with aggregates of all subcategories within.
- * @type {Object<IdString, AggregateAtom>}
+ * Record having a key for each master category with aggregates of all subcategories within.
+ * @type {Record<IdString, AggregateAtom>}
  */
 
 /**
@@ -44,14 +44,14 @@ class AggregateAtom
 
 	/**
 	 * Adds properties to the aggregate atom object.
-	 * @param {Map<String, any>} map Map of properties to attach to the aggregate atom
+	 * @param {Record<String, any>} properties Object with properties to attach to the aggregate atom
 	 * @returns {AggregateAtom} Current aggregate extendet with the objects properties
 	 */
-	extend (map)
+	extend (properties)
 	{
-		for (let mem in map)
+		for (let mem in properties)
 		{
-			this[mem] = map[mem];
+			this[mem] = properties[mem];
 		}
 		return this;
 	}
@@ -103,7 +103,7 @@ const myxStatisticAggregator = function ()
 	 * @type {Number}
 	 */
 	let _monthCount;
-	/** @type {Object<MonthString, MonthAggregate>} */
+	/** @type {Record<MonthString, MonthAggregate>} */
 	let _aggregates = {};
 
 	/**
