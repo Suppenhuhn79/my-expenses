@@ -477,15 +477,13 @@
 	font-size: 0.9rem;
 	text-align: center;
 	bottom: 2rem;
-	left: 50%;
 	max-width: 75vw;
-	transform: translateX(-50%);
-	background-color: #000;
+	transform: translateX(calc((100vw - 100%) / 2));
+	background-color: #000000a0;
 	color: #fff;
 	border-radius: 1.5em;
 	padding: 1em 2em;
 	z-index: 9999;
-	opacity: 0.75;
 	animation: notification 3s linear;
 }
 @keyframes notification {
@@ -493,10 +491,10 @@
 		opacity: 0.25;
 	}
 	10% {
-		opacity: 0.75;
+		opacity: 1;
 	}
 	70% {
-		opacity: 0.75;
+		opacity: 1;
 	}
 	100% {
 		opacity: 0;
