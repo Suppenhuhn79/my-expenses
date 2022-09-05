@@ -1,18 +1,4 @@
 /**
- * @typedef RepeatingInterval
- * @type {Object}
- * @property {Number} [months]
- * @property {Number} [dayOfMonth]
- * @property {Number} [weeks]
- *
- * @typedef RepeatingExpense
- * @type {Object}
- * @property {IdString} id
- * @property {Expense} expense
- * @property {RepeatingInterval} interval
- */
-
-/**
  * A repeating interval; may be either a count of `weeks` or a count of `months`.
  * @constructor
  * @param {RepeatingInterval} [src] Repeating interval to copy. If ommitted, the interval is set to "every month"
@@ -141,8 +127,8 @@ function RepeatingExpense (id, expense, interval)
 };
 
 /**
- * @namespace myxRepeatingExpenses
  * my-expenses repeating expenses functionality for the "expenses" module.
+ * @namespace
  */
 function myxRepeatingExpenses ()
 {
@@ -196,11 +182,6 @@ function myxRepeatingExpenses ()
 	 */
 	function modify (id, expense, interval, autosave = true)
 	{
-		// console.log("repExps BEFORE modification:", order, Object.assign({}, data));
-		// console.group("setting repeating expense");
-		// console.log("id:", id);
-		// console.log("expense:", expense);
-		// console.log("interval:", interval);
 		if (interval?.isValid())
 		{
 			id ||= myx.newId();
@@ -208,7 +189,6 @@ function myxRepeatingExpenses ()
 			{
 				order.push(id);
 			}
-			// TODO: How to modify interval.originalDay? Not here, I guess, but in promptEditor??
 			data.set(id, new RepeatingExpense(id, expense, interval));
 			console.log("data[id]:", data.get(id));
 		}
@@ -224,8 +204,6 @@ function myxRepeatingExpenses ()
 		{
 			saveToFile();
 		}
-		// console.groupEnd();
-		// console.log("repExps AFTER modification:", order, data);
 		return id;
 	}
 
@@ -282,13 +260,12 @@ function myxRepeatingExpenses ()
 	}
 
 	/**
-	 * // TODO: repeating interval editor
+	 * // TODO: implement repeating interval editor
 	 * @param {Expense} expense Origin expense to set as repeating expense
 	 * @param {IdString} [id] Id of already exisintg repeating expense
 	 */
 	function promptEditor (expense, id)
 	{
-		// TODO: implement an editor
 		console.warn("NOT IMPLEMENTED YET: promptEditor()");
 		/*
 		id ||= myx.newId();

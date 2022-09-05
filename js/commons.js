@@ -1,22 +1,33 @@
 /**
- * Creates a new instance of ModuleModeHandler.
+ * Mode handler for my-expenses tabs.
+ * 
+ * Preserves data on edits. Updates the UI on switching mode.
+ * 
  * @constructor
- * @param {HTMLElement} element Element that contains module items
- * @param {Function} dataGetter `function(): Object` to get the current module data before switching to "edit" mode
+ * @param {HTMLElement} element Element that contains tab items
+ * @param {Function} dataGetter `function(): Object` to get the current tab data before switching to "edit" mode
  * @param {Function} dataSetter `function(data: Object)` to call to reset modified data when cancelling "edit" mode
  */
-function ModuleModeHandler (element, dataGetter, dataSetter)
+function TabModeHandler (element, dataGetter, dataSetter)
 {
+	/**
+	 * Serialized tab data before entering "edit" mode.
+	 * @type {String}
+	 */
 	let dataBeforeEdit;
+
+	/**
+	 * Current mode.
+	 */
 	let currentMode = "default";
 
 	/**
-	 * Sets the current mode for the module. Hides all elements that have the class "for-mode"
+	 * Sets the current mode for the tab. Hides all elements that have the class "for-mode"
 	 * but not "\<mode\>-mode".
 	 * 
-	 * If switching from "default" to "edit" mode, a backup of the module data is taken via the `dataGetter()`.
+	 * If switching from "default" to "edit" mode, a backup of the tab data is taken via the `dataGetter()`.
 	 * 
-	 * If Switching from "edit" to "default" mode (which means the edit mode was cancelled), the module data
+	 * If Switching from "edit" to "default" mode (which means the edit mode was cancelled), the tab data
 	 * is restored to backup via `dataSetter()`.
 	 * 
 	 * @param {String} newMode New mode to set
@@ -64,6 +75,30 @@ function ModuleModeHandler (element, dataGetter, dataSetter)
 	this.get = function ()
 	{
 		return currentMode;
+	};
+}
+
+/**
+ * FontAwesome glyph.
+ * @constructor
+ * @param {String} glyphCode Code of the glyph to be created as combination of a CSS style and unicode codepoint, e.g. `"fas:f100"`
+ * @returns {FAGlyph} New FontAwesome glyph
+ */
+function FAGlyph (glyphCode)
+{
+	this.value = glyphCode;
+	this.scope = glyphCode.substring(0, 3);
+	this.unicodeCodepoint = glyphCode.substring(4);
+	this.htmlEntity = "&#x" + glyphCode.substring(4) + ";";
+
+	this.valueOf = function ()
+	{
+		return this.value;
+	};
+
+	this.render = function ()
+	{
+		return htmlBuilder.newElement("i." + this.scope, this.htmlEntity);
 	};
 }
 

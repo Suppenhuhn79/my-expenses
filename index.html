@@ -17,15 +17,12 @@
 		<script src="https://suppenhuhn79.github.io/on-screen-console/onscreenconsole.js"></script>
 		<script src="https://suppenhuhn79.github.io/pagesnippets/pagesnippets.js"></script>
 
-		<script src="lib/prototypes.js"></script>
-		<script src="lib/vikb.js"></script>
-		<script src="lib/vanilla-tools/htmlbuilder.js"></script>
-		<script src="lib/vanilla-tools/menubox.js"></script>
+		<script src="js/vanilla-tools/htmlbuilder.js"></script>
+		<script src="js/vanilla-tools/menubox.js"></script>
 
-		<script src="lib/choices.js"></script>
-		<script src="lib/googleappapi.js"></script>
-
-		<script src="classes.js"></script>
+		<script src="js/lib/prototypes.js"></script>
+		<script src="js/lib/tools.js"></script>
+		<script src="js/lib/googleappapi.js"></script>
 	</head>
 	<body>
 		<div id="header">
@@ -142,10 +139,10 @@
 			<div id="categories-tab" data-choice-client="categories-tab">
 				<div class="client-header">
 					<span class="flex-fill">categories</span>
-					<i name="edit-button" class="click for-mode default-mode fas" data-icon="pen">?</i>
 					<i name="search-button" class="click for-mode default-mode fas" data-icon="search">?</i>
-					<i name="cancel-search-button" class="click for-mode search-mode fas" data-icon="times">?</i>
+					<i name="edit-button" class="click for-mode default-mode fas" data-icon="pen">?</i>
 					<i name="add-button" class="click for-mode default-mode fas" data-icon="plus-square">?</i>
+					<i name="cancel-search-button" class="click for-mode search-mode fas" data-icon="times">?</i>
 					<i name="apply-edits-button" class="click for-mode edit-mode fas" data-icon="check">?</i>
 					<i name="cancel-edits-button" class="click for-mode edit-mode fas" data-icon="times">?</i>
 				</div>
@@ -160,10 +157,10 @@
 			<div id="payment-methods-tab" data-choice-client="payment-methods-tab">
 				<div class="client-header">
 					<span class="flex-fill">payment methods</span>
-					<i name="edit-button" class="click for-mode default-mode fas" data-icon="pen">?</i>
 					<i name="search-button" class="click for-mode default-mode fas" data-icon="search">?</i>
-					<i name="cancel-search-button" class="click for-mode search-mode fas" data-icon="times">?</i>
+					<i name="edit-button" class="click for-mode default-mode fas" data-icon="pen">?</i>
 					<i name="add-button" class="click for-mode default-mode fas" data-icon="plus-square">?</i>
+					<i name="cancel-search-button" class="click for-mode search-mode fas" data-icon="times">?</i>
 					<i name="apply-edits-button" class="click for-mode edit-mode fas" data-icon="check">?</i>
 					<i name="cancel-edits-button" class="click for-mode edit-mode fas" data-icon="times">?</i>
 				</div>
@@ -248,15 +245,16 @@
 
 		<div id="xhr-indicator">&#x00a0;</div>
 
-		<script src="home.js"></script>
-		<script src="myx.pmt.js"></script>
-		<script src="myx.cat.js"></script>
-		<script src="myx.sta.js"></script>
-		<script src="myx.sta.agg.js"></script>
-		<script src="myx.exp.js"></script>
-		<script src="myx.exp.dix.js"></script>
-		<script src="myx.exp.rep.js"></script>
-		<script src="myx.js"></script>
-		<script src="debug.js" defer="defer" async="async"></script>
+		<script src="js/commons.js"></script>
+		<script src="js/home.js"></script>
+		<script src="js/paymentmethods.js"></script>
+		<script src="js/categories.js"></script>
+		<script src="js/statistics.js"></script>
+		<script src="js/aggregator.js"></script>
+		<script src="js/dataindex.js"></script>
+		<script src="js/repeatingexpenses.js"></script>
+		<script src="js/expenses.js"></script>
+		<script src="js/app.js"></script>
+		<script src="js/debug.js" defer="defer" async="async"></script>
 	</body>
 </html>

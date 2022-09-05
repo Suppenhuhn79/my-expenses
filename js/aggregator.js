@@ -1,16 +1,4 @@
 /**
- * @typedef AggregateItem
- * @property {IdString} catId category id
- * @property {Array<AggregateItem>} [subs] sub-category aggregates
- * @property {Number} sum Sum of expenses
- * @property {Number} count Sount of expenses
- *
- * @typedef MonthAggregate
- * Record having a key for each master category with aggregates of all subcategories within.
- * @type {Record<IdString, AggregateAtom>}
- */
-
-/**
  * Class representing an aggregation of expenses, basicly the `sum` of amount and `count` of items.
  */
 class AggregateAtom
@@ -93,10 +81,10 @@ class AggregateAtom
 }
 
 /**
- * @namespace myxStatisticAggregator
  * my-expenses expenses aggregation functionality for the "statistics" module.
+ * @namespace
  */
-const myxStatisticAggregator = function ()
+function myxStatisticAggregator ()
 {
 	/**
 	 * Count of months selected for aggregation. Required for calculating monthly agerages.

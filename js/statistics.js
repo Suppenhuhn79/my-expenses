@@ -154,9 +154,9 @@ const myxStatisticsTimerange = function ()
 
 /**
  * my-expenses "statistics" module.
- * @namespace myxStatistics
+ * @namespace
  */
-const myxStatistics = function ()
+function myxStatistics ()
 {
 	const MODULE_NAME = "statistics-tab";
 	let elements = document.getElementById(MODULE_NAME).getNamedChildren();

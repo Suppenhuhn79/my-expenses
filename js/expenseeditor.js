@@ -65,7 +65,7 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 	 * @type {ExpenseEditorCallback} */
 	let callbackFunc;
 
-	let tabMode = new ModuleModeHandler(elements.get());
+	let tabMode = new TabModeHandler(elements.get());
 	let categorySelector = new CategorySelector(elements.get("category-selector"), onCategoryChosen);
 	let confirmDeletePrompt = new Menubox("delete-expense", {
 		title: "Confirm delete expense",

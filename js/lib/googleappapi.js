@@ -167,22 +167,32 @@ const googleAppApi = {
 	 */
 	loadFile: (name) => new Promise((resolve, reject) =>
 	{
-		googleAppApi._query({
-			method: "GET",
-			url: "/drive/v3/files/" + googleAppApi.files.get(name).id +
-				"?alt=media" +
-				"&source=downloadUrl"
-		}).then(resolve, reject);
+		if (googleAppApi.files.has(name))
+		{
+			googleAppApi._query({
+				method: "GET",
+				url: "/drive/v3/files/" + googleAppApi.files.get(name).id +
+					"?alt=media" +
+					"&source=downloadUrl"
+			}).then(resolve, reject);
+		}
+		else
+		{
+			reject({ status: 0, text: "File not known '" + name + "'" });
+		}
 	}),
 
 	/**
 	 * Saves data to a file. If the file does not exists, it will be created.
 	 * @param {String} name Name of file to save data to
-	 * @param {String|Object} data Content to wirte to the file
+	 * @param {String|Object} data Content to write to the file; objects will be automatically serialized
 	 * @returns {Promise<undefined, XhrErrorResponse>} Returns a Promise: `resolve()` or `reject(XhrErrorResponseObject)`.
 	 */
 	saveToFile: (name, data) => new Promise((resolve, reject) =>
 	{
+		console.warn("Not saving '" + name + "'", (typeof data === "object") ? JSON.stringify(data) : data);
+		resolve();
+		return;
 		function _doSaveFile ()
 		{
 			let metadata = {
