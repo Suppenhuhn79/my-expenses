@@ -190,9 +190,9 @@ const googleAppApi = {
 	 */
 	saveToFile: (name, data) => new Promise((resolve, reject) =>
 	{
-		console.warn("Not saving '" + name + "'", (typeof data === "object") ? JSON.stringify(data) : data);
-		resolve();
-		return;
+		// console.warn("Not saving '" + name + "'", (typeof data === "object") ? JSON.stringify(data) : data);
+		// resolve();
+		// return;
 		function _doSaveFile ()
 		{
 			let metadata = {

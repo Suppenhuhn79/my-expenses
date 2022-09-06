@@ -74,7 +74,7 @@ let myx = function ()
 		fa.applyOn(document.body);
 		choices.set("active-tab", "data-dummy");
 		choices.onChoose("active-tab", onTabChosen);
-		// window.addEventListener("focus", onWindowFocus, false);
+		window.addEventListener("focus", onWindowFocus, false);
 		return new Promise((resolve) =>
 		{
 			Promise.allSettled([
