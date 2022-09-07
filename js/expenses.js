@@ -229,8 +229,12 @@ function myxExpenses ()
 	};
 
 	/**
-	 * Imports the content of a _data-n.csv_ file. This does replace all data of the imported months.
+	 * Imports the content of a _data-n.csv_ file.
+	 * 
+	 * This does replace all data of the imported months.
+	 * 
 	 * Also registers months and file numbers.
+	 * 
 	 * @param {Number} fileIndex Index (`1..x`) of the file where the data came from
 	 * @param {String} csvString Native csv data (as in a file)
 	 */
@@ -244,6 +248,10 @@ function myxExpenses ()
 		{
 			if (!!line)
 			{
+				/*
+				 * Note: We can not use `add()` here, because we need to clear the `data[month]` array to avoid
+				 * duplicated, which `add()` doesn't.
+				 */
 				let exp = new Expense(line);
 				let month = exp.dat.toMonthString();
 				if (monthsLoaded.includes(month) === false)
@@ -255,7 +263,7 @@ function myxExpenses ()
 				data[month].push(exp);
 			}
 		}
-		for (let month of dataIndex.allMonthsInFile(fileIndex))
+		for (let month of monthsLoaded.removeDuplicates())
 		{
 			sortItems(month);
 		}
@@ -342,11 +350,20 @@ function myxExpenses ()
 		{
 			expenses = [expenses];
 		}
+		/**
+		 * Collection of all months that have been affected by adding expenses.
+		 * @type {Array<MonthString>} */
+		let monthsAffected = [];
 		for (let item of expenses)
 		{
 			let month = item.dat.toMonthString();
 			data[month] ||= [];
 			data[month].push(new Expense(item));
+			monthsAffected.push(month);
+		}
+		for (let month of monthsAffected.removeDuplicates())
+		{
+			sortItems(month);
 		}
 		saveToFile(expenses);
 	}
