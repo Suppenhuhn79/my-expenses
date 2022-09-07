@@ -2,56 +2,66 @@
  * Mode handler for my-expenses tabs.
  * 
  * Preserves data on edits. Updates the UI on switching mode.
- * 
- * @constructor
- * @param {HTMLElement} element Element that contains tab items
- * @param {Function} dataGetter `function(): Object` to get the current tab data before switching to "edit" mode
- * @param {Function} dataSetter `function(data: Object)` to call to reset modified data when cancelling "edit" mode
  */
-function TabModeHandler (element, dataGetter, dataSetter)
+class TabModeHandler
 {
 	/**
 	 * Serialized tab data before entering "edit" mode.
 	 * @type {String}
 	 */
-	let dataBeforeEdit;
+	_dataBeforeEdit;
 
 	/**
-	 * Current mode.
+	 * @param {HTMLElement} element Element that contains tab items
+	 * @param {Function} dataGetter `function(): Object` to get the current tab data before switching to "edit" mode
+	 * @param {Function} dataSetter `function(data: Object)` to call to reset modified data when cancelling "edit" mode
 	 */
-	let currentMode = "default";
+	constructor(element, dataGetter, dataSetter)
+	{
+		/** @type {String} */
+		this.currentMode = "default";
+
+		/** @type {HTMLElement} */
+		this.element = element;
+
+		/** @type {Function} */
+		this._dataGetter = dataGetter;
+
+		/** @type {Function} */
+		this._dataSetter = dataSetter;
+	}
 
 	/**
 	 * Sets the current mode for the tab. Hides all elements that have the class "for-mode"
 	 * but not "\<mode\>-mode".
-	 * 
+	 *
 	 * If switching from "default" to "edit" mode, a backup of the tab data is taken via the `dataGetter()`.
-	 * 
+	 *
 	 * If Switching from "edit" to "default" mode (which means the edit mode was cancelled), the tab data
 	 * is restored to backup via `dataSetter()`.
-	 * 
+	 *
 	 * @param {String} newMode New mode to set
 	 */
-	this.set = function (newMode) 
+	set (newMode)
 	{
-		if ((typeof dataGetter === "function") && (typeof dataSetter === "function"))
+		if ((typeof this._dataGetter === "function") && (typeof this._dataSetter === "function"))
 		{
-			if ((currentMode === "default") && (newMode === "edit"))
+			if ((this.currentMode === "default") && (newMode === "edit"))
 			{
 				// backup data to persistent json string
-				dataBeforeEdit = JSON.stringify(dataGetter());
+				this._dataBeforeEdit = JSON.stringify(this._dataGetter());
 			}
-			else if ((currentMode === "edit") && (newMode === "default"))
+			else if ((this.currentMode === "edit") && (newMode === "default"))
 			{
 				// revert data to pre-edit state
-				dataSetter(JSON.parse(dataBeforeEdit));
+				this._dataSetter(JSON.parse(this._dataBeforeEdit));
 			}
 		}
-		currentMode = newMode || "default";
+		this.currentMode = newMode || "default";
 		if (newMode.startsWith("__") === false) // a mode with "__" prefix is an intermediate mode and we don't need to update the ui
 		{
-			let modeCssClass = currentMode + "-mode";
-			for (let childElement of element.querySelectorAll(".for-mode"))
+			let modeCssClass = this.currentMode + "-mode";
+			for (let childElement of this.element.querySelectorAll(".for-mode"))
 			{
 				(childElement.classList.contains(modeCssClass)) ? childElement.classList.remove("hidden") : childElement.classList.add("hidden");
 			}
@@ -63,40 +73,51 @@ function TabModeHandler (element, dataGetter, dataSetter)
 	 * @param {String} mode Mode to check
 	 * @returns {Boolean} `true` if the current mode is the checked mode, otherwise `false`
 	 */
-	this.is = function (mode)
+	is (mode)
 	{
-		return (currentMode === mode);
+		return (this.currentMode === mode);
 	};
 
 	/**
 	 * Returns the current mode.
 	 * @returns {String} Current mode
 	 */
-	this.get = function ()
+	get ()
 	{
-		return currentMode;
+		return this.currentMode;
 	};
 }
 
 /**
  * FontAwesome glyph.
- * @constructor
- * @param {String} glyphCode Code of the glyph to be created as combination of a CSS style and unicode codepoint, e.g. `"fas:f100"`
- * @returns {FAGlyph} New FontAwesome glyph
  */
-function FAGlyph (glyphCode)
+class FAGlyph
 {
-	this.value = glyphCode;
-	this.scope = glyphCode.substring(0, 3);
-	this.unicodeCodepoint = glyphCode.substring(4);
-	this.htmlEntity = "&#x" + glyphCode.substring(4) + ";";
+	/**
+	 * @param {String} glyphCode Code of the glyph to be created as combination of a CSS style and unicode codepoint, e.g. `"fas:f100"`
+	 */
+	constructor(glyphCode)
+	{
+		this.value = glyphCode;
+		this.scope = glyphCode.substring(0, 3);
+		this.unicodeCodepoint = glyphCode.substring(4);
+		this.htmlEntity = "&#x" + glyphCode.substring(4) + ";";
+	}
 
-	this.valueOf = function ()
+	/**
+	 * Returns the glyph code of this FontAwesome glyph.
+	 * @returns {String}
+	 */
+	valueOf ()
 	{
 		return this.value;
 	};
 
-	this.render = function ()
+	/**
+	 * Returns an `<i>` element that shows this glyphs image.
+	 * @returns {HTMLElement}
+	 */
+	render ()
 	{
 		return htmlBuilder.newElement("i." + this.scope, this.htmlEntity);
 	};
@@ -156,7 +177,7 @@ const fa = {
 	/**
 	 * @deprecated
 	 */
-	space: "\u00a0",
+	space: "\u00a0", // DEPRECATED: fa.space
 
 	/**
 	 * On the given element, all `<i data-icon="...">` children will receive the desired icon as its content.

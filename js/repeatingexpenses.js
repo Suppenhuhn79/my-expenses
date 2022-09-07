@@ -1,34 +1,37 @@
 /**
- * A repeating interval; may be either a count of `weeks` or a count of `months`.
- * @constructor
- * @param {RepeatingInterval} [src] Repeating interval to copy. If ommitted, the interval is set to "every month"
- * @returns {RepeatingInterval} New repeating interval object
+ * A repeating interval may be either a count of `weeks` or a count of `months`.
  */
-function RepeatingInterval (src)
+class RepeatingInterval
 {
 	/**
-	 * Count of months between interval points
-	 * @type {Number}
+	 * @param {RepeatingInterval} [src] Repeating interval to copy. If ommitted, the interval is set to "every month"
 	 */
-	this.months = (src?.months > 0) ? src.months : undefined;
+	constructor(src)
+	{
+		/**
+		 * Count of months between interval points
+		 * @type {Number}
+		 */
+		this.months = (src?.months > 0) ? src.months : undefined;
 
-	/**
-	* Day of month for a monthly interval to trigger (for preserving execution on last-of-month)
-	* @type {Number}
-	*/
-	this.dayOfMonth = (src?.months > 0) ? src?.originalDate || src?.originalDay || src?.dayOfMonth || 1 : undefined; // TODO: remove deprecated property names
+		/**
+		* Day of month for a monthly interval to trigger (for preserving execution on last-of-month)
+		* @type {Number}
+		*/
+		this.dayOfMonth = (src?.months > 0) ? src?.originalDate || src?.originalDay || src?.dayOfMonth || 1 : undefined; // TODO: remove deprecated property names
 
-	/**
-	 * Count of weeks between interval points
-	 * @type {Number}
-	 */
-	this.weeks = src?.weeks || undefined;
+		/**
+		 * Count of weeks between interval points
+		 * @type {Number}
+		 */
+		this.weeks = src?.weeks || undefined;
+	}
 
 	/**
 	 * Checks if this interval is valid. Valid intervals do have eithter _months_ or _weeks_ set to a positive integer.
 	 * @returns {Boolean} Whether this is a valid interval or not
 	 */
-	this.isValid = function ()
+	isValid ()
 	{
 		return (((this.months > 0) && (this.dayOfMonth > 0)) || (this.weeks > 0));
 	};
@@ -39,7 +42,7 @@ function RepeatingInterval (src)
 	 * @param {Number} dayOfMonth Day of months on that the expense is executed
 	 * @returns {RepeatingInterval} This interval
 	 */
-	this.setMonths = function (count, dayOfMonth)
+	setMonths (count, dayOfMonth)
 	{
 		this.clear();
 		this.months = count;
@@ -52,7 +55,7 @@ function RepeatingInterval (src)
 	 * @param {Number} count Count of weeks between interval points
 	 * @returns {RepeatingInterval} This interval
 	 */
-	this.setWeeks = function (count)
+	setWeeks (count)
 	{
 		this.clear();
 		this.weeks = count;
@@ -63,7 +66,7 @@ function RepeatingInterval (src)
 	 * Clears the interval (months and weeks are set to `undefined`).
 	 * @returns {RepeatingInterval} This interval
 	 */
-	this.clear = function ()
+	clear ()
 	{
 		this.weeks = undefined;
 		this.months = undefined;
@@ -75,33 +78,37 @@ function RepeatingInterval (src)
 	 * Gives a super short text hat describes this interval.
 	 * @returns {String} Super short interval text
 	 */
-	this.getSupershortText = function ()
+	getSupershortText ()
 	{
 		return (this.weeks > 0) ? this.weeks.toString() + "w" : this.months.toString() + "m";
 	};
 };
 
 /**
- * Expense that repeats in defined intervals.
- * @constructor
- * @param {IdString} [id]
- * @param {Expense} [expense]
- * @param {RepeatingInterval} [interval]
+ * Wrapper for expenses that repeat in defined intervals.
  */
-function RepeatingExpense (id, expense, interval)
+class RepeatingExpense
 {
-	/** @type {IdString} */
-	this.id = id || myx.newId();
-	/** @type {Expense} */
-	this.expense = new Expense(expense, { rep: this.id });
-	/** @type {RepeatingInterval} */
-	this.interval = new RepeatingInterval(interval);
+	/**
+	 * @param {IdString} [id]
+	 * @param {Expense} [expense]
+	 * @param {RepeatingInterval} [interval]
+	 */
+	constructor(id, expense, interval)
+	{
+		/** @type {IdString} */
+		this.id = id || myx.newId();
+		/** @type {Expense} */
+		this.expense = new Expense(expense, { rep: this.id });
+		/** @type {RepeatingInterval} */
+		this.interval = new RepeatingInterval(interval);
+	}
 
 	/**
 	 * Calculates the next execution date for this repeating expense.
 	 * @returns {Date} Next date in interval
 	 */
-	this.nextDate = function (date = this.expense.dat)
+	nextDate (date = this.expense.dat)
 	{
 		/** @type {Date} */
 		let result;

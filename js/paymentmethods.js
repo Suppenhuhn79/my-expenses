@@ -1,36 +1,40 @@
 /**
  * Payment method.
- * @constructor
- * @param {PaymentMethod|EditableIcon} [src] Payment method to copy; if omitted, a new payment method is created
- * @param {IdString} [id] Id of the src payment method if it is an EditableIcon
  */
-function PaymentMethod (src, id)
+class PaymentMethod
 {
 	/**
-	 * @type {IdString}
+	 * @param {PaymentMethod|EditableIcon} [src] Payment method to copy; if omitted, a new payment method is created
+	 * @param {IdString} [id] Id of the src payment method if it is an EditableIcon
 	 */
-	this.id = src?.id || ((!!id) ? id : myx.newId());
+	constructor(src, id)
+	{
+		/**
+		 * @type {IdString}
+		 */
+		this.id = src?.id || ((!!id) ? id : myx.newId());
 
-	/**
-	 * @type {String}
-	 */
-	this.label = src?.label;
+		/**
+		 * @type {String}
+		 */
+		this.label = src?.label || "";
 
-	/**
-	 * @type {FAGlyph}
-	 */
-	this.glyph = new FAGlyph((src?.glyph instanceof FAGlyph) ? src.glyph.value : (src?.glyph || src?.icon || "fas:f555"));
+		/**
+		 * @type {FAGlyph}
+		 */
+		this.glyph = new FAGlyph((src?.glyph instanceof FAGlyph) ? src.glyph.value : (src?.glyph || src?.icon || "fas:f555"));
 
-	/**
-	 * @type {String}
-	 */
-	this.color = src?.color || "#808080";
+		/**
+		 * @type {String}
+		 */
+		this.color = src?.color || "#808080";
+	}
 
 	/**
 	 * Returns a HTML element that shows this payment methods icon.
 	 * @returns {HTMLElement}
 	 */
-	this.renderIcon = function ()
+	renderIcon ()
 	{
 		return htmlBuilder.newElement("div.pmt.icon", { style: "color:" + this.color }, this.glyph.render());
 	};
@@ -39,7 +43,7 @@ function PaymentMethod (src, id)
 	 * Returns a simplified payment method object for serialisation.
 	 * @returns {Object} Simplified payment method object for serialisation
 	 */
-	this.toJSON = function ()
+	toJSON ()
 	{
 		return {
 			label: this.label,
@@ -50,7 +54,6 @@ function PaymentMethod (src, id)
 }
 
 const PaymentMethodTabMode = {
-	/** @enum {String} */
 	DEFAULT: "default",
 	EDIT: "edit",
 	SEARCH: "search",

@@ -1,98 +1,101 @@
 /**
- * Creates an instance of an `Expense` object.
- * @constructor
- * @param {Expense|String} [src] Csv string to parse or expense to copy
- * @param {Object} [override] Optional values to override default/source value
- * @returns {Expense} New expense object
+ * Expense.
  */
-function Expense (src, override)
+class Expense
 {
 	/**
 	 * Order of keys for conversion from/to csv
 	 * @type {Array<String>}
 	 */
-	const KEY_ORDER = ["dat", "amt", "cat", "txt", "pmt", "rep"];
+	static KEY_ORDER = ["dat", "amt", "cat", "txt", "pmt", "rep"];
 
 	/**
-	 * Expense date.
-	 * @type {Date}
+	 * @param {Expense|String} [src] Csv string to parse or expense to copy
+	 * @param {Object} [override] Optional values to override default/source value
 	 */
-	this.dat = new Date();
-
-	/**
-	 * Expense amount
-	 * @type {Number}
-	 */
-	this.amt = 0;
-
-	/**
-	 * Expense category - id reference to categories
-	 * @type {IdString}
-	 */
-	this.cat = "";
-
-	/**
-	 * Additional text
-	 * @type {String}
-	 */
-	this.txt = "";
-
-	/**
-	 * Used payment method - id reference to payment methods
-	 * @type {IdString}
-	 */
-	this.pmt = "";
-
-	/**
-	 * Repeating expense - id reference to repeating expenses
-	 * @type {IdString}
-	 */
-	this.rep = "";
-
-	switch (typeof src)
+	constructor(src, override)
 	{
-		case "string":
-			let vals = src.split("\t");
-			for (let c = 0, cc = KEY_ORDER.length; c < cc; c += 1)
-			{
-				this[KEY_ORDER[c]] = (c === 0) ? new Date(vals[c]) : ((c === 1) ? Number(vals[c]) : vals[c] || "");
-			}
-			break;
-		case "object":
-			if (typeof override === "object")
-			{
-				src = Object.assign({}, src, override);
-			}
-			for (let key of KEY_ORDER)
-			{
-				switch (key)
+		/**
+		 * Expense date.
+		 * @type {Date}
+		 */
+		this.dat = new Date();
+
+		/**
+		 * Expense amount
+		 * @type {Number}
+		 */
+		this.amt = 0;
+
+		/**
+		 * Expense category - id reference to categories
+		 * @type {IdString}
+		 */
+		this.cat = "";
+
+		/**
+		 * Additional text
+		 * @type {String}
+		 */
+		this.txt = "";
+
+		/**
+		 * Used payment method - id reference to payment methods
+		 * @type {IdString}
+		 */
+		this.pmt = "";
+
+		/**
+		 * Repeating expense - id reference to repeating expenses
+		 * @type {IdString}
+		 */
+		this.rep = "";
+
+		switch (typeof src)
+		{
+			case "string":
+				let vals = src.split("\t");
+				for (let c = 0, cc = Expense.KEY_ORDER.length; c < cc; c += 1)
 				{
-					case "dat":
-						this.dat = new Date(src.dat || Date.now());
-						break;
-					case "amt":
-						this.amt = Number(src.amt) || 0;
-						break;
-					case "pmt":
-						this.pmt = src.pmt || myx.paymentMethods.default;
-						break;
-					default:
-						this[key] = src[key] || "";
+					this[Expense.KEY_ORDER[c]] = (c === 0) ? new Date(vals[c]) : ((c === 1) ? Number(vals[c]) : vals[c] || "");
 				}
-			}
-			break;
-	}
-	// TODO: this.pmt_ = new PaymentMethod(myx.paymentMethods.get(this.pmt));
+				break;
+			case "object":
+				if (typeof override === "object")
+				{
+					src = Object.assign({}, src, override);
+				}
+				for (let key of Expense.KEY_ORDER)
+				{
+					switch (key)
+					{
+						case "dat":
+							this.dat = new Date(src.dat || Date.now());
+							break;
+						case "amt":
+							this.amt = Number(src.amt) || 0;
+							break;
+						case "pmt":
+							this.pmt = src.pmt || myx.paymentMethods.default;
+							break;
+						default:
+							this[key] = src[key] || "";
+					}
+				}
+				break;
+		}
+		// TODO: this.pmt_ = new PaymentMethod(myx.paymentMethods.get(this.pmt));
+	};
 
 	/**
 	 * Compares two expenses if they are equal (date, amount, category, etc.)
 	 * @param {Expense} otherExpense Second expense to compare
 	 * @returns {Boolean} `true` if both expenses are equal, otherwise `false`
 	 */
-	this.equals = function (otherExpense)
+	equals (otherExpense)
 	{
 		let result = true;
-		for (let key of KEY_ORDER)
+		for (let key of Expense.KEY_ORDER)
 		{
 			result &&= (this[key].valueOf() === otherExpense[key].valueOf());
 		}
@@ -103,7 +106,7 @@ function Expense (src, override)
 	 * Returns a serializable object of this expense.
 	 * @returns {Object} Serializable object
 	 */
-	this.toJSON = function ()
+	toJSON ()
 	{
 		let json = {
 			dat: this.dat.toIsoDate(),
@@ -125,7 +128,7 @@ function Expense (src, override)
 	 * Gives a csv line for the expense.
 	 * @returns {String}
 	 */
-	this.toString = function ()
+	toString ()
 	{
 		return [this.dat.format("yyyy-mm-dd"), this.amt, this.cat, this.txt, this.pmt, this.rep].join("\t");
 	};
