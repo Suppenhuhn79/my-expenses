@@ -208,20 +208,6 @@ let myx = function ()
 	};
 
 	/**
-	 * Provides attributes of an icon code.
-	 * @param {IconCode} iconCode Icon code to parse
-	 * @returns {IconAttributes} Object providing the attributes of the icon
-	 */
-	function getIconAttributes (iconCode) // DEPRECATED use `FAGlyph` instead
-	{
-		return {
-			faScope: iconCode.substring(0, 3),
-			unicodeCodepoint: iconCode.substring(4),
-			htmlEntity: "&#x" + iconCode.substring(4) + ";"
-		};
-	}
-
-	/**
 	 * Gives an identifier string.
 	 * @return {IdString} New identifier
 	 */
@@ -274,7 +260,6 @@ let myx = function ()
 					xhrSuccess();
 					if (currentChosenTab === "data-dummy")
 					{
-						// choices.set("active-tab", expenses.moduleName);
 						choices.set("active-tab", home.moduleName);
 					}
 					onTabChosen(choices.get("active-tab"), true);
@@ -334,7 +319,6 @@ let myx = function ()
 		paymentMethods: paymentMethods,
 		get currencySymbol () { return currencySymbol; },
 		loadFile: loadFile,
-		getIconAttributes: getIconAttributes,
 		addExpense: expenses.edit,
 		setExpenseFilter: expenses.setFilter,
 		newId: newIdString,
