@@ -197,15 +197,15 @@ function myxPaymentMethods ()
 				if (active)
 				{
 					optionalElmts = [
-						htmlBuilder.newElement("i.for-mode.default-mode.default-flag.fas", (defaultId === id) ? fa.icon("star") : ""),
-						htmlBuilder.newElement("i.for-mode.edit-mode.hover.default-flag.far", fa.icon("star"), { onclick: onSetDefaultClick }),
-						htmlBuilder.newElement("i.for-mode.edit-mode.dragger-ns.fas", fa.icon("sort"))
+						htmlBuilder.newElement("i.for-mode.default-mode.default-flag.fas", (defaultId === id) ? fa.toHTML("star") : ""),
+						htmlBuilder.newElement("i.for-mode.edit-mode.hover.default-flag.far", fa.toHTML("star"), { onclick: onSetDefaultClick }),
+						htmlBuilder.newElement("i.for-mode.edit-mode.dragger-ns.fas", fa.toHTML("sort"))
 					];
 				}
 				else
 				{
 					optionalElmts = [
-						htmlBuilder.newElement("i.hover.for-mode.edit-mode.fas", fa.icon("trash-restore-alt"), { onclick: onUntrashClick })
+						htmlBuilder.newElement("i.hover.for-mode.edit-mode.fas", fa.toHTML("trash-restore-alt"), { onclick: onUntrashClick })
 					];
 				}
 				let div = htmlBuilder.newElement("div.click.item" + ((active) ? ".sortable" : ""),

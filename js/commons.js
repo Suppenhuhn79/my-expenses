@@ -175,11 +175,6 @@ const fa = {
 	},
 
 	/**
-	 * @deprecated
-	 */
-	space: "\u00a0", // DEPRECATED: fa.space
-
-	/**
 	 * On the given element, all `<i data-icon="...">` children will receive the desired icon as its content.
 	 * @param {HTMLElement} element Element to put FontAwesome glyphs on
 	 */
@@ -187,7 +182,7 @@ const fa = {
 	{
 		for (let e of element.querySelectorAll("i[data-icon]"))
 		{
-			e.innerHTML = fa.icon(e.dataset.icon);
+			e.innerHTML = fa.toHTML(e.dataset.icon);
 		}
 	},
 
@@ -196,7 +191,7 @@ const fa = {
 	 * @param {String} name Name of desired FontAwesome icon
 	 * @returns {String} HTML entity of the requested icon; or icon name if it is not known
 	 */
-	icon: function (name)
+	toHTML: function (name)
 	{
 		name = name.replaceAll(/-/g, "_");
 		let result = fa.ICONS[name];

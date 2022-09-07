@@ -648,7 +648,7 @@ function myxExpenses ()
 		else
 		{
 			elements.get("content").appendChild(htmlBuilder.newElement("div.fullscreen-msg",
-				htmlBuilder.newElement("div.icon.far", fa.icon("smiley-meh")),
+				htmlBuilder.newElement("div.icon.far", fa.toHTML("smiley-meh")),
 				htmlBuilder.newElement("div.label", "Nothing here.")
 			));
 		}

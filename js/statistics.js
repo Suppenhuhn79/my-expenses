@@ -183,17 +183,17 @@ function myxStatistics ()
 			{
 				key: "pie",
 				label: "Distribution by category",
-				iconHtml: htmlBuilder.newElement("i.fas.icon", fa.icon("chart-pie"))
+				iconHtml: htmlBuilder.newElement("i.fas.icon", fa.toHTML("chart-pie"))
 			},
 			{
 				key: "areat",
 				label: "Course over time",
-				iconHtml: htmlBuilder.newElement("i.fas.icon", fa.icon("chart-area"))
+				iconHtml: htmlBuilder.newElement("i.fas.icon", fa.toHTML("chart-area"))
 			},
 			{
 				key: "none",
 				label: "None",
-				iconHtml: htmlBuilder.newElement("i.fas.icon", fa.icon("ban"))
+				iconHtml: htmlBuilder.newElement("i.fas.icon", fa.toHTML("ban"))
 			}
 		]
 	});
@@ -391,7 +391,7 @@ function myxStatistics ()
 		else
 		{
 			htmlBuilder.replaceContent(elements.get("content"), htmlBuilder.newElement("div.fullscreen-msg",
-				htmlBuilder.newElement("div.icon.far", fa.icon("smiley-meh")),
+				htmlBuilder.newElement("div.icon.far", fa.toHTML("smiley-meh")),
 				htmlBuilder.newElement("div.label", "Nothing here.")
 			));
 		}

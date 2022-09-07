@@ -49,7 +49,7 @@ let myx = function ()
 				_items.push({
 					key: dataTab.tab,
 					label: dataTab.label,
-					iconHtml: htmlBuilder.newElement("i.fas.icon", fa.icon(dataTab.icon))
+					iconHtml: htmlBuilder.newElement("i.fas.icon", fa.toHTML(dataTab.icon))
 				});
 			}
 			return _items;
@@ -171,7 +171,7 @@ let myx = function ()
 				let dataChoiceButton = bottomButtonElements.get("data-selection-button");
 				dataChoiceButton.classList.add("chosen");
 				dataChoiceButton.dataset.current = dataTab.tab;
-				dataChoiceButton.getElementsByTagName("i")[0].innerHTML = fa.icon(dataTab.icon);
+				dataChoiceButton.getElementsByTagName("i")[0].innerHTML = fa.toHTML(dataTab.icon);
 				dataChoiceButton.getElementsByTagName("span")[0].innerHTML = dataTab.label;
 				break;
 			}
