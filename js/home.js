@@ -54,12 +54,14 @@ const myxHome = function ()
 	 */
 	function enter ()
 	{
+		let thisMonth = (new Date()).toMonthString();
 		elements.get("headline").innerHTML = (new Date()).format("dddd, d. mmmm yyyy");
-		myx.statistics.aggregator.calc([(new Date()).toMonthString()]).then((aggs) =>
+		myx.repeatings.process(thisMonth);
+		myx.statistics.aggregator.calc([thisMonth]).then((aggs) =>
 		{
 			elements.get("this-month-total").innerText = myx.formatAmountLocale(aggs.sum);
 		});
-		let thisMonthsExpenses = myx.expenses.data[(new Date()).toMonthString()];
+		let thisMonthsExpenses = myx.expenses.data[thisMonth];
 		// TODO: Handle no expenses.
 		let lastExpenseIndex = thisMonthsExpenses.length - 1;
 		let lastExpense = thisMonthsExpenses[lastExpenseIndex];

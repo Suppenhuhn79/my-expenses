@@ -1,6 +1,5 @@
 /**
  * Application main module.
- * @namespace
  */
 let myx = function ()
 {
@@ -38,6 +37,7 @@ let myx = function ()
 	let paymentMethods = myxPaymentMethods();
 	let categories = myxCategories();
 	let expenses = myxExpenses();
+	let repeatings = myxRepeatingExpenses();
 	let statistics = myxStatistics();
 
 	let dataSelectionMenu = new Menubox("data-selection", {
@@ -326,9 +326,10 @@ let myx = function ()
 	init().then(onWindowFocus);
 
 	return { // publish members
-		statistics: statistics, // debug_only
+		statistics: statistics,
 		home: home,
 		expenses: expenses,
+		repeatings: repeatings,
 		categories: categories,
 		paymentMethods: paymentMethods,
 		get currencySymbol () { return currencySymbol; },

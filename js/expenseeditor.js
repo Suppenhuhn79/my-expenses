@@ -20,12 +20,9 @@ const ExpenseEditorMode = {
  */
 
 /**
- * 
- * @param {repeatingExpenses} repeatingExpenses 
- * @param {HTMLElement} targetElement 
- * @returns 
+ * my-expenses "expense editor" module.
  */
-let expenseEditor = function (repeatingExpenses, targetElement)
+let expenseEditor = function ()
 {
 	let elements = pageSnippets.expenseEditor.produce({
 		onApplyClick: onApplyClick,
@@ -85,7 +82,7 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 	{
 		(event === "opened") ? elements.get("keypad").classList.add("hidden") : elements.get("keypad").classList.remove("hidden");
 	});
-	targetElement.appendChild(elements.get());
+	document.getElementById("client").appendChild(elements.get());
 
 	/**
 	 * Checks if an existing expense is being edited. For an existing expense `currentDataIndex` is a non-negative integer.
@@ -156,7 +153,7 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 	function switchToRepeatMode ()
 	{
 		tabMode.set(ExpenseEditorMode.REPEATING);
-		currentItem.dat = repeatingExpenses.lastExecutionDateOf(currentItem.rep) || currentItem.dat;
+		currentItem.dat = myx.repeatings.lastExecutionDateOf(currentItem.rep) || currentItem.dat;
 		if (editedInterval.isValid() === false)
 		{
 			editedInterval = new RepeatingInterval({ months: 1, dayOfMonth: currentItem.dat.getDate() });
@@ -197,7 +194,7 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 		originTabName = choices.get("active-tab");
 		currentItem = new Expense(item);
 		currentDataIndex = dataIndex;
-		editedInterval = repeatingExpenses.intervalOf(currentItem.rep);
+		editedInterval = myx.repeatings.intervalOf(currentItem.rep);
 		console.log("editor:", currentItem, editedInterval);
 		callbackFunc = callback;
 		renderPaymentmethod();
@@ -207,7 +204,7 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 		elements.get("txt").value = currentItem.txt || "";
 		choices.set("active-tab", "expense-editor");
 		categorySelector.refresh(currentItem.cat);
-		if ((!isExistingExpense()) && (repeatingExpenses.intervalOf(currentItem.rep).isValid()))
+		if ((!isExistingExpense()) && (myx.repeatings.intervalOf(currentItem.rep).isValid()))
 		{
 			switchToRepeatMode();
 		}
@@ -312,7 +309,7 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 		{
 			if (tabMode.is(ExpenseEditorMode.REPEATING))
 			{
-				repeatingExpenses.set(currentItem.rep, null, null);
+				myx.repeatings.set(currentItem.rep, null, null);
 				callbackFunc(null, ExpenseEditorAction.NONE);
 			}
 			else
@@ -370,7 +367,7 @@ let expenseEditor = function (repeatingExpenses, targetElement)
 			currentItem.dat = new Date(elements.get("dat").value);
 			currentItem.amt = Number(amountAsString);
 			currentItem.txt = elements.get("txt").value;
-			currentItem.rep = repeatingExpenses.set(currentItem.rep, currentItem, editedInterval);
+			currentItem.rep = myx.repeatings.set(currentItem.rep, currentItem, editedInterval);
 			if (isExistingExpense())
 			{
 				returnType = ExpenseEditorAction.MODIFY;

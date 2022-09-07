@@ -142,7 +142,6 @@ const ExpensesTabMode = {
 
 /**
  * my-expenses "expenses" module.
- * @namespace
  */
 function myxExpenses ()
 {
@@ -158,7 +157,6 @@ function myxExpenses ()
 	let filter = {};
 	let elements = document.getElementById(MODULE_NAME).getNamedChildren();
 	let tabMode = new TabModeHandler(elements.get());
-	let repeatings = myxRepeatingExpenses();
 	/** @type {expenseEditor} */
 	let editor;
 	/** @type {Date} */
@@ -196,10 +194,8 @@ function myxExpenses ()
 				pageSnippets.import("js/expenseeditor.xml")
 			]).then(() =>
 			{
-				editor = expenseEditor(repeatings, document.getElementById("client"));
-				window.exd = editor; // debug_only
-				window.r = repeatings; // debug_only
-				console.log("Repeating expenses (`r`) have loaded.", window.r.data); // debug_only
+				editor = expenseEditor();
+				myx.exEditor = editor; // debug_only
 				resolve();
 			});
 		});
@@ -218,7 +214,7 @@ function myxExpenses ()
 			 * Iterable promises of all file load actions
 			 * @type {Array<Promise>} */
 			let asyncCalls = [];
-			asyncCalls.push(repeatings.fetchData());
+			asyncCalls.push(myx.repeatings.fetchData());
 			for (let fileIndex = googleAppApi.files.size; fileIndex > 0; fileIndex -= 1)
 			{
 				let fileName = "data-" + fileIndex + ".csv";
@@ -577,7 +573,7 @@ function myxExpenses ()
 		elements.get("content").scrollTop = 0;
 		for (let month of filter.months.sort().reverse())
 		{
-			data[PREVIEW] = (tabMode.is(ExpensesTabMode.DEFAULT)) ? repeatings.process(month) : [];
+			data[PREVIEW] = (tabMode.is(ExpensesTabMode.DEFAULT)) ? myx.repeatings.process(month) : [];
 			/** @type {Number} */
 			let currentDay = 0;
 			/** @type {HTMLElement} */
