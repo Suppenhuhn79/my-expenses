@@ -84,7 +84,6 @@ class Expense
 				}
 				break;
 		}
-		// TODO: this.pmt_ = new PaymentMethod(myx.paymentMethods.get(this.pmt));
 	};
 
 	/**
