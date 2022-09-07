@@ -3,9 +3,11 @@
  */
 class PaymentMethod
 {
+	static DEFAULT_LABEL = "Unnamed payment method";
+
 	/**
 	 * @param {PaymentMethod|EditableIcon} [src] Payment method to copy; if omitted, a new payment method is created
-	 * @param {IdString} [id] Id of the src payment method if it is an EditableIcon
+	 * @param {IdString} [id] Id of the src payment method if it is an `EditableIcon`
 	 */
 	constructor(src, id)
 	{
@@ -17,7 +19,7 @@ class PaymentMethod
 		/**
 		 * @type {String}
 		 */
-		this.label = src?.label || "";
+		this.label = src?.label || PaymentMethod.DEFAULT_LABEL;
 
 		/**
 		 * @type {FAGlyph}
@@ -28,6 +30,17 @@ class PaymentMethod
 		 * @type {String}
 		 */
 		this.color = src?.color || "#808080";
+	}
+
+	/**
+	 * Assigns properties from an editable icon to this payment method.
+	 * @param {EditableIcon} icon Editable icon to assign
+	 */
+	assign (icon)
+	{
+		this.label = icon.label;
+		this.glyph = icon.glyph;
+		this.color = icon.color;
 	}
 
 	/**
@@ -84,7 +97,6 @@ function myxPaymentMethods ()
 			}
 		}
 	};
-	const DEFAULT_LABEL = "New payment method";
 	/** @type {Map<IdString, PaymentMethod>} */
 	let data = new Map();
 	/** @type {Array<IdString>} */
@@ -104,8 +116,8 @@ function myxPaymentMethods ()
 	});
 
 	let tabMode = new TabModeHandler(elements.get(),
-		 /*getData*/() => { return { items: JSON.stringify([...data]), order: order, disabled: disabledItems, default: defaultId }; },
-		 /*revertData*/(revertData) => { revertData.items = Object.fromEntries(JSON.parse(revertData.items)); fromObject(revertData); }
+		function stashData () { return { items: JSON.stringify([...data]), order: order, disabled: disabledItems, default: defaultId }; },
+		function revertData (revertData) { revertData.items = Object.fromEntries(JSON.parse(revertData.items)); fromObject(revertData); }
 	);
 
 	elements.get("edit-button").onclick = () => tabMode.set(PaymentMethodTabMode.EDIT);
@@ -240,30 +252,29 @@ function myxPaymentMethods ()
 	function promptEditor (id)
 	{
 		let creatingNewItem = !(!!id);
-		let itemToEdit = new PaymentMethod(data.get(id));
+		let itemToEdit = new EditableIcon(data.get(id) || new PaymentMethod());
 		tabMode.set(PaymentMethodTabMode.EDIT);
-		itemToEdit.label ||= DEFAULT_LABEL;
 		iconEditor.popup(itemToEdit,
 			{
 				iconType: EditableIconType.COLOR_ON_WHITE,
 				iconClass: "paymentmethod",
 				title: (creatingNewItem) ? "New payment method" : "Edit payment method",
-				defaultLabel: DEFAULT_LABEL,
+				defaultLabel: PaymentMethod.DEFAULT_LABEL,
 				context: id,
 				deleteHandler: (creatingNewItem) ? null : onTrashClick
 			},
-			function callback (editedObj)
+			function editorCallback (editedObj)
 			{
 				if (creatingNewItem)
 				{
-					let newPmt = new PaymentMethod(editedObj);
-					id = newPmt.id;
+					id = myx.newId();
+					let newPmt = new PaymentMethod(editedObj, id);
 					data.set(id, newPmt);
 					order.push(id);
 				}
 				else
 				{
-					data.set(id, new PaymentMethod(editedObj));
+					data.get(id).assign(editedObj);
 				}
 				renderList();
 				elements.get("content").querySelector("[data-id='" + id + "']").scrollIntoView();

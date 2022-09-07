@@ -428,7 +428,7 @@ function myxExpenses ()
 			let searchHint = "";
 			if (filter.cats.length > 0)
 			{
-				searchHint += myx.categories.getLabel(filter.cats[0]);
+				searchHint += myx.categories.get(filter.cats[0]).fullQualifiedLabel;
 			}
 			else if (!!filter.pmt)
 			{
@@ -526,7 +526,7 @@ function myxExpenses ()
 	 */
 	function renderItem (item, dataIndex)
 	{
-		let catLabel = myx.categories.getLabel(item.cat);
+		let category = myx.categories.get(item.cat);
 		let div = htmlBuilder.newElement("div.item.click" + ((item.dat > new Date()) ? ".preview" : ""),
 			{
 				'data-index': dataIndex,
@@ -536,10 +536,10 @@ function myxExpenses ()
 				onpointerup: onItemPointerUp
 			},
 			// dataIndex,
-			myx.categories.renderIcon(item.cat),
+			category.renderIcon(),
 			htmlBuilder.newElement("div.flex-fill.cutoff",
-				htmlBuilder.newElement("div.cutoff.big", item.txt || catLabel),
-				htmlBuilder.newElement("div.cutoff.grey", (!!item.txt) ? catLabel : "")),
+				htmlBuilder.newElement("div.cutoff.big", item.txt || category.fullQualifiedLabel),
+				htmlBuilder.newElement("div.cutoff.grey", (!!item.txt) ? category.fullQualifiedLabel : "")),
 			htmlBuilder.newElement("div.amount.right.big", myx.formatAmountLocale(item.amt)),
 			myx.paymentMethods.get(item.pmt).renderIcon()
 		);

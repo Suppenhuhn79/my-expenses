@@ -9,12 +9,6 @@
  * @property {Boolean} [canColor] Whether the editor should provide a color selection (`true`, default) or not (`false`).
  * @property {any} [context] Context of the icon that is being edited; usually it's the icons item id
  *
- * @typedef EditableIcon
- * Interface of common editable icon properties.
- * @property {String} label The icons label
- * @property {FAGlyph} glyph The actual FontAwesome icon
- * @property {String} color The icons color
- * 
  * @callback IconEditorCallback
  * @param {EditableIcon} editedIcon Edited icon
  * 

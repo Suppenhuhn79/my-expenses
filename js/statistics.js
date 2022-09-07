@@ -353,6 +353,7 @@ function myxStatistics ()
 			elements.get("amount").innerHTML = myx.formatAmountLocale(data[k]);
 			for (let catAggr of data.totals)
 			{
+				let category = myx.categories.get(catAggr.catId);
 				let subCatDiv = htmlBuilder.newElement("div.hidden", { 'data-cat': catAggr.catId });
 				if (catAggr.sum > 0)
 				{
@@ -360,11 +361,12 @@ function myxStatistics ()
 					{
 						if ((subCat.catId !== catAggr.catId) || (subCat.sum > 0))
 						{
+							let subCategory = myx.categories.get(subCat.catId);
 							subCatDiv.appendChild(htmlBuilder.newElement("div.subcat.wide-flex" + ".grey" + (subCat.sum === 0 ? ".zero-sum" : ""),
 								{ 'data-cat': subCat.catId, onclick: onSubcategoryClick },
-								myx.categories.renderIcon(subCat.catId),
+								subCategory.renderIcon(),
 								htmlBuilder.newElement("div.flex-fill.click",
-									myx.categories.getLabel(subCat.catId, false)),
+									subCategory.label),
 								htmlBuilder.newElement("div.amt", myx.formatAmountLocale(subCat[k])
 								)));
 						}
@@ -373,15 +375,15 @@ function myxStatistics ()
 				let div = htmlBuilder.newElement(
 					"div.item.click" + (catAggr.sum === 0 ? ".zero-sum" : ""),
 					{ onclick: () => toggleSubcategoryVisibility(catAggr.catId) },
-					myx.categories.renderIcon(catAggr.catId),
+					category.renderIcon(),
 					htmlBuilder.newElement(
 						"div.flex-fill.high-flex",
 						htmlBuilder.newElement(
 							"div.flex-fill.wide-flex",
-							htmlBuilder.newElement("div.flex-fill.cutoff.big", myx.categories.getLabel(catAggr.catId)),
+							htmlBuilder.newElement("div.flex-fill.cutoff.big", category.fullQualifiedLabel),
 							htmlBuilder.newElement("div.amount.right.big", myx.formatAmountLocale(catAggr[k]))
 						),
-						renderPercentBar("percentbar", catAggr[k] / data[k], myx.categories.getColor(catAggr.catId)),
+						renderPercentBar("percentbar", catAggr[k] / data[k], category.color),
 						subCatDiv
 					)
 				);

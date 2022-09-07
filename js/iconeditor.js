@@ -4,6 +4,27 @@ const EditableIconType = {
 	WHITE_ON_COLOR: 2
 };
 
+/**
+ * Interface of common editable icon properties.
+ */
+class EditableIcon
+{
+	/**
+	 * @param {{label: String, glyph: FAGlyph, color: String}} src Object from which to create an editable icon
+	 */
+	constructor(src)
+	{
+		/** @type {String} */
+		this.label = src.label;
+
+		/** @type {FAGlyph} */
+		this.glyph = new FAGlyph(src.glyph.value);
+
+		/** @type {String} */
+		this.color = src.color;
+	}
+}
+
 // TODO: refactor
 const colorSelector = function (element, bubbleCount, initialSat = 0.8, initalLight = 0.6, hueOffset = 0)
 {

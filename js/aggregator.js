@@ -121,14 +121,14 @@ function myxStatisticAggregator ()
 	{
 		/** @type {Array<AggregateItem>} */
 		let result = [];
-		for (let masterCat of myx.categories.masterCategoryIds)
+		for (let masterCat of myx.categories.masters)
 		{
 			/**
 			 * Total of all sub-catergories including master category.
 			 * @type {AggregateAtom}
 			 */
-			let masterCatAggregate = (new AggregateAtom()).extend({ catId: masterCat, subs: [] });
-			for (let subcatId of [masterCat].concat(myx.categories.getSubCategories(masterCat)))
+			let masterCatAggregate = (new AggregateAtom()).extend({ catId: masterCat.id, subs: [] });
+			for (let subcatId of [masterCat.id].concat(masterCat.subCategoriesIds))
 			{
 				/** 
 				 * Not-null aggregate atom
