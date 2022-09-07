@@ -899,12 +899,8 @@ function myxExpenses ()
 	}
 
 	return { // publish members
-		get index () { return dataIndex; }, // debug_only
-		scrollTo: scrollTo, // debug_only
-		getCsv: getCsv, // debug_only
-		save: saveToFile, // debug_only
 		get moduleName () { return MODULE_NAME; },
-		get data () { return data; },
+		get data () { return data; }, // debug_only
 		init: init,
 		fetchData: fetchData,
 		enter: resetFilter,
