@@ -9,19 +9,19 @@ class RepeatingInterval
 	constructor(src)
 	{
 		/**
-		 * Count of months between interval points
+		 * Count of months between interval points.
 		 * @type {Number}
 		 */
 		this.months = (src?.months > 0) ? src.months : undefined;
 
 		/**
-		* Day of month for a monthly interval to trigger (for preserving execution on last-of-month)
+		* Day of month for a monthly interval to trigger (for preserving execution on last-of-month).
 		* @type {Number}
 		*/
 		this.dayOfMonth = (src?.months > 0) ? src?.originalDate || src?.originalDay || src?.dayOfMonth || 1 : undefined; // TODO: remove deprecated property names
 
 		/**
-		 * Count of weeks between interval points
+		 * Count of weeks between interval points.
 		 * @type {Number}
 		 */
 		this.weeks = src?.weeks || undefined;
@@ -98,9 +98,15 @@ class RepeatingExpense
 	{
 		/** @type {IdString} */
 		this.id = id || myx.newId();
-		/** @type {Expense} */
+
+		/**
+		 * Expense that does repeat in the given interval. Does have the date of its last execution.
+		 * @type {Expense} */
 		this.expense = new Expense(expense, { rep: this.id });
-		/** @type {RepeatingInterval} */
+
+		/**
+		 * The inteval in which the expense does repeat.
+		 * @type {RepeatingInterval} */
 		this.interval = new RepeatingInterval(interval);
 	}
 
