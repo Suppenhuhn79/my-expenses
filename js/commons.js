@@ -124,10 +124,11 @@ class FAGlyph
 }
 
 /**
- * fontAwesome glyph codes and processing function.
+ * fontAwesome glyph codes and functions.
  */
-const fa = {
-	ICONS: {
+class FA
+{
+	static ICONS = {
 		angle_left: "f104",
 		angle_right: "f105",
 		angle_up: "f106",
@@ -172,29 +173,34 @@ const fa = {
 		trash_alt: "f2ed",
 		trash_restore_alt: "f82a",
 		wallet: "f555"
-	},
+	};
 
 	/**
 	 * On the given element, all `<i data-icon="...">` children will receive the desired icon as its content.
 	 * @param {HTMLElement} element Element to put FontAwesome glyphs on
 	 */
-	applyOn: function (element)
+	static applyOn (element)
 	{
 		for (let e of element.querySelectorAll("i[data-icon]"))
 		{
-			e.innerHTML = fa.toHTML(e.dataset.icon);
+			e.innerHTML = FA.toHTML(e.dataset.icon);
 		}
-	},
+	}
 
 	/**
 	 * Returns the HTML entity for a known FontAwesome icon.
 	 * @param {String} name Name of desired FontAwesome icon
 	 * @returns {String} HTML entity of the requested icon; or icon name if it is not known
 	 */
-	toHTML: function (name)
+	static toHTML (name)
 	{
 		name = name.replaceAll(/-/g, "_");
-		let result = fa.ICONS[name];
+		let result = FA.ICONS[name];
 		return (!!result) ? "&#x" + result + ";" : "[" + name + "]";
+	}
+
+	constructor()
+	{
+		if (new.target === FA) throw TypeError("FA is not a constructor");
 	}
 };

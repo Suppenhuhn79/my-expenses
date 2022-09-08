@@ -209,15 +209,15 @@ function myxPaymentMethods ()
 				if (active)
 				{
 					optionalElmts = [
-						htmlBuilder.newElement("i.for-mode.default-mode.default-flag.fas", (defaultId === id) ? fa.toHTML("star") : ""),
-						htmlBuilder.newElement("i.for-mode.edit-mode.hover.default-flag.far", fa.toHTML("star"), { onclick: onSetDefaultClick }),
-						htmlBuilder.newElement("i.for-mode.edit-mode.dragger-ns.fas", fa.toHTML("sort"))
+						htmlBuilder.newElement("i.for-mode.default-mode.default-flag.fas", (defaultId === id) ? FA.toHTML("star") : ""),
+						htmlBuilder.newElement("i.for-mode.edit-mode.hover.default-flag.far", FA.toHTML("star"), { onclick: onSetDefaultClick }),
+						htmlBuilder.newElement("i.for-mode.edit-mode.dragger-ns.fas", FA.toHTML("sort"))
 					];
 				}
 				else
 				{
 					optionalElmts = [
-						htmlBuilder.newElement("i.hover.for-mode.edit-mode.fas", fa.toHTML("trash-restore-alt"), { onclick: onUntrashClick })
+						htmlBuilder.newElement("i.hover.for-mode.edit-mode.fas", FA.toHTML("trash-restore-alt"), { onclick: onUntrashClick })
 					];
 				}
 				let div = htmlBuilder.newElement("div.click.item" + ((active) ? ".sortable" : ""),
@@ -236,7 +236,7 @@ function myxPaymentMethods ()
 			elements.get("content").appendChild(htmlBuilder.newElement("div.headline", "Disabled payment methods"));
 			_renderList(disabledItems, false);
 		}
-		fa.applyOn(elements.get("content"));
+		FA.applyOn(elements.get("content"));
 		for (let e of elements.get("content").querySelectorAll("[data-id='" + defaultId + "'] .default-flag"))
 		{
 			e.classList.add("selected");

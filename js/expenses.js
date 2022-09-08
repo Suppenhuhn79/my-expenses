@@ -606,7 +606,7 @@ function myxExpenses ()
 							);
 							// marker.addEventListener("animationend", () => { console.log("animation ended"); marker.style.animation = null; });
 							scrollToDate ||= today;
-							fa.applyOn(marker);
+							FA.applyOn(marker);
 							renders.push(marker);
 						}
 						if ((filter.months.length > 1) && (lastRenderedMonth !== item.dat.toMonthString()))
@@ -643,7 +643,7 @@ function myxExpenses ()
 		else
 		{
 			elements.get("content").appendChild(htmlBuilder.newElement("div.fullscreen-msg",
-				htmlBuilder.newElement("div.icon.far", fa.toHTML("smiley-meh")),
+				htmlBuilder.newElement("div.icon.far", FA.toHTML("smiley-meh")),
 				htmlBuilder.newElement("div.label", "Nothing here.")
 			));
 		}

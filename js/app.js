@@ -49,7 +49,7 @@ let myx = function ()
 				_items.push({
 					key: dataTab.tab,
 					label: dataTab.label,
-					iconHtml: htmlBuilder.newElement("i.fas.icon", fa.toHTML(dataTab.icon))
+					iconHtml: htmlBuilder.newElement("i.fas.icon", FA.toHTML(dataTab.icon))
 				});
 			}
 			return _items;
@@ -71,7 +71,7 @@ let myx = function ()
 
 	function init ()
 	{
-		fa.applyOn(document.body);
+		FA.applyOn(document.body);
 		choices.set("active-tab", "data-dummy");
 		choices.onChoose("active-tab", onTabChosen);
 		window.addEventListener("focus", onWindowFocus, false);
@@ -171,7 +171,7 @@ let myx = function ()
 				let dataChoiceButton = bottomButtonElements.get("data-selection-button");
 				dataChoiceButton.classList.add("chosen");
 				dataChoiceButton.dataset.current = dataTab.tab;
-				dataChoiceButton.getElementsByTagName("i")[0].innerHTML = fa.toHTML(dataTab.icon);
+				dataChoiceButton.getElementsByTagName("i")[0].innerHTML = FA.toHTML(dataTab.icon);
 				dataChoiceButton.getElementsByTagName("span")[0].innerHTML = dataTab.label;
 				break;
 			}

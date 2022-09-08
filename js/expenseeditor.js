@@ -75,7 +75,7 @@ let expenseEditor = function ()
 	let decimalSeparator = (1.2).toLocaleString().substring(1, 2);
 	let amountAsString = "0";
 
-	fa.applyOn(elements.get());
+	FA.applyOn(elements.get());
 	elements.get("decimal-separator").innerText = decimalSeparator;
 	elements.get("dat").setAttribute("max", (new Date()).format("yyyy-mm-dd"));
 	vikb.addEventListener((event) =>
