@@ -2,19 +2,19 @@
  * Provides functionality to handle radio selections (one active item at one time).
  * You'll need an element with a `data-choice` attribute and some children with `data-choice-value` attributes.
  * If there is an element with client content linked to the choice, get it a `data-choice-client` attribute with
- * the same value as the _data-choice_.
+ * the same value as the _data-choice-value_.
  */
 let choices = new function ()
 {
 	/**
-	 * HashMap of choice callbacks
-	 * @type {Object<String, ChoiceCallback>} */
-	let callbacks = {};
+	 * Map of choice callbacks.
+	 * @type {Map<String, ChoiceCallback>} */
+	let callbacks = new Map();
 
 	/**
-	 * HashMap of choice values
-	 * @type {Object<String, String>} */
-	let data = {};
+	 * Map of choice values.
+	 * @type {Map<String, String?>} */
+	let data = new Map();
 
 	window.addEventListener("click", (mouseEvent) =>
 	{
@@ -30,18 +30,18 @@ let choices = new function ()
 	});
 
 	/**
-	 * Register an event handler to call when an item of a certain choice is made.
+	 * Register an event handler to call when a choice is made.
 	 * @param {String} choiceKey Choice key to act on
-	 * @param {ChoiceCallback} callbackFunction `function(choiceKey: String, [event: Event])` to call on choice
+	 * @param {ChoiceCallback} callback `function(choiceKey: String, [event: Event])` to call on choice
 	 */
-	this.onChoose = function (choiceKey, callbackFunction)
+	this.onChoose = function (choiceKey, callback)
 	{
-		if (typeof callbackFunction === "function")
+		if (typeof callback === "function")
 		{
-			callbacks[choiceKey] = callbackFunction;
-			if (data.hasOwnProperty(choiceKey) === false)
+			callbacks.set(choiceKey, callback);
+			if (data.has(choiceKey) === false)
 			{
-				data[choiceKey] = undefined;
+				data.set(choiceKey, undefined);
 			}
 		}
 	};
@@ -49,17 +49,17 @@ let choices = new function ()
 	/**
 	 * Returns the current value of a chioce.
 	 * @param {String} choiceKey Choice key of the requested choice
-	 * @returns {String} Current value of the choice
+	 * @returns {String?} Current value of the choice
 	 */
 	this.get = function (choiceKey)
 	{
-		return data[choiceKey];
+		return data.get(choiceKey);
 	};
 
 	/**
-	 * Sets chioce to an item of a chioce.
-	 * @param {String} choiceKey Choice key of the current choice
-	 * @param {String} value Item key of the current choice
+	 * Sets the value of a chioce. Also calls the callback for that choice key, if defined.
+	 * @param {String} choiceKey Choice key of the choice to set
+	 * @param {String} value Value to set for the choice
 	 * @param {Event} [event] Event that triggered the choice
 	 */
 	this.set = function (choiceKey, value, event)
@@ -77,8 +77,11 @@ let choices = new function ()
 			}
 			choiceElement?.classList.add("chosen");
 			choiceClientElement?.classList.add("chosen");
-			data[choiceKey] = value;
-			callbacks[choiceKey]?.(value, (event instanceof Event));
+			data.set(choiceKey, value);
+			if (callbacks.has(choiceKey))
+			{
+				callbacks.get(choiceKey)(value, (event instanceof Event));
+			}
 		}
 		else
 		{
@@ -104,14 +107,14 @@ let checks = new function ()
 
 	/**
 	 * Returns all elements that are 'checked'.
-	 * @param {HTMLElement} element Element to get all checked child elements
-	 * @returns {Array<String>} Array with the data-names of all checked elements within the element
+	 * @param {HTMLElement} [element] Element to get all checked child elements; entire document body if omitted
+	 * @returns {Array<String>} Array with the data values of all checked elements within the element
 	 */
 	this.getAllChecked = function (element = document.body)
 	{
 		/** @type {Array<String>} */
 		let result = [];
-		for (let e of element.querySelectorAll(".checked"))
+		for (let e of element.querySelectorAll(".checked[data-check]"))
 		{
 			result.push(e.dataset.check);
 		}
@@ -120,7 +123,7 @@ let checks = new function ()
 
 	/**
 	 * Gets the 'checked' state of an element.
-	 * @param {HTMLElement} element Element to set the 'checked' state
+	 * @param {HTMLElement} element Element to get the 'checked' state
 	 * @return {Boolean} `true` if the element is checked, otherwiese `false`
 	 */
 	this.isChecked = function (element)
@@ -131,7 +134,7 @@ let checks = new function ()
 	/**
 	 * Sets the 'checked' state of an element.
 	 * @param {HTMLElement} element Element to set the 'checked' state
-	 * @param {Boolean} [isChecked=true] `true` if the element shall be checked (default), `false` if it shall be unchecked
+	 * @param {Boolean} [isChecked] `true` if the element shall be checked (default), `false` if it shall be unchecked
 	 */
 	this.setChecked = function (element, isChecked = true)
 	{
