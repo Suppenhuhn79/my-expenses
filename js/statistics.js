@@ -162,18 +162,22 @@ function myxStatistics ()
 	let elements = document.getElementById(MODULE_NAME).getNamedChildren();
 	let aggregator = myxStatisticAggregator();
 	let timerange = myxStatisticsTimerange(performAggregation);
+
 	/**
 	 * Prevents calculation while setting modes on module entering.
 	 * @type {Boolean}
 	 */
 	let entering;
+
 	/**
 	 * Determinants the statistics mode. Either _sum_ or _monthly average_.
 	 * @type {CalculationMode}
 	 */
 	let calcMode;
-	/** @type {Record<MonthString, MonthAggregate>} */
+
+	/** @type {AggregationResult} */
 	let data;
+
 	/** @type {Array<MonthString>} */
 	let actualCalculatedMonths;
 
@@ -350,8 +354,8 @@ function myxStatistics ()
 			htmlBuilder.removeAllChildren(elements.get("content"));
 			elements.get("headline").innerHTML = getHeadline();
 			elements.get("title").innerHTML = getTitle();
-			elements.get("amount").innerHTML = myx.formatAmountLocale(data[k]);
-			for (let catAggr of data.totals)
+			elements.get("amount").innerHTML = myx.formatAmountLocale(data.meta[k]);
+			for (let catAggr of data.total.values())
 			{
 				let category = myx.categories.get(catAggr.catId);
 				let subCatDiv = htmlBuilder.newElement("div.hidden", { 'data-cat': catAggr.catId });
@@ -383,7 +387,7 @@ function myxStatistics ()
 							htmlBuilder.newElement("div.flex-fill.cutoff.big", category.fullQualifiedLabel),
 							htmlBuilder.newElement("div.amount.right.big", myx.formatAmountLocale(catAggr[k]))
 						),
-						renderPercentBar("percentbar", catAggr[k] / data[k], category.color),
+						renderPercentBar("percentbar", catAggr[k] / data.meta[k], category.color),
 						subCatDiv
 					)
 				);
@@ -427,8 +431,9 @@ function myxStatistics ()
 	{
 		mouseEvent.stopPropagation();
 		let catId = mouseEvent.target.closest("[data-cat]").dataset.cat;
-		let masterId = myx.categories.data[catId].masterCategory || catId;
-		for (let aggregate of data.totals)
+		let masterId = myx.categories.get(catId).master?.id || catId;
+		console.log(catId, masterId);
+		for (let aggregate of data.total.values())
 		{
 			if (aggregate.catId === masterId)
 			{
@@ -436,7 +441,6 @@ function myxStatistics ()
 				{
 					if (sub.catId === catId)
 					{
-						// console.log(sub, timerange.selectedMonths);
 						console.log(sub.count / timerange.selectedMonths.length + " times per month, " + sub.sum / sub.count + "€ per time, " + sub.mavg + "€ per month");
 						break;
 					}

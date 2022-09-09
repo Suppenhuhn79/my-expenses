@@ -59,7 +59,7 @@ const myxHome = function ()
 		myx.repeatings.process(thisMonth);
 		myx.statistics.aggregator.calc([thisMonth]).then((aggs) =>
 		{
-			elements.get("this-month-total").innerText = myx.formatAmountLocale(aggs.sum);
+			elements.get("this-month-total").innerText = myx.formatAmountLocale(aggs.meta.sum);
 		});
 		let thisMonthsExpenses = myx.expenses.data[thisMonth];
 		// TODO: Handle no expenses.
