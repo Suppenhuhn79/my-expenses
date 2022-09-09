@@ -62,10 +62,16 @@ let myx = function ()
 	 */
 	bottomButtonElements.get("data-selection-button").onclick = function onDataSelectionButtonClick (event)
 	{
-		let dataChoiceButton = bottomButtonElements.get("data-selection-button");
-		choices.set("active-tab", dataChoiceButton.dataset.current, event);
+		let dataChoiceButton = event.target.closest("div");
 		dataChoiceButton.classList.add("chosen");
-		dataSelectionMenu.popup(event, null, dataChoiceButton, "start left, above top");
+		if (choices.get("active-tab") === dataChoiceButton.dataset.current)
+		{
+			dataSelectionMenu.popup(event, null, dataChoiceButton, "start left, above top");
+		}
+		else
+		{
+			choices.set("active-tab", dataChoiceButton.dataset.current, event);
+		}
 	};
 	bottomButtonElements.get("data-selection-button").dataset.current = DATA_TABS[0].tab;
 
