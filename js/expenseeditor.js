@@ -325,7 +325,7 @@ let expenseEditor = function ()
 	*/
 	function onKeypadClick (mouseEvent)
 	{
-		let code = mouseEvent.target.dataset.keycode;
+		let code = mouseEvent.target.closest("td").dataset.keycode;
 		switch (code)
 		{
 			case "__clearall__":
