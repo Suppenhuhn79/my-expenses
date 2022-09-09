@@ -14,11 +14,11 @@
 	--primary-dark-color: #09428c;
 	--primary-darkest-color: #06336e;
 
-	--complementay-color: #ff8e00;
-	--complementay-lightest-color: #ffb85e;
-	--complementay-light-color: #ffa431;
-	--complementay-dark-color: #d57700;
-	--complementay-darkest-color: #a75d00;
+	--complementary-color: #ff8e00;
+	--complementary-lightest-color: #ffb85e;
+	--complementary-light-color: #ffa431;
+	--complementary-dark-color: #d57700;
+	--complementary-darkest-color: #a75d00;
 
 	--header-gradient: linear-gradient(90deg, var(--primary-dark-color) 0%, var(--primary-color) 20%, var(--primary-light-color) 100%);
 
@@ -115,6 +115,14 @@ body {
 }
 .big {
 	font-size: 1.2rem;
+}
+
+.small {
+	font-size: 0.8rem;
+}
+
+.uppercase {
+	text-transform: uppercase;
 }
 
 .labeled-icon {
