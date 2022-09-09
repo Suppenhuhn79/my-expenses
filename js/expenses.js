@@ -900,7 +900,7 @@ function myxExpenses ()
 
 	return { // publish members
 		get moduleName () { return MODULE_NAME; },
-		get data () { return data; }, // debug_only
+		get data () { return data; },
 		init: init,
 		fetchData: fetchData,
 		enter: resetFilter,
