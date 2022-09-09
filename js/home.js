@@ -6,6 +6,11 @@ const myxHome = function ()
 	let categorySelector = new CategorySelector(elements.get("category-selector"), onCategoryChosen, true);
 
 	/**
+	 * Current date.
+	 */
+	let now = new Date();
+
+	/**
 	 * Action for clicking the this months total filter icon.
 	 * Switches to statistics tab.
 	 */
@@ -50,19 +55,45 @@ const myxHome = function ()
 	}
 
 	/**
-	 * Actions on setting the module the active tab.
+	 * Renders the "Expenses this month so far" content.
 	 */
-	function enter ()
+	function renderMonthTotal ()
 	{
-		let thisMonth = (new Date()).toMonthString();
-		elements.get("headline").innerHTML = (new Date()).format("dddd, d. mmmm yyyy");
+		let thisMonth = now.toMonthString();
+		elements.get("headline").innerHTML = now.format("dddd, d. mmmm yyyy");
 		myx.repeatings.process(thisMonth);
 		myx.statistics.aggregator.calc([thisMonth]).then((aggs) =>
 		{
 			elements.get("this-month-total").innerText = myx.formatAmountLocale(aggs.meta.sum);
 		});
-		let thisMonthsExpenses = myx.expenses.data[thisMonth];
-		// TODO: Handle no expenses.
+	}
+
+	/**
+	 * Renders the month and budget progress bars.
+	 */
+	function renderProgress ()
+	{
+		let bom = new Date(now.getFullYear(), now.getMonth(), 1);
+		let eom = now.endOfMonth();
+		let monthProgress = (now - bom) / (eom - bom);
+		htmlBuilder.replaceContent(
+			elements.get("progress-bar-month"),
+			myx.statistics.renderPercentBar("percentbar", monthProgress, "var(--primary-color)")
+		);
+		// TODO: Budget
+		htmlBuilder.replaceContent(
+			elements.get("progress-bar-budget"),
+			myx.statistics.renderPercentBar("percentbar", 0, "var(--complementary-color)")
+		);
+	}
+
+	/**
+	 * Renders the last expense panel.
+	 * // TODO: Handle no expenses.
+	 */
+	function renderLastExpense ()
+	{
+		let thisMonthsExpenses = myx.expenses.data[now.toMonthString()];
 		let lastExpenseIndex = thisMonthsExpenses.length - 1;
 		let lastExpense = thisMonthsExpenses[lastExpenseIndex];
 		let lastExpenseElement = myx.expenses.renderItem(lastExpense, lastExpenseIndex);
@@ -78,7 +109,26 @@ const myxHome = function ()
 		let lastExpenseDaysAgo = Date.daysBetween(lastExpense.dat, new Date());
 		elements.get("latest-expense-date").innerText = Date.locales.relativeDayNames[lastExpenseDaysAgo] || lastExpense.dat.format("dddd, d. mmmm");
 		htmlBuilder.replaceContent(elements.get("latest-expense-item"), lastExpenseElement);
+	}
+
+	/**
+	 * Renders the category selection panel to quick add an expense.
+	 */
+	function renderAddExpensePanel ()
+	{
 		categorySelector.refresh();
+	}
+
+	/**
+	 * Actions on setting the module the active tab.
+	 */
+	function enter ()
+	{
+		now = new Date();
+		renderMonthTotal();
+		renderProgress();
+		renderLastExpense();
+		renderAddExpensePanel();
 		elements.get("content").scrollTo({ top: 0 });
 	};
 

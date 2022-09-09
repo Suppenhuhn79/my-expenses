@@ -463,7 +463,8 @@ function myxStatistics ()
 		get timerange () { return timerange; }, // debug_only
 		get elements () { return elements; }, // debug_only
 		get moduleName () { return MODULE_NAME; },
-		enter: enter
+		enter: enter,
+		renderPercentBar: renderPercentBar // TODO: should not be borrowed from this module
 		/*
 		getMonthsInYear: (year) =>
 		{

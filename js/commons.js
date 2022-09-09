@@ -150,6 +150,7 @@ class FA
 		chart_pie: "f200",
 		check: "f00c",
 		clone: "f24d",
+		cog: "f013",
 		divide: "f529",
 		filter: "f0b0",
 		forward: "f04e",
