@@ -50,7 +50,7 @@ interface Date {
 	/**
 	 * Returns a new date which is set to the end of the current dates month.
 	 */
-	endOfMonths(): date;
+	endOfMonth(): date;
 
 	/**
 	 * Returns whether this dates day is the last day of this dates month.
