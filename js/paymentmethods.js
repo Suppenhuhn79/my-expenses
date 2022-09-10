@@ -1,5 +1,5 @@
 /**
- * Payment method.
+ * A payment method.
  */
 class PaymentMethod
 {
@@ -30,6 +30,11 @@ class PaymentMethod
 		 * @type {String}
 		 */
 		this.color = src?.color || "#808080";
+
+		/**
+		 * @type {Boolean}
+		 */
+		this.isDisabled = false;
 	}
 
 	/**
@@ -65,6 +70,37 @@ class PaymentMethod
 		};
 	};
 }
+
+/**
+ * Selector for payment methods.
+ * 
+ * @extends {Selector}
+ */
+class PaymentMethodSelector extends Selector
+{
+	/**
+	 * @param {SelectorCallback} callback Function to call on selection
+	 * @param {Boolean} multiSelect Whether to allow selection of multiple items (`true`) or single item selection only (`false`)
+	 * @param {Boolean} activeOnly Provide only active payment methods for selection (`true`) or also include disabled payment methods (`false`)
+	 */
+	constructor(callback, multiSelect, activeOnly)
+	{
+		/** @type {Map<String, ISelectableIcon>} */
+		let items = new Map();
+		if (activeOnly)
+		{
+			for (let pmt of myx.paymentMethods.active)
+			{
+				items.set(pmt.id, pmt);
+			}
+		}
+		else
+		{
+			items = myx.paymentMethods.data;
+		}
+		super(callback, multiSelect, items);
+	}
+};
 
 const PaymentMethodTabMode = {
 	DEFAULT: "default",
@@ -120,12 +156,12 @@ function myxPaymentMethods ()
 		function revertData (revertData) { revertData.items = Object.fromEntries(JSON.parse(revertData.items)); fromObject(revertData); }
 	);
 
-	elements.get("edit-button").onclick = () => tabMode.set(PaymentMethodTabMode.EDIT);
-	elements.get("apply-edits-button").onclick = () => saveToFile();
-	elements.get("cancel-edits-button").onclick = () => { tabMode.set(PaymentMethodTabMode.DEFAULT); renderList(); };
-	elements.get("search-button").onclick = () => tabMode.set(PaymentMethodTabMode.SEARCH);
-	elements.get("cancel-search-button").onclick = () => tabMode.set(PaymentMethodTabMode.DEFAULT);
-	elements.get("add-button").onclick = () => promptEditor();
+	elements.get("edit-button").onclick = function onEditButtonClick () { tabMode.set(PaymentMethodTabMode.EDIT); };
+	elements.get("apply-edits-button").onclick = function onApplyEditsButtonClick () { saveToFile(); };
+	elements.get("cancel-edits-button").onclick = function onCancelEditsButtonClick () { { tabMode.set(PaymentMethodTabMode.DEFAULT); renderList(); }; };
+	elements.get("search-button").onclick = function onSearchButtonClick () { tabMode.set(PaymentMethodTabMode.SEARCH); };
+	elements.get("cancel-search-button").onclick = function onCancelSearchButtonClick () { tabMode.set(PaymentMethodTabMode.DEFAULT); };
+	elements.get("add-button").onclick = function onAddButtonClick () { promptEditor(); };
 
 	/**
 	 * Loads _payment methods_ from cache or remote file (if modified).
@@ -150,19 +186,37 @@ function myxPaymentMethods ()
 	function fromObject (obj)
 	{
 		data.clear();
+		order = obj.order;
+		disabledItems = obj.disabled || [];
 		for (let itemKey of Object.keys(obj.items))
 		{
 			data.set(itemKey, new PaymentMethod(obj.items[itemKey], itemKey));
+			if (disabledItems.includes(itemKey))
+			{
+				data.get(itemKey).isDisabled = true;
+			}
 		}
-		order = obj.order;
-		disabledItems = obj.disabled || [];
 		defaultId = obj.default || Object.keys(obj.items)[0];
 	}
 
 	/**
+	 * Returns an ordered array with all active payment methods.
+	 * @returns {Array<PaymentMethod>}
+	 */
+	function getActivePaymentMethods ()
+	{
+		/** @type {Array<PaymentMethod>} */
+		let result = [];
+		for (let id of order)
+		{
+			result.push(data.get(id));
+		}
+		return result;
+	}
+	/**
 	 * Pops up a menu to prompt for a payment method.
 	 * @param {HTMLElement} alignElement Element to align the menu to
-	 * @param {PaymentMethodPromptCallback} callback Fcuntion to call on selection
+	 * @param {SelectorCallback} callback Function to call on selection
 	 */
 	function prompt (alignElement, callback)
 	{
@@ -335,15 +389,16 @@ function myxPaymentMethods ()
 	 * Event handler for clicking the "trash" button in the icon editor.
 	 * Puts the item at the top of the disabled items.
 	 * @param {Event} [event] Triggering event; not used, but required by interface
-	 * @param {IdString} context Id of the affected payment method
+	 * @param {IdString} pmtId Id of the affected payment method
 	 */
-	function onTrashClick (event, context)
+	function onTrashClick (event, pmtId)
 	{
 		if (order.length > 1)
 		{
-			order.splice(order.indexOf(context), 1);
-			disabledItems.splice(0, 0, context);
-			if (defaultId === context)
+			order.splice(order.indexOf(pmtId), 1);
+			disabledItems.splice(0, 0, pmtId);
+			data.get(pmtId).isDisabled = true;
+			if (defaultId === pmtId)
 			{
 				defaultId = order[0];
 			}
@@ -360,17 +415,21 @@ function myxPaymentMethods ()
 	{
 		let pmtId = event.target.closest("div.item").dataset.id;
 		disabledItems.splice(disabledItems.indexOf(pmtId), 1);
+		data.get(pmtId).isDisabled = false;
 		order.push(pmtId);
 		renderList();
 	}
 
 	return { // publish members
 		get moduleName () { return MODULE_NAME; },
-		get data () { return data; }, // debug_only
+		get data () { return data; },
+		/**
+		 * Ordered array of all master categories.
+		 */
+		get active () { return getActivePaymentMethods(); },
 		fetchData: fetchData,
 		enter: () => renderList(PaymentMethodTabMode.DEFAULT),
 		leave: () => tabMode.set(PaymentMethodTabMode.DEFAULT),
-		/** @type {IdString} */
 		get default () { return defaultId; },
 		/** @param {IdString} id */
 		get: (id) => { return data.get(id); },

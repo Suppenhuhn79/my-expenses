@@ -3,7 +3,6 @@ const myxHome = function ()
 	const MODULE_NAME = "home-tab";
 
 	let elements = document.getElementById("home-tab").getNamedChildren();
-	let categorySelector = new CategorySelector(elements.get("category-selector"), onCategoryChosen, true);
 
 	/**
 	 * Current date.
@@ -14,8 +13,10 @@ const myxHome = function ()
 	 * Action for clicking the this months total filter icon.
 	 * Switches to statistics tab.
 	 */
-	elements.get("filter-sum-button").onclick = function onFilterSumButtonClick ()
+	elements.get("filter-sum-button").onclick = function onFilterSumButtonClick (event)
 	{
+		let filterMenu = new FilterMenu();
+		filterMenu.popup(event, elements.get("filter-sum-button"), "end right, below bottom");
 		myx.showNotification("Not implemented yet.");
 	};
 
@@ -49,7 +50,7 @@ const myxHome = function ()
 	/**
 	 * Initializes the module.
 	 */
-	function init ()
+	async function init ()
 	{
 		// May be required by interface.
 	}
@@ -116,7 +117,16 @@ const myxHome = function ()
 	 */
 	function renderAddExpensePanel ()
 	{
-		categorySelector.refresh();
+		let selectorContainer = elements.get("category-selector");
+		htmlBuilder.removeAllChildren(selectorContainer);
+		for (let item of CategorySelector.getMasters().values())
+		{
+			selectorContainer.appendChild(htmlBuilder.newElement("div.item.labeled-icon.click",
+				{ 'data-id': item.id, onclick: onCategoryItemClick },
+				item.renderIcon(),
+				htmlBuilder.newElement("div.label", item.label))
+			);
+		}
 	}
 
 	/**
@@ -139,10 +149,9 @@ const myxHome = function ()
 	 * 
 	 * @param {IdString} catId Id of selected category
 	 */
-	function onCategoryChosen (catId)
+	function onCategoryItemClick (event)
 	{
-		myx.addExpense(new Expense(null, { cat: catId }));
-		categorySelector.refresh(); // deselect selected category
+		myx.addExpense(new Expense(null, { cat: event.target.closest("[data-id]").dataset.id }));
 	}
 
 	return {

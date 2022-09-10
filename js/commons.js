@@ -205,3 +205,216 @@ class FA
 		if (new.target === FA) throw TypeError("FA is not a constructor");
 	}
 };
+
+/**
+ * Abstract class for selectors.
+ * 
+ * Provides functionality for rendering and selecting items.
+ * 
+ * @abstract
+ */
+class Selector
+{
+	/**
+	 * @param {SelectorCallback} callback Callback on item selection
+	 * @param {Boolean} multiSelect Allow seletion multiple items (`true`) or single item selection (`false`)
+	 * @param {Map<String, ISelectableIcon>} items // TODO
+	 */
+	constructor(callback, multiSelect, items)
+	{
+		if (this.constructor === Selector)
+		{
+			throw new TypeError("Selector is an abstract class");
+		}
+		else
+		{
+			/**
+			 * This instance, to have it in event handlers where `this` is `window`.
+			 * @type {Selector}
+			 */
+			let _this = this;
+
+			/**
+			 * Callback on item selection
+			 * @type {SelectorCallback}
+			 */
+			this.callback = callback;
+
+			/**
+			 * Allow seletion multiple items or single item selection only
+			 */
+			this.multiSelect = multiSelect;
+
+			/**
+			 * Items to be availible for selection in this selector.
+			 * @type {Map<IdString, ISelectableIcon>}
+			 */
+			this.items = items;
+
+			/**
+			 * Element to render the selection on
+			 * @type {HTMLElement}
+			 */
+			this.element = htmlBuilder.newElement("div.selector" + ((this.multiSelect) ? ".multiselect" : ""));
+
+			/**
+			 * Event handler for clicking an item.
+			 *
+			 * Calls the `callback` function.
+			 *
+			 * @param {Event} event Triggering event
+			 */
+			this._onItemClick = function (event)
+			{
+				/**
+				 * Actual item.
+				 * @type {HTMLElement} */
+				let eventItem = event.target.closest(".item");
+				/**
+				 * Id of the clicked items.
+				 * @type {String} */
+				let id = eventItem.dataset.id;
+				if (_this.multiSelect === true)
+				{
+					eventItem.classList.toggle("selected");
+				}
+				else
+				{
+					_this.highlightItem(id);
+				}
+				eventItem.scrollIntoView();
+				_this.callback(id);
+			};
+		}
+	}
+
+	/**
+	 * Selects (highlights) a item within the selection.
+	 * @param {IdString} id Category id to select
+	 * @param {Boolean} [scrollIntoView] Wheter to scroll the selected item into view (`true`) or not (`false`, default)
+	 */
+	highlightItem (id, scrollIntoView)
+	{
+		for (let otherElement of this.element.querySelectorAll("[data-id]"))
+		{
+			otherElement.setStyles({
+				backgroundColor: null,
+				color: null
+			});
+			otherElement.querySelector("i").style.color = null;
+		};
+		let selectedElement = this.element.querySelector("[data-id='" + id + "']");
+		if (!!selectedElement)
+		{
+			selectedElement.setStyles({
+				backgroundColor: this.items.get(id).color,
+				color: "#fff"
+			});
+			selectedElement.querySelector("i").style.color = "#fff";
+			if (scrollIntoView)
+			{
+				selectedElement.scrollIntoView({ inline: "center" });
+			}
+		}
+	};
+
+	/**
+	 * Renders the items as _labled icons_ on this selectors element.
+	 * @param {IdString} [selectedId] Id of the pre-selected item; no selection if omitted
+	 */
+	refresh (selectedId)
+	{
+		htmlBuilder.removeAllChildren(this.element);
+		for (let item of this.items.values())
+		{
+			this.element.appendChild(htmlBuilder.newElement("div.item.labeled-icon.click",
+				{ 'data-id': item.id, onclick: this._onItemClick },
+				item.renderIcon(),
+				htmlBuilder.newElement("div.label", item.label)));
+		}
+		if (selectedId)
+		{
+			this.highlightItem(selectedId, true);
+		}
+		else
+		{
+			this.element.scrollTo({ left: 0 });
+		}
+	};
+
+	/**
+	 * Sets items as "selected".
+	 * @param {Array<IdString>} ids Ids of items to set "selected"
+	 */
+	select (ids)
+	{
+		for (let element of this.element.querySelectorAll(".item"))
+		{
+			element.setClassConditional("selected", (ids.includes(element.dataset.id)));
+		}
+	}
+
+	/**
+	 * Returns the ids of all selected items in this selector.
+	 * @returns {Array<IdString>} Ids all selected items
+	 */
+	getSelectedIds ()
+	{
+		/** @type {Array<IdString>} */
+		let result = [];
+		for (let element of this.element.querySelectorAll(".item.selected"))
+		{
+			result.push(element.dataset.id);
+		}
+		return result;
+	}
+}
+
+// TODO: doc
+class FilterMenu
+{
+	constructor()
+	{
+		let pmtSelector = new PaymentMethodSelector(console.log, true, false);
+		let catSelector = new CategorySelector(console.log, true);
+		pmtSelector.element.classList.add("wide-flex");
+		pmtSelector.element.style = "padding: 0.5em; max-width: 85vw; overflow-x: scroll;";
+		pmtSelector.refresh();
+		pmtSelector.select(Array.from(myx.paymentMethods.data.keys()));
+		myxDebug.publish(pmtSelector, "pmtSelector");
+
+		catSelector.element.classList.add("wide-flex");
+		catSelector.element.style = "padding: 0.5em; max-width: 85vw; overflow-x: scroll;";
+		catSelector.refresh();
+
+		let mbConfig = {
+			title: "Filter",
+			items: [{
+				html: pmtSelector.element,
+				enabled: false
+			},
+			{
+				html: catSelector.element
+			}
+			],
+			buttons: [
+				{
+					key: "ok",
+					label: "apply"
+				},
+				{
+					key: "cancel",
+					label: "cancel"
+				}
+			]
+		};
+		this._menuBox = new Menubox("FilterMenu", mbConfig);
+		myxDebug.publish(this._menuBox, "filterMenu");
+	}
+
+	// TODO: doc
+	popup (event, element, align)
+	{
+		this._menuBox.popup(event, null, element, align);
+	}
+}

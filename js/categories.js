@@ -5,6 +5,9 @@ const CategoriesTabMode = {
 	SAVING: "__saving__"
 };
 
+/**
+ * An expenses category.
+ */
 class Category
 {
 	static DEFAULT_LABEL = "Unnamed category";
@@ -42,7 +45,7 @@ class Category
 	 */
 	get color ()
 	{
-		return (this.master instanceof Category) ? this.master.color : this._color;
+		return (this.isMaster) ? this._color : this.master.color;
 	}
 
 	/**
@@ -51,7 +54,7 @@ class Category
 	get fullQualifiedLabel ()
 	{
 		let result = this.label;
-		if (this.master instanceof Category)
+		if (this.isMaster === false)
 		{
 			result = this.master.label + "/" + result;
 		}
@@ -59,7 +62,15 @@ class Category
 	}
 
 	/**
-	 * Returns the ids of this categorys sub-categories.
+	 * `true` if this is a master category, `false` if this is a sub-category.
+	 */
+	get isMaster ()
+	{
+		return ((this.master instanceof Category) === false);
+	}
+
+	/**
+	 * Ids of this categorys sub-categories.
 	 * @returns {Array<IdString>}
 	 */
 	get subCategoriesIds ()
@@ -93,7 +104,7 @@ class Category
 	{
 		this.label = icon.label;
 		this.glyph = icon.glyph;
-		this._color = (this.master instanceof Category) ? undefined : icon.color;
+		this._color = (this.isMaster) ? icon.color : undefined;
 	}
 
 	/**
@@ -115,7 +126,7 @@ class Category
 			label: this.label,
 			icon: this.glyph.value
 		};
-		if ((this.master instanceof Category) === false)
+		if (this.isMaster)
 		{
 			result.color = this._color;
 			if ((this.subCategories instanceof Array) && (this.subCategories.length > 0))
@@ -127,7 +138,7 @@ class Category
 				}
 			}
 		}
-		else if (this.master instanceof Category)
+		else
 		{
 			result.masterCategory = this.master.id;
 		}
@@ -136,132 +147,113 @@ class Category
 }
 
 /**
- * Puts a category selection element on an existing document node.
+ * Selector for categories.
+ * 
+ * @extends {Selector}
  */
-class CategorySelector
+class CategorySelector extends Selector
 {
 	/**
-	 * @param {HTMLElement} element Element to render the selection on
-	 * @param {CategorySelectorCallback} callback Callback on category selection
-	 * @param {Boolean} [mastersOnly] Set if selection is limited to maste categories only, or if sub-categories can be selected (default)
+	 * Returns all master categories as a map to build selection items from.
+	 * @returns {Map<IdString, Category>} All master categories as a map
 	 */
-	constructor(element, callback, mastersOnly = false)
+	static getMasters ()
 	{
-		/**
-		 * This instance, to have it in event handlers where `this` is `window`.
-		 * @type {CategorySelector}
-		 */
-		let _instance = this;
-
-		/**
-		 * Callback on category selection
-		 * @type {CategorySelectorCallback}
-		 */
-		this.callback = callback;
-
-		/**
-		 * Element to render the selection on
-		 * @type {HTMLElement}
-		 */
-		this.element = element;
-
-		/**
-		 * Limit selection to master categories only (`true`) or allow selection of sub-categiroes (`false`)
-		 * @type {Boolean}
-		 */
-		this.mastersOnly = mastersOnly;
-
-		/**
-		 * Selects (highlights) a category within the selection.
-		 * @param {IdString} id Category id to select
-		 * @param {Boolean} [scrollIntoView] Wheter to scroll the selected item into view (`true`) or not (`false`, default)
-		 */
-		this._highlightSelection = function (id, scrollIntoView)
+		let result = new Map();
+		for (let cat of myx.categories.masters)
 		{
-			for (let otherElement of this.element.querySelectorAll("[data-catid]"))
-			{
-				otherElement.style.backgroundColor = null;
-				otherElement.style.color = null;
-			};
-			let selectedElement = this.element.querySelector("[data-catid='" + id + "']");
-			selectedElement.style.backgroundColor = myx.categories.get(id).color;
-			selectedElement.style.color = "#fff";
-			if (scrollIntoView)
-			{
-				selectedElement.scrollIntoView({ inline: "center" });
-			}
-		};
+			result.set(cat.id, cat);
+		}
+		return result;
+	}
+
+	/**
+	 * @param {SelectorCallback} callback Callback on item selection
+	 * @param {Boolean} multiSelect Allow seletion multiple items (`true`) or single item selection (`false`)
+	 */
+	constructor(callback, multiSelect)
+	{
+		super(callback, multiSelect, CategorySelector.getMasters());
+
+		/** @type {CategorySelector} */
+		let _this = this; // Must be accessed after calling `super()`
 
 		/**
-		 * Event handler for clicking a category item (or the "back" button).
+		 * Event handler for clicking an item.
+		 * 
+		 * Overloads the parent method to handle switching between master and sub-categories.
 		 *
 		 * Calls the `callback` function.
 		 *
 		 * @param {Event} event Triggering event
 		 */
-		function _onItemClick (event)
+		this._onItemClick = function (event)
 		{
+			/**
+			 * Actual item.
+			 * @type {HTMLElement} */
+			let eventItem = event.target.closest("[data-id]");
 			/**
 			 * Id of the clicked items.
 			 * @type {String} */
-			let id = event.target.closest("[data-catid]").dataset.catid;
+			let id = eventItem.dataset.id;
+			eventItem.scrollIntoView();
 			if (id === "__back__")
 			{
-				_instance.refresh(null);
+				_this.items = CategorySelector.getMasters();
+				_this.refresh();
+			}
+			else if (myx.categories.get(id).isMaster)
+			{
+				if ((_this.multiSelect !== true) || (_this.element.querySelector(".back") === null))
+				{
+					_this.refresh(id);
+				}
+			}
+			if (_this.multiSelect === true)
+			{
+				// TODO: aint enough setting the class, because we can not net all selected items from the existing elements, but must have a set in this class
+				eventItem.classList.toggle("selected");
 			}
 			else
 			{
-				// if ((_instance.mastersOnly !== true) && (myx.categories.masterCategoryIds.includes(id)))
-				if (_instance.mastersOnly !== true)
-				{
-					_instance.refresh(id);
-				}
-				else
-				{
-					_instance._highlightSelection(id);
-				}
-				_instance.callback(id);
+				_this.highlightItem(id, false);
+			}
+			_this.callback(id);
+		};
+	};
+
+	/**
+	 * Renders the items as _labled icons_ on this selectors element.
+	 * @param {IdString} [selectedId] Id of the pre-selected item; no selection if omitted
+	 */
+	refresh (selectedId)
+	{
+		if (!!selectedId)
+		{
+			let masterOfSelected = (myx.categories.get(selectedId).isMaster) ? myx.categories.get(selectedId) : myx.categories.get(selectedId).master;
+			this.items.clear();
+			this.items.set(masterOfSelected.id, masterOfSelected);
+			for (let cat of masterOfSelected.subCategories)
+			{
+				this.items.set(cat.id, cat);
+			}
+			this.refresh();
+			this.element.insertBefore(htmlBuilder.newElement("div.labeled-icon",
+				{ 'data-id': "__back__", onclick: this._onItemClick },
+				htmlBuilder.newElement("i.icon.back.fas", FA.toHTML("arrow-left"))
+			), this.element.firstElementChild);
+			if (this.multiSelect !== true)
+			{
+				super.highlightItem(selectedId);
 			}
 		}
-
-		/**
-		 * Renders the category items as _labled icons_ on the given document element.
-		 * @param {IdString} [selectedId] Id of the pre-selected category; no selection if omitted
-		 */
-		this.refresh = function (selectedId)
+		else
 		{
-			htmlBuilder.removeAllChildren(element);
-			let catSet = myx.categories.masters;
-			if (selectedId)
-			{
-				let masterCat = myx.categories.get(selectedId).master || myx.categories.get(selectedId);
-				catSet = [masterCat].concat(masterCat.subCategories);
-			}
-			if (selectedId)
-			{
-				element.appendChild(htmlBuilder.newElement("div.item.labeled-icon.click",
-					htmlBuilder.newElement("div.cat.icon.back.fas",
-						{ 'data-catid': "__back__", onclick: _onItemClick },
-						FA.toHTML("arrow-left"))));
-			}
-			for (let cat of catSet)
-			{
-				element.appendChild(htmlBuilder.newElement("div.item.labeled-icon.click",
-					{ 'data-catid': cat.id, onclick: _onItemClick },
-					cat.renderIcon(),
-					htmlBuilder.newElement("div.label", cat.label)));
-			}
-			if (selectedId)
-			{
-				this._highlightSelection(selectedId, true);
-			}
-			else
-			{
-				element.scrollTo({ left: 0 });
-			}
-		};
+			super.refresh(selectedId);
+		}
 	}
-};
+}
 
 /**
  * my-expenses "categories" module.
@@ -463,11 +455,12 @@ function myxCategories ()
 	}
 
 	/**
-	 * Returns an array with all master categories.
-	 * @returns {Array<Category>}
+	 * Returns an ordered array with all master categories.
+	 * @returns {Array<Category>} Ordered array with all master categories
 	 */
 	function getMasters ()
 	{
+		/** @type {Array<Category>} */
 		let result = [];
 		for (let masterId of order)
 		{
@@ -485,7 +478,7 @@ function myxCategories ()
 		for (let listElement of elements.get("content").children)
 		{
 			let masterCategory = data.get(listElement.dataset.id || listElement.querySelector("[data-id]").dataset.id);
-			if (masterCategory.master instanceof Category) // former sub-category became a master
+			if (masterCategory.isMaster === false) // former sub-category became a master
 			{
 				masterCategory._color = masterCategory.master.color;
 				masterCategory.master = undefined;
@@ -553,12 +546,15 @@ function myxCategories ()
 
 	return { // publish members
 		get moduleName () { return MODULE_NAME; },
-		get data () { return data; }, // debug_only
+		get data () { return data; },
 		fetchData: fetchData,
 		enter: () => renderList(CategoriesTabMode.DEFAULT),
 		leave: () => tabMode.set(CategoriesTabMode.DEFAULT),
 		/** @param {IdString} id */
 		get: (id) => { return data.get(id); },
+		/**
+		 * Ordered array of all master categories.
+		 */
 		get masters () { return getMasters(); }
 	};
 };

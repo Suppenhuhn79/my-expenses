@@ -28,11 +28,6 @@
 	border-radius: 0.3em;
 	overflow: hidden;
 }
-.labled-icons-grid .item .label {
-	overflow: hidden;
-	max-width: 100%;
-	text-overflow: ellipsis;
-}
 
 .percentbar {
 	width: 100%;
@@ -47,6 +42,21 @@
 	padding: 0 0.5em;
 	font-size: 0.8rem;
 	margin: 0 1em;
+}
+
+.selector .back {
+	color: #888;
+	font-size: 1.5em;
+	width: 2em;
+	margin: 0;
+	text-align: center;
+}
+
+.selector.multiselect .item:not(.selected) {
+	opacity: 0.45;
+}
+.selector.multiselect .item:not(.selected) .label {
+	text-decoration: line-through;
 }
 
 #header {
@@ -166,6 +176,7 @@
 	flex: 1;
 	max-width: 25%;
 	padding: 0.8rem;
+	border-radius: 0;
 }
 #bottom-menu > div + div {
 	border-left: 1px solid #aaa;

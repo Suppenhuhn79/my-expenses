@@ -62,8 +62,13 @@ let expenseEditor = function ()
 	 * @type {ExpenseEditorCallback} */
 	let callbackFunc;
 
+	/**
+	 * Category selector.
+	 * @type {CategorySelector} */
+	let categorySelector;
+
 	let tabMode = new TabModeHandler(elements.get());
-	let categorySelector = new CategorySelector(elements.get("category-selector"), onCategoryChosen);
+
 	let confirmDeletePrompt = new Menubox("delete-expense", {
 		title: "Confirm delete expense",
 		items: [],
@@ -122,7 +127,7 @@ let expenseEditor = function ()
 		_setElementEnabled(elements.get("clone"), isExisting);
 		_setElementEnabled(elements.get("redo"), isExisting);
 		_setElementEnabled(elements.get("delete"), (isExisting || isRepeatingMode));
-		_setElementEnabled(elements.get("apply"), (!!currentItem.cat));
+		_setElementEnabled(elements.get("apply"), (myx.categories.data.has(currentItem.cat)));
 		elements.get("title").innerText = (isRepeatingMode) ? "set repeating expense" : ((isExisting) ? "edit expense" : "add expense");
 		elements.get("dat").value = currentItem.dat.format("yyyy-mm-dd");
 		if (editedInterval.isValid())
@@ -203,7 +208,12 @@ let expenseEditor = function ()
 		renderAmountText();
 		elements.get("txt").value = currentItem.txt || "";
 		choices.set("active-tab", "expense-editor");
+		categorySelector = new CategorySelector(onCategorySelected, false);
 		categorySelector.refresh(currentItem.cat);
+		htmlBuilder.replaceContent(
+			elements.get("category-selector"),
+			categorySelector.element
+		);
 		if ((!isExistingExpense()) && (myx.repeatings.intervalOf(currentItem.rep).isValid()))
 		{
 			switchToRepeatMode();
@@ -343,8 +353,9 @@ let expenseEditor = function ()
 
 	/**
 	 * Event handler for chosing a category. Applies the choice to the currently edited expense.
+	 * @param {IdString} catId Id of the selected category
 	 */
-	function onCategoryChosen (catId)
+	function onCategorySelected (catId)
 	{
 		currentItem.cat = catId;
 		refreshEditor();

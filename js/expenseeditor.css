@@ -1,29 +1,15 @@
-#expense-editor [name="category-selector"] {
+#expense-editor [name="category-selector"] .selector {
 	display: flex;
+	flex-direction: row;
 	padding: 0.5rem 0;
 	overflow: scroll;
 }
 
-#expense-editor [name="category-selector"] > div {
-	border-radius: 0.3em;
-	padding: 0.3em;
-}
-#expense-editor [name="category-selector"] > div:first-child {
+#expense-editor [name="category-selector"] .selector > div:first-child {
 	margin-left: 0.5em;
 }
-#expense-editor [name="category-selector"] > div:last-child {
+#expense-editor [name="category-selector"] .selector > div:last-child {
 	margin-right: 0.5em;
-}
-#expense-editor [name="category-selector"] .label {
-	min-width: 3.5rem;
-	text-align: center;
-}
-#expense-editor [name="category-selector"] .back {
-	color: #888;
-	font-size: 1.5em;
-	/* max-width: 2rem; */
-	/* flex: 1; */
-	margin: 0;
 }
 
 #expense-editor [name="amt"] {
