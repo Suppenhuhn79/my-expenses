@@ -162,6 +162,11 @@ HTMLElement.prototype.setStyles = function (styles)
 	}
 };
 
+HTMLElement.prototype.setClassConditional = function (className, condition)
+{
+	(condition === true) ? this.classList.add(className) : this.classList.remove(className);
+};
+
 /*
  * String
  */

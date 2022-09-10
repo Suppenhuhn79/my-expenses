@@ -102,6 +102,13 @@ interface HTMLElement {
 	assginProperties(props: Object);
 
 	/**
+	 * Adds or removes a CSS class to this element by condition.
+	 * @param className Name of CSS class to add/remove to this element
+	 * @param condition Condition whether to add (`true`) or remove (`false`) the class
+	 */
+	setClassConditional(className: String, condition: Boolean);
+
+	/**
 	 * Sets this elements style.
 	 * @param styles Object of `[key: string]: String` style items to set to the HTML elements style
 	 */
