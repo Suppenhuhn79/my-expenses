@@ -168,6 +168,18 @@ HTMLElement.prototype.setClassConditional = function (className, condition)
 };
 
 /*
+ * Set
+ */
+Set.prototype.exclude = function (iterable)
+{
+	for (let item of iterable)
+	{
+		this.delete(item);
+	}
+	return this;
+};
+
+/*
  * String
  */
 String.prototype.getHash = function ()

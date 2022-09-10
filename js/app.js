@@ -256,6 +256,7 @@ let myx = function ()
 				localStorage.removeItem(AUTOSIGNIN_FLAG);
 				console.table(Object.fromEntries(googleAppApi.files));
 				Promise.allSettled([
+					home.fetchData(),
 					categories.fetchData(),
 					paymentMethods.fetchData(),
 					expenses.fetchData(),
@@ -330,6 +331,11 @@ let myx = function ()
 		newId: newIdString,
 		formatAmountLocale: formatAmountLocale,
 		showNotification: showNotification,
+		/**
+		 * User defined expenses filters.
+		 * @type {Map<String, ExpensesFilter>}
+		 */
+		userFilters: new Map(),
 		xhrBegin: xhrBegin,
 		xhrSuccess: xhrSuccess,
 		xhrError: xhrError

@@ -1,8 +1,22 @@
 const myxHome = function ()
 {
 	const MODULE_NAME = "home-tab";
+	const FILE_NAME = "usr.json";
+	const DEFAULTS = {
+		filters: {
+			default: {
+				cats: [],
+				pmts: []
+			}
+		}
+	};
 
 	let elements = document.getElementById("home-tab").getNamedChildren();
+
+	/**
+	 * @type {Number?}
+	 */
+	let userBudget;
 
 	/**
 	 * Current date.
@@ -15,7 +29,7 @@ const myxHome = function ()
 	 */
 	elements.get("filter-sum-button").onclick = function onFilterSumButtonClick (event)
 	{
-		let filterMenu = new FilterMenu();
+		let filterMenu = new FilterMenu(myx.userFilters.get("default"), onExpensesFilterSet);
 		filterMenu.popup(event, elements.get("filter-sum-button"), "end right, below bottom");
 		myx.showNotification("Not implemented yet.");
 	};
@@ -48,11 +62,37 @@ const myxHome = function ()
 	};
 
 	/**
-	 * Initializes the module.
+	 * Loads user data from cache or remote file (if modified).
+	 * @async
+	 * @returns {Promise<void>} Promise
 	 */
-	async function init ()
+	function fetchData ()
 	{
-		// May be required by interface.
+		return new Promise((resolve) =>
+		{
+			myx.loadFile(FILE_NAME, DEFAULTS, (obj) =>
+			{
+				userBudget = obj.budget;
+				for (let key of Object.keys(obj.filters))
+				{
+					myx.userFilters.set(key, new ExpensesFilter().from(obj.filters[key]));
+				}
+			}).then(resolve);
+		});
+	}
+
+	/**
+	 * Saves user data to file.
+	 * @async
+	 */
+	async function saveToFile ()
+	{
+		console.log(Object.fromEntries(myx.userFilters));
+		myx.xhrBegin();
+		googleAppApi.saveToFile(FILE_NAME, {
+			budget: userBudget,
+			filters: Object.fromEntries(myx.userFilters),
+		}).then(myx.xhrSuccess, myx.xhrError);
 	}
 
 	/**
@@ -63,7 +103,7 @@ const myxHome = function ()
 		let thisMonth = now.toMonthString();
 		elements.get("headline").innerHTML = now.format("dddd, d. mmmm yyyy");
 		myx.repeatings.process(thisMonth);
-		myx.statistics.aggregator.calc([thisMonth]).then((aggs) =>
+		myx.statistics.aggregator.calc(myx.userFilters.get("default")).then((aggs) =>
 		{
 			elements.get("this-month-total").innerText = myx.formatAmountLocale(aggs.meta.sum);
 		});
@@ -135,6 +175,7 @@ const myxHome = function ()
 	function enter ()
 	{
 		now = new Date();
+		myx.userFilters.get("default").setMonths(now.toMonthString());
 		renderMonthTotal();
 		renderProgress();
 		renderLastExpense();
@@ -154,9 +195,24 @@ const myxHome = function ()
 		myx.addExpense(new Expense(null, { cat: event.target.closest("[data-id]").dataset.id }));
 	}
 
+	/**
+	 * Callback function for setting the expenses filter.
+	 * 
+	 * Sets the filter as "default", renders this month totals and saves user data.
+	 * 
+	 * @param {ExpensesFilter} filter Expenses filter to be set
+	 */
+	function onExpensesFilterSet (filter)
+	{
+		myx.userFilters.set("default", filter);
+		saveToFile();
+		myx.userFilters.get("default").setMonths(now.toMonthString());
+		renderMonthTotal();
+	}
+
 	return {
 		get moduleName () { return MODULE_NAME; },
-		init: init,
+		fetchData: fetchData,
 		enter: enter
 	};
 };

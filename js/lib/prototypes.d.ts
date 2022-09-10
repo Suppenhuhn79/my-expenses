@@ -115,6 +115,14 @@ interface HTMLElement {
 	setStyles(styles: Object);
 }
 
+interface Set {
+	/**
+	 * Excludes items from this set.
+	 * @param iterable Items to exclude from the set
+	 */
+	exclude(iterable: Iterable);
+}
+
 interface String {
 	/**
 	 * Provides the hash value of a string.

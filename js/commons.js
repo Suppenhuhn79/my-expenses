@@ -344,27 +344,27 @@ class Selector
 
 	/**
 	 * Sets items as "selected".
-	 * @param {Array<IdString>} ids Ids of items to set "selected"
+	 * @param {Set<IdString>} ids Ids of items to set "selected"
 	 */
 	select (ids)
 	{
 		for (let element of this.element.querySelectorAll(".item"))
 		{
-			element.setClassConditional("selected", (ids.includes(element.dataset.id)));
+			element.setClassConditional("selected", (ids.has(element.dataset.id)));
 		}
 	}
 
 	/**
 	 * Returns the ids of all selected items in this selector.
-	 * @returns {Array<IdString>} Ids all selected items
+	 * @returns {Set<IdString>} Ids all selected items
 	 */
 	getSelectedIds ()
 	{
-		/** @type {Array<IdString>} */
-		let result = [];
+		/** @type {Set<IdString>} */
+		let result = new Set();
 		for (let element of this.element.querySelectorAll(".item.selected"))
 		{
-			result.push(element.dataset.id);
+			result.add(element.dataset.id);
 		}
 		return result;
 	}
@@ -373,19 +373,25 @@ class Selector
 // TODO: doc
 class FilterMenu
 {
-	constructor()
+	constructor(filter, callback)
 	{
-		let pmtSelector = new PaymentMethodSelector(console.log, true, false);
-		let catSelector = new CategorySelector(console.log, true);
-		pmtSelector.element.classList.add("wide-flex");
-		pmtSelector.element.style = "padding: 0.5em; max-width: 85vw; overflow-x: scroll;";
-		pmtSelector.refresh();
-		pmtSelector.select(Array.from(myx.paymentMethods.data.keys()));
-		myxDebug.publish(pmtSelector, "pmtSelector");
+		/** @type {FilterMenu} */
+		let _this = this;
 
-		catSelector.element.classList.add("wide-flex");
-		catSelector.element.style = "padding: 0.5em; max-width: 85vw; overflow-x: scroll;";
-		catSelector.refresh();
+		/** @type {ExpensesFilter} */
+		this.filter = filter;
+
+		this.callback = callback;
+
+		this.pmtSelector = new PaymentMethodSelector(onMenuboxClick, true, false);
+		this.catSelector = new CategorySelector(console.log, true);
+		this.pmtSelector.element.classList.add("wide-flex");
+		this.pmtSelector.element.style = "padding: 0.5em; max-width: 85vw; overflow-x: scroll;";
+		this.pmtSelector.refresh();
+
+		this.catSelector.element.classList.add("wide-flex");
+		this.catSelector.element.style = "padding: 0.5em; max-width: 85vw; overflow-x: scroll;";
+		this.catSelector.refresh();
 
 		let mbConfig = {
 			title: "Expenses Filter",
@@ -398,7 +404,7 @@ class FilterMenu
 					iconHtml: htmlBuilder.newElement("i.fas.icon", FA.toHTML("wallet"))
 				},
 				{
-					html: pmtSelector.element,
+					html: this.pmtSelector.element,
 					enabled: false
 				},
 				{
@@ -408,7 +414,7 @@ class FilterMenu
 					iconHtml: htmlBuilder.newElement("i.fas.icon", FA.toHTML("boxes"))
 				},
 				{
-					html: catSelector.element
+					html: this.catSelector.element
 				}
 			],
 			buttons: [
@@ -422,13 +428,26 @@ class FilterMenu
 				}
 			]
 		};
-		this._menuBox = new Menubox("filter-menu", mbConfig);
+		this._menuBox = new Menubox("filter-menu", mbConfig, onMenuboxClick);
 		myxDebug.publish(this._menuBox, "filterMenu");
+
+		function onMenuboxClick (event)
+		{
+			if (event.buttonKey === "ok")
+			{
+				let filter = new ExpensesFilter();
+				filter.excludePaymentMethods(ExpensesFilter.allPaymentMethods.exclude(_this.pmtSelector.getSelectedIds()));
+				// TODO: get selected categories
+				_this.callback(filter);
+			}
+		}
+
 	}
 
 	// TODO: doc
 	popup (event, element, align)
 	{
+		this.pmtSelector.select(ExpensesFilter.allPaymentMethods.exclude(this.filter.pmts));
 		this._menuBox.popup(event, null, element, align);
 	}
 }

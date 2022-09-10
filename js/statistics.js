@@ -295,7 +295,9 @@ function myxStatistics ()
 					actualCalculatedMonths.splice(0, actualCalculatedMonths.indexOf(todayMonth) + 1);
 				}
 			}
-			aggregator.calc(actualCalculatedMonths, calcMode).then((aggregates) =>
+			let filter = new ExpensesFilter(); // TODO
+			filter.setMonths(actualCalculatedMonths);
+			aggregator.calc(filter, calcMode).then((aggregates) =>
 			{
 				data = aggregates;
 				myxDebug.publish(data, "aggrs");

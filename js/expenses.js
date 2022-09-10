@@ -1,5 +1,5 @@
 /**
- * Expense.
+ * An expense.
  */
 class Expense
 {
@@ -131,6 +131,112 @@ class Expense
 	{
 		return [this.dat.format("yyyy-mm-dd"), this.amt, this.cat, this.txt, this.pmt, this.rep].join("\t");
 	};
+}
+
+/*
+ * Categories and payment methotds to exclude, and months to include in expenses selection or aggregation.
+ */
+class ExpensesFilter
+{
+	/**
+	 * Returns ids of all categories.
+	 * @returns {Set<IdString>}
+	 */
+	static get allCategories ()
+	{
+		return new Set(myx.categories.data.keys());
+	}
+
+	/**
+	 * Returns ids of all (active and disabled) payment methods.
+	 * @returns {Set<IdString>}
+	 */
+	static get allPaymentMethods ()
+	{
+		return new Set(myx.paymentMethods.data.keys());
+	}
+
+	constructor()
+	{
+		/**
+		 * Ids of categories to be excluded.
+		 * @type {Set<IdString>}
+		 */
+		this.cats = new Set();
+
+		/**
+		 * Ids of payment methods to be excluded.
+		 * @type {Set<IdString>}
+		 */
+		this.pmts = new Set();
+
+		/**
+		 * Months to be included.
+		 * @type {Set<MonthString>}
+		 */
+		this.months = [];
+	}
+
+	/**
+	 * Sets categories to be excluded.
+	 * @param {Iterable<IdString>} categories Category ids to add to filter to be excluded
+	 * @returns {ExpensesFilter} This
+	 */
+	excludeCategories (categories)
+	{
+		this.cats = new Set(categories);
+		return this;
+	}
+
+	/**
+	 * Sets payment methods to be excluded.
+	 * @param {Iterable<IdString>} paymentMethods Payment method ids to add to filter to be excluded
+	 * @returns {ExpensesFilter} This
+	 */
+	excludePaymentMethods (paymentMethods)
+	{
+		this.pmts = new Set(paymentMethods);
+		return this;
+	}
+
+	/**
+	 * Sets months to be included.
+	 * @param {Array<MonthString>} months Months to be included
+	 * @returns {ExpensesFilter} This
+	 */
+	setMonths (months)
+	{
+		if (typeof months === "string")
+		{
+			months = [months];
+		}
+		this.months = [...months];
+		return this;
+	}
+
+	/**
+	 * Imports categories and payment methods from an object.
+	 * @param {{cats: Iterable<IdString>, pmts: Iterable<IdString>}} obj Object to be imported
+	 * @returns {ExpensesFilter} This
+	 */
+	from (obj)
+	{
+		this.cats = new Set(obj.cats);
+		this.pmts = new Set(obj.pmts);
+		return this;
+	}
+
+	/**
+	 * Returns a serializable object of this expense.
+	 * @returns {Object} Serializable object
+	 */
+	toJSON ()
+	{
+		return {
+			cats: Array.from(this.cats),
+			pmts: Array.from(this.pmts)
+		};
+	}
 }
 
 const ExpensesTabMode = {

@@ -134,8 +134,12 @@ body {
 	justify-content: center;
 }
 .wide-flex .labeled-icon {
-	max-width: 35%;
+	max-width: 45%;
 }
+.selector .labeled-icon:not(.selected) .icon {
+	opacity: 0.5;
+}
+
 .labeled-icon .label {
 	font-size: 0.8rem;
 	padding-top: 0.3rem;
