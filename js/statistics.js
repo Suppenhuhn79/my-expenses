@@ -11,7 +11,7 @@
 /**
  * @namespace myxStatisticsTimerange
  */
-const myxStatisticsTimerange = function () 
+function myxStatisticsTimerange () 
 {
 	/** @type {TimerangeMode} */
 	let mode = "month";
@@ -298,7 +298,7 @@ function myxStatistics ()
 			aggregator.calc(actualCalculatedMonths, calcMode).then((aggregates) =>
 			{
 				data = aggregates;
-				console.log("aggregates:", data);
+				myxDebug.publish(data, "aggrs");
 				renderContent();
 			});
 		}
@@ -315,8 +315,9 @@ function myxStatistics ()
 	{
 		let ratioPercent = Math.round(ratio * 100);
 		let percentAsCssString = ratioPercent + "%;";
-		let ratioAsPercentString = ((ratio > 0) && (ratioPercent < 1)) ? "< 1" : ratioPercent.toString();
-		let labelPosition = "left:" + ((ratio < 0.9) ? percentAsCssString : "calc(100% - 4.5em)") + ";";
+		// TODO: progress bar > 100%
+		let ratioAsPercentString = ((ratio > 0) && (ratioPercent < 1)) ? "< 1" : (((ratio > 0.99) && (ratio < 1)) ? "> 99" : ratioPercent.toString());
+		let labelPosition = "left:" + percentAsCssString + ((ratio > 0.75) ? "transform: translateX(calc(-100% - 2em));" : "");
 		return htmlBuilder.newElement("div." + baseClass,
 			htmlBuilder.newElement("div",
 				{ style: "width:" + percentAsCssString + "height:100%;background-color:" + color + ";" }),

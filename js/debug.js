@@ -1,4 +1,4 @@
-myx.debug = {
+let myxDebug = {
 
 	backupAll: function ()
 	{
@@ -6,7 +6,7 @@ myx.debug = {
 		for (let file of googleAppApi.files.keys())
 		{
 			let periodIndex = file.indexOf(".");
-			myx.debug.pull(file, "/" + today + "/" + file.substring(0, periodIndex) + file.substring(periodIndex));
+			myxDebug.pull(file, "/" + today + "/" + file.substring(0, periodIndex) + file.substring(periodIndex));
 		}
 	},
 
@@ -31,5 +31,18 @@ myx.debug = {
 			console.log(payload);
 			googleAppApi.saveToFile(filename, payload).then(console.log, console.error);
 		});
+	},
+
+	/**
+	 * Publishes any data as a property of `window`.
+	 * @param {any} data Data to publish
+	 * @param {String} name Window variable name fot the data
+	 */
+	publish: function (data, name)
+	{
+		name = "$" + name;
+		window[name] = data;
+		console.info("PUBLISHED as '" + name + "'", data);
 	}
+
 };
