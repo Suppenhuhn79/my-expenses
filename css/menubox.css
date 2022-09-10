@@ -70,3 +70,7 @@
 	display: block;
 	border: none;
 }
+.menubox.filter .menuitem.disabled {
+	color: #aaa;
+	padding-bottom: 0;
+}

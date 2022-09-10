@@ -300,7 +300,7 @@ i.fab {
 @media (hover: hover) {
 	.buttons > div:hover,
 	.labeled-icon:hover,
-	.menubox .menuitem:hover,
+	.menubox .menuitem:hover:not(.disabled),
 	.menubox .menubutton:hover,
 	#expense-editor tbody td:hover {
 		background-color: #eee;

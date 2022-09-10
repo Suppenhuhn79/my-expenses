@@ -87,16 +87,9 @@ class PaymentMethodSelector extends Selector
 	{
 		/** @type {Map<String, ISelectableIcon>} */
 		let items = new Map();
-		if (activeOnly)
+		for (let pmt of ((activeOnly) ? myx.paymentMethods.active : myx.paymentMethods.all))
 		{
-			for (let pmt of myx.paymentMethods.active)
-			{
-				items.set(pmt.id, pmt);
-			}
-		}
-		else
-		{
-			items = myx.paymentMethods.data;
+			items.set(pmt.id, pmt);
 		}
 		super(callback, multiSelect, items);
 	}
@@ -138,7 +131,7 @@ function myxPaymentMethods ()
 	/** @type {Array<IdString>} */
 	let order = [];
 	/** @type {Array<IdString>} */
-	let disabledItems = [];
+	let disabledIds = [];
 	/** @type {IdString} */
 	let defaultId;
 	let elements = document.getElementById(MODULE_NAME).getNamedChildren();
@@ -152,7 +145,7 @@ function myxPaymentMethods ()
 	});
 
 	let tabMode = new TabModeHandler(elements.get(),
-		function stashData () { return { items: JSON.stringify([...data]), order: order, disabled: disabledItems, default: defaultId }; },
+		function stashData () { return { items: JSON.stringify([...data]), order: order, disabled: disabledIds, default: defaultId }; },
 		function revertData (revertData) { revertData.items = Object.fromEntries(JSON.parse(revertData.items)); fromObject(revertData); }
 	);
 
@@ -187,11 +180,11 @@ function myxPaymentMethods ()
 	{
 		data.clear();
 		order = obj.order;
-		disabledItems = obj.disabled || [];
+		disabledIds = obj.disabled || [];
 		for (let itemKey of Object.keys(obj.items))
 		{
 			data.set(itemKey, new PaymentMethod(obj.items[itemKey], itemKey));
-			if (disabledItems.includes(itemKey))
+			if (disabledIds.includes(itemKey))
 			{
 				data.get(itemKey).isDisabled = true;
 			}
@@ -200,14 +193,20 @@ function myxPaymentMethods ()
 	}
 
 	/**
-	 * Returns an ordered array with all active payment methods.
-	 * @returns {Array<PaymentMethod>}
+	 * Returns an ordered array of payment methods.
+	 * @param {Boolean} includeDisabled Whether to include disabled payment methods into the result (`true`) or get only active payment methods (`false`)
+	 * @returns {Array<PaymentMethod>} ordered array of payment methods
 	 */
-	function getActivePaymentMethods ()
+	function getOrderedPaymentMethods (includeDisabled)
 	{
 		/** @type {Array<PaymentMethod>} */
 		let result = [];
-		for (let id of order)
+		let set = order;
+		if (includeDisabled)
+		{
+			set = set.concat(disabledIds);
+		}
+		for (let id of set)
 		{
 			result.push(data.get(id));
 		}
@@ -285,10 +284,10 @@ function myxPaymentMethods ()
 		}
 		htmlBuilder.removeAllChildren(elements.get("content"));
 		_renderList(order, true);
-		if (disabledItems.length > 0)
+		if (disabledIds.length > 0)
 		{
 			elements.get("content").appendChild(htmlBuilder.newElement("div.headline", "Disabled payment methods"));
-			_renderList(disabledItems, false);
+			_renderList(disabledIds, false);
 		}
 		FA.applyOn(elements.get("content"));
 		for (let e of elements.get("content").querySelectorAll("[data-id='" + defaultId + "'] .default-flag"))
@@ -347,7 +346,7 @@ function myxPaymentMethods ()
 		googleAppApi.saveToFile(FILE_NAME, {
 			order: order,
 			items: Object.fromEntries(data),
-			disabled: disabledItems,
+			disabled: disabledIds,
 			default: defaultId
 		}).then(myx.xhrSuccess, myx.xhrError);
 		tabMode.set(PaymentMethodTabMode.DEFAULT);
@@ -396,7 +395,7 @@ function myxPaymentMethods ()
 		if (order.length > 1)
 		{
 			order.splice(order.indexOf(pmtId), 1);
-			disabledItems.splice(0, 0, pmtId);
+			disabledIds.splice(0, 0, pmtId);
 			data.get(pmtId).isDisabled = true;
 			if (defaultId === pmtId)
 			{
@@ -414,7 +413,7 @@ function myxPaymentMethods ()
 	function onUntrashClick (event)
 	{
 		let pmtId = event.target.closest("div.item").dataset.id;
-		disabledItems.splice(disabledItems.indexOf(pmtId), 1);
+		disabledIds.splice(disabledIds.indexOf(pmtId), 1);
 		data.get(pmtId).isDisabled = false;
 		order.push(pmtId);
 		renderList();
@@ -424,9 +423,13 @@ function myxPaymentMethods ()
 		get moduleName () { return MODULE_NAME; },
 		get data () { return data; },
 		/**
-		 * Ordered array of all master categories.
+		 * Ordered array of all payment methods.
 		 */
-		get active () { return getActivePaymentMethods(); },
+		get all () { return getOrderedPaymentMethods(true); },
+		/**
+		 * Ordered array of all active payment methods (excluding disabled payment methods).
+		 */
+		get active () { return getOrderedPaymentMethods(false); },
 		fetchData: fetchData,
 		enter: () => renderList(PaymentMethodTabMode.DEFAULT),
 		leave: () => tabMode.set(PaymentMethodTabMode.DEFAULT),

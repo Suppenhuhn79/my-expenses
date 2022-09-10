@@ -218,7 +218,7 @@ class Selector
 	/**
 	 * @param {SelectorCallback} callback Callback on item selection
 	 * @param {Boolean} multiSelect Allow seletion multiple items (`true`) or single item selection (`false`)
-	 * @param {Map<String, ISelectableIcon>} items // TODO
+	 * @param {Map<String, ISelectableIcon>} items Items to be availible for selection in this selector
 	 */
 	constructor(callback, multiSelect, items)
 	{
@@ -388,14 +388,28 @@ class FilterMenu
 		catSelector.refresh();
 
 		let mbConfig = {
-			title: "Filter",
-			items: [{
-				html: pmtSelector.element,
-				enabled: false
-			},
-			{
-				html: catSelector.element
-			}
+			title: "Expenses Filter",
+			css: "filter",
+			items: [
+				{
+					key: "_pmts",
+					label: "Payment methods:",
+					enabled: false,
+					iconHtml: htmlBuilder.newElement("i.fas.icon", FA.toHTML("wallet"))
+				},
+				{
+					html: pmtSelector.element,
+					enabled: false
+				},
+				{
+					key: "_cats",
+					label: "Categories:",
+					enabled: false,
+					iconHtml: htmlBuilder.newElement("i.fas.icon", FA.toHTML("boxes"))
+				},
+				{
+					html: catSelector.element
+				}
 			],
 			buttons: [
 				{
@@ -408,7 +422,7 @@ class FilterMenu
 				}
 			]
 		};
-		this._menuBox = new Menubox("FilterMenu", mbConfig);
+		this._menuBox = new Menubox("filter-menu", mbConfig);
 		myxDebug.publish(this._menuBox, "filterMenu");
 	}
 
