@@ -175,6 +175,11 @@ function myxStatistics ()
 	 */
 	let calcMode;
 
+	/**
+	 * Filter to exclude categories or payment methods.
+	 */
+	let filter = new ExpensesFilter();
+
 	/** @type {AggregationResult} */
 	let data;
 
@@ -201,6 +206,12 @@ function myxStatistics ()
 			}
 		]
 	});
+
+	elements.get("filter-select-button").onclick = function onFilterButtonClick (event)
+	{
+		// TODO: implement statistics filter selection
+		myx.showNotification("Not implemented yet.");
+	};
 
 	elements.get("chart-select-button").onclick = (mouseEvent) => chartMenu.popup(mouseEvent, null, elements.get("chart-select-button"), "below bottom, center");
 
@@ -295,9 +306,7 @@ function myxStatistics ()
 					actualCalculatedMonths.splice(0, actualCalculatedMonths.indexOf(todayMonth) + 1);
 				}
 			}
-			let filter = new ExpensesFilter(); // TODO
-			filter.setMonths(actualCalculatedMonths);
-			aggregator.calc(filter, calcMode).then((aggregates) =>
+			aggregator.calc(filter, actualCalculatedMonths, calcMode).then((aggregates) =>
 			{
 				data = aggregates;
 				myxDebug.publish(data, "aggrs");

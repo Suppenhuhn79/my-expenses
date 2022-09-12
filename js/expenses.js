@@ -138,6 +138,8 @@ class Expense
  */
 class ExpensesFilter
 {
+	static DEFAULT_NAME = "New expenses filter";
+
 	/**
 	 * Returns ids of all categories.
 	 * @returns {Set<IdString>}
@@ -158,6 +160,9 @@ class ExpensesFilter
 
 	constructor()
 	{
+		/** @type {String} */
+		this.name = ExpensesFilter.DEFAULT_NAME;
+
 		/**
 		 * Ids of categories to be excluded.
 		 * @type {Set<IdString>}
@@ -169,12 +174,6 @@ class ExpensesFilter
 		 * @type {Set<IdString>}
 		 */
 		this.pmts = new Set();
-
-		/**
-		 * Months to be included.
-		 * @type {Set<MonthString>}
-		 */
-		this.months = [];
 	}
 
 	/**
@@ -200,27 +199,13 @@ class ExpensesFilter
 	}
 
 	/**
-	 * Sets months to be included.
-	 * @param {Array<MonthString>} months Months to be included
-	 * @returns {ExpensesFilter} This
-	 */
-	setMonths (months)
-	{
-		if (typeof months === "string")
-		{
-			months = [months];
-		}
-		this.months = [...months];
-		return this;
-	}
-
-	/**
 	 * Imports categories and payment methods from an object.
-	 * @param {{cats: Iterable<IdString>, pmts: Iterable<IdString>}} obj Object to be imported
+	 * @param {{name: String, cats: Iterable<IdString>, pmts: Iterable<IdString>}} obj Object to be imported
 	 * @returns {ExpensesFilter} This
 	 */
 	from (obj)
 	{
+		this.name = obj.name;
 		this.cats = new Set(obj.cats);
 		this.pmts = new Set(obj.pmts);
 		return this;
@@ -233,6 +218,7 @@ class ExpensesFilter
 	toJSON ()
 	{
 		return {
+			name: this.name,
 			cats: Array.from(this.cats),
 			pmts: Array.from(this.pmts)
 		};

@@ -87,7 +87,6 @@ const myxHome = function ()
 	 */
 	async function saveToFile ()
 	{
-		console.log(Object.fromEntries(myx.userFilters));
 		myx.xhrBegin();
 		googleAppApi.saveToFile(FILE_NAME, {
 			budget: userBudget,
@@ -103,7 +102,7 @@ const myxHome = function ()
 		let thisMonth = now.toMonthString();
 		elements.get("headline").innerHTML = now.format("dddd, d. mmmm yyyy");
 		myx.repeatings.process(thisMonth);
-		myx.statistics.aggregator.calc(myx.userFilters.get("default")).then((aggs) =>
+		myx.statistics.aggregator.calc(myx.userFilters.get("default"), [now.toMonthString()]).then((aggs) =>
 		{
 			elements.get("this-month-total").innerText = myx.formatAmountLocale(aggs.meta.sum);
 		});
@@ -174,7 +173,6 @@ const myxHome = function ()
 	function enter ()
 	{
 		now = new Date();
-		myx.userFilters.get("default").setMonths(now.toMonthString());
 		renderMonthTotal();
 		renderProgress();
 		renderLastExpense();
@@ -205,7 +203,6 @@ const myxHome = function ()
 	{
 		myx.userFilters.set("default", filter);
 		saveToFile();
-		myx.userFilters.get("default").setMonths(now.toMonthString());
 		renderMonthTotal();
 	}
 

@@ -127,9 +127,15 @@ class CategoryAggregate extends AggregateAtom
 function myxStatisticAggregator ()
 {
 	/**
-	 * // TODO: doc
+	 * Filter to exclude categories or payment methods.
 	 * @type {ExpensesFilter} */
 	let _filter;
+
+	/**
+	 * Count of months to aggregate; used to calculate monthly averages.
+	 * @type {Number}
+	 */
+	let _monthsCount;
 
 	/**
 	 * Map of category aggregates for each month.
@@ -178,20 +184,20 @@ function myxStatisticAggregator ()
 		{
 			/**
 			 * Total of all sub-catergories including master category. */
-			let masterCatAggregate = new CategoryAggregate(masterCat.id, _filter.months.length);
+			let masterCatAggregate = new CategoryAggregate(masterCat.id, _monthsCount);
 			for (let catId of [masterCat.id].concat(masterCat.subCategoriesIds))
 			{
 				/** 
 				 * Not-null aggregate
 				 * @type {CategoryAggregate} */
-				let catAggregate = new CategoryAggregate(catId, _filter.months.length, categoriesAggregates.get(catId));
+				let catAggregate = new CategoryAggregate(catId, _monthsCount, categoriesAggregates.get(catId));
 				masterCatAggregate.add(catAggregate);
 				masterCatAggregate.subs.push(catAggregate);
 				if (sumupTotals)
 				{
 					if (totalsPerCategory.has(catId) === false)
 					{
-						totalsPerCategory.set(catId, new CategoryAggregate(catId, _filter.months.length));
+						totalsPerCategory.set(catId, new CategoryAggregate(catId, _monthsCount));
 					}
 					totalsPerCategory.get(catId).add(catAggregate);
 				}
@@ -229,28 +235,30 @@ function myxStatisticAggregator ()
 	 * Returns an `AggregationResult` object with all data sorted by the given sort key.
 	 * 
 	 * @async
-	 * @param {ExpensesFilter} filter Months to calculate
+	 * @param {ExpensesFilter} filter Filter to exclude payment methods or categories
+	 * @param {Array<MonthString>} months Months to calculate
 	 * @param {AggregatesCompareProperty} sortKey Whether to sort results by sum (default) or average
 	 * @returns {Promise<AggregationResult>} Promise
 	 */
-	function calc (filter, sortKey)
+	function calc (filter, months, sortKey)
 	{
 		/** @type {Array<Promise>} */
 		let asyncCalcs = [];
 		categoriesPerMonth.clear();
 		totalsPerCategory.clear();
 		_filter = filter;
+		_monthsCount = months.length;
 		CategoryAggregate.compareKey = sortKey;
 		return new Promise((resolve) =>
 		{
-			for (let month of filter.months)
+			for (let month of months)
 			{
 				asyncCalcs.push(calcMonth(month));
 			}
 			Promise.allSettled(asyncCalcs).then(() =>
 			{
 				let totals = aggregatesToSortedArray(totalsPerCategory, true);
-				let sum = totals.reduce(CategoryAggregate.reduce, new CategoryAggregate("", _filter.months.length));
+				let sum = totals.reduce(CategoryAggregate.reduce, new CategoryAggregate("", _monthsCount));
 				resolve({
 					months: categoriesPerMonth,
 					total: totals,
