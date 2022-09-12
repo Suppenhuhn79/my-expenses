@@ -1,9 +1,11 @@
 /**
  * A payment method.
+ * @augments UserDataItem
  */
-class PaymentMethod
+class PaymentMethod extends UserDataItem
 {
-	static DEFAULT_LABEL = "Unnamed payment method";
+	static DEFAULT_LABEL = "New payment method";
+	static DEFAULT_GLYPH = "fas:f555";
 
 	/**
 	 * @param {PaymentMethod|EditableIcon} [src] Payment method to copy; if omitted, a new payment method is created
@@ -11,41 +13,13 @@ class PaymentMethod
 	 */
 	constructor(src, id)
 	{
-		/**
-		 * @type {IdString}
-		 */
-		this.id = src?.id || ((!!id) ? id : myx.newId());
+		super(src, id);
 
 		/**
-		 * @type {String}
-		 */
-		this.label = src?.label || PaymentMethod.DEFAULT_LABEL;
-
-		/**
-		 * @type {FAGlyph}
-		 */
-		this.glyph = new FAGlyph((src?.glyph instanceof FAGlyph) ? src.glyph.value : (src?.glyph || src?.icon || "fas:f555"));
-
-		/**
-		 * @type {String}
-		 */
-		this.color = src?.color || "#808080";
-
-		/**
+		 * Whether this payment method is disabled (`true`) or active (`false`).
 		 * @type {Boolean}
 		 */
 		this.isDisabled = false;
-	}
-
-	/**
-	 * Assigns properties from an editable icon to this payment method.
-	 * @param {EditableIcon} icon Editable icon to assign
-	 */
-	assign (icon)
-	{
-		this.label = icon.label;
-		this.glyph = icon.glyph;
-		this.color = icon.color;
 	}
 
 	/**
@@ -73,25 +47,19 @@ class PaymentMethod
 
 /**
  * Selector for payment methods.
- * 
- * @extends {Selector}
+ * @augments Selector
  */
 class PaymentMethodSelector extends Selector
 {
 	/**
 	 * @param {SelectorCallback} callback Function to call on selection
-	 * @param {Boolean} multiSelect Whether to allow selection of multiple items (`true`) or single item selection only (`false`)
+	 * @param {SelectorOptions} options Configuration of the payment method selector
 	 * @param {Boolean} activeOnly Provide only active payment methods for selection (`true`) or also include disabled payment methods (`false`)
 	 */
-	constructor(callback, multiSelect, activeOnly)
+	constructor(callback, options, activeOnly)
 	{
-		/** @type {Map<String, ISelectableIcon>} */
-		let items = new Map();
-		for (let pmt of ((activeOnly) ? myx.paymentMethods.active : myx.paymentMethods.all))
-		{
-			items.set(pmt.id, pmt);
-		}
-		super(callback, multiSelect, items);
+		let items = (activeOnly) ? myx.paymentMethods.active : myx.paymentMethods.all;
+		super(callback, items, options);
 	}
 };
 
@@ -275,7 +243,7 @@ function myxPaymentMethods ()
 				}
 				let div = htmlBuilder.newElement("div.click.item" + ((active) ? ".sortable" : ""),
 					{ "data-id": id },
-					pmt.renderIcon(),
+					pmt.renderIcon(), // TODO: replace by `renderLabeledIcon()`?
 					htmlBuilder.newElement("div.flex-fill.big.cutoff", pmt.label, { onclick: onItemClick }),
 					...optionalElmts
 				);

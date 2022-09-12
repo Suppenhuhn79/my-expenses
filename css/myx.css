@@ -15,6 +15,7 @@
 .white:last-of-type {
 	border-bottom: 2px solid #aaa;
 }
+
 .labled-icons-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, 5em);
@@ -23,10 +24,35 @@
 	align-content: start;
 }
 .labled-icons-grid .item {
-	padding: 0.5em 0.25em;
 	width: 100%;
-	border-radius: 0.3em;
-	overflow: hidden;
+}
+
+.selector {
+	overflow: scroll;
+}
+.selector .item {
+	border-radius: 0.4em;
+}
+.selector.wide-flex .item {
+	max-width: 45%;
+}
+
+.selector.multiselect .item:not(.selected) {
+	opacity: 0.45;
+}
+.selector.multiselect .item:not(.selected) .icon {
+	opacity: 0.5;
+}
+.selector.multiselect .item:not(.selected) .label {
+	text-decoration: line-through;
+}
+
+.selector .back {
+	color: #888;
+	font-size: 1.5em;
+	width: 2em;
+	margin: 0;
+	text-align: center;
 }
 
 .percentbar {
@@ -42,21 +68,6 @@
 	padding: 0 0.5em;
 	font-size: 0.8rem;
 	margin: 0 1em;
-}
-
-.selector .back {
-	color: #888;
-	font-size: 1.5em;
-	width: 2em;
-	margin: 0;
-	text-align: center;
-}
-
-.selector.multiselect .item:not(.selected) {
-	opacity: 0.45;
-}
-.selector.multiselect .item:not(.selected) .label {
-	text-decoration: line-through;
 }
 
 #header {

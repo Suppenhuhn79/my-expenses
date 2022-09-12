@@ -159,12 +159,11 @@ const myxHome = function ()
 	{
 		let selectorContainer = elements.get("category-selector");
 		htmlBuilder.removeAllChildren(selectorContainer);
-		for (let item of CategorySelector.getMasters().values())
+		for (let item of myx.categories.masters)
 		{
-			selectorContainer.appendChild(htmlBuilder.newElement("div.item.labeled-icon.click",
+			selectorContainer.appendChild(htmlBuilder.newElement("div.item.click",
 				{ 'data-id': item.id, onclick: onCategoryItemClick },
-				item.renderIcon(),
-				htmlBuilder.newElement("div.label", item.label))
+				item.renderLabeledIcon())
 			);
 		}
 	}

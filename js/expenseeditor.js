@@ -181,9 +181,8 @@ let expenseEditor = function ()
 	function renderPaymentmethod ()
 	{
 		let pmt = myx.paymentMethods.get(currentItem.pmt);
-		let div = htmlBuilder.newElement("div.labeled-icon",
-			pmt.renderIcon(),
-			htmlBuilder.newElement("div.label.cutoff", pmt.label)
+		let div = htmlBuilder.newElement("div.cutoff",
+			pmt.renderLabeledIcon()
 		);
 		htmlBuilder.replaceContent(elements.get("pmt"), div);
 	};
@@ -208,7 +207,7 @@ let expenseEditor = function ()
 		renderAmountText();
 		elements.get("txt").value = currentItem.txt || "";
 		choices.set("active-tab", "expense-editor");
-		categorySelector = new CategorySelector(onCategorySelected, false);
+		categorySelector = new CategorySelector(onCategorySelected, { class: "wide-flex" });
 		categorySelector.refresh(currentItem.cat);
 		htmlBuilder.replaceContent(
 			elements.get("category-selector"),

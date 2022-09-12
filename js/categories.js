@@ -7,10 +7,12 @@ const CategoriesTabMode = {
 
 /**
  * An expenses category.
+ * @augments UserDataItem
  */
-class Category
+class Category extends UserDataItem
 {
-	static DEFAULT_LABEL = "Unnamed category";
+	static DEFAULT_LABEL = "New category";
+	static DEFAULT_GLYPH = "fas:f07a";
 
 	/**
 	 * @param {Category|EditableIcon} [src] Category to copy; if omitted, a new category is created
@@ -18,14 +20,7 @@ class Category
 	 */
 	constructor(src, id)
 	{
-		/** @type {IdString} */
-		this.id = src?.id || ((!!id) ? id : myx.newId());
-
-		/** @type {String} */
-		this.label = src?.label || Category.DEFAULT_LABEL;
-
-		/** @type {FAGlyph}*/
-		this.glyph = new FAGlyph((src?.glyph instanceof FAGlyph) ? src.glyph.value : (src?.glyph || src?.icon || "fas:f07a"));
+		super(src, id);
 
 		/** 
 		 * @private Use `color` getter instead.
@@ -46,6 +41,17 @@ class Category
 	get color ()
 	{
 		return (this.isMaster) ? this._color : this.master.color;
+	}
+
+	/**
+	 * Sets this categorys color, it it is a master category.
+	 */
+	set color (val)
+	{
+		if (this.isMaster)
+		{
+			this._color = val;
+		}
 	}
 
 	/**
@@ -97,17 +103,6 @@ class Category
 	}
 
 	/**
-	* Assigns properties from an editable icon to this category.
-	* @param {EditableIcon} icon Editable icon to assign
-	*/
-	assign (icon)
-	{
-		this.label = icon.label;
-		this.glyph = icon.glyph;
-		this._color = (this.isMaster) ? icon.color : undefined;
-	}
-
-	/**
 	 * Returns a HTML element that shows this payment methods icon.
 	 * @returns {HTMLElement}
 	 */
@@ -148,32 +143,17 @@ class Category
 
 /**
  * Selector for categories.
- * 
- * @extends {Selector}
+ * @augments Selector
  */
 class CategorySelector extends Selector
 {
 	/**
-	 * Returns all master categories as a map to build selection items from.
-	 * @returns {Map<IdString, Category>} All master categories as a map
-	 */
-	static getMasters ()
-	{
-		let result = new Map();
-		for (let cat of myx.categories.masters)
-		{
-			result.set(cat.id, cat);
-		}
-		return result;
-	}
-
-	/**
 	 * @param {SelectorCallback} callback Callback on item selection
-	 * @param {Boolean} multiSelect Allow seletion multiple items (`true`) or single item selection (`false`)
+	 * @param {SelectorOptions} options Configuration of the payment method selector
 	 */
-	constructor(callback, multiSelect)
+	constructor(callback, options)
 	{
-		super(callback, multiSelect, CategorySelector.getMasters());
+		super(callback, myx.categories.masters, options);
 
 		/** @type {CategorySelector} */
 		let _this = this; // Must be accessed after calling `super()`
@@ -200,7 +180,7 @@ class CategorySelector extends Selector
 			eventItem.scrollIntoView();
 			if (id === "__back__")
 			{
-				_this.items = CategorySelector.getMasters();
+				_this.items = myx.categories.masters;
 				_this.refresh();
 			}
 			else if (myx.categories.get(id).isMaster)
@@ -232,14 +212,9 @@ class CategorySelector extends Selector
 		if (!!selectedId)
 		{
 			let masterOfSelected = (myx.categories.get(selectedId).isMaster) ? myx.categories.get(selectedId) : myx.categories.get(selectedId).master;
-			this.items.clear();
-			this.items.set(masterOfSelected.id, masterOfSelected);
-			for (let cat of masterOfSelected.subCategories)
-			{
-				this.items.set(cat.id, cat);
-			}
+			this.items = [masterOfSelected].concat(masterOfSelected.subCategories);
 			this.refresh();
-			this.element.insertBefore(htmlBuilder.newElement("div.labeled-icon",
+			this.element.insertBefore(htmlBuilder.newElement("div.item.labeled-icon",
 				{ 'data-id': "__back__", onclick: this._onItemClick },
 				htmlBuilder.newElement("i.icon.back.fas", FA.toHTML("arrow-left"))
 			), this.element.firstElementChild);
@@ -361,7 +336,7 @@ function myxCategories ()
 			{
 				subCatDiv.appendChild(htmlBuilder.newElement("div.subcat.click",
 					{ 'data-id': subCategory.id, 'data-master-id': id, onclick: onItemClick },
-					subCategory.renderIcon(),
+					subCategory.renderIcon(), // TODO: replace by `renderLabeledIcon()`?
 					htmlBuilder.newElement("span.grey", subCategory.label),
 					htmlBuilder.newElement("div.for-mode.edit-mode.dragger-ew.fas", FA.toHTML("sort"))
 				));
@@ -371,7 +346,7 @@ function myxCategories ()
 				FA.toHTML("plus-square")));
 			labelElement.appendChild(subCatDiv);
 			let div = htmlBuilder.newElement("div.item",
-				category.renderIcon(),
+				category.renderIcon(), // TODO: replace by `renderLabeledIcon()`?
 				labelElement,
 				htmlBuilder.newElement("i.for-mode.edit-mode.dragger-ns.fas", FA.toHTML("sort"))
 			);

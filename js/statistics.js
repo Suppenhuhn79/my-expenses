@@ -371,7 +371,7 @@ function myxStatistics ()
 							let subCategory = myx.categories.get(subCat.catId);
 							subCatDiv.appendChild(htmlBuilder.newElement("div.subcat.wide-flex" + ".grey" + (subCat.sum === 0 ? ".zero-sum" : ""),
 								{ 'data-cat': subCat.catId, onclick: onSubcategoryClick },
-								subCategory.renderIcon(),
+								subCategory.renderIcon(), // TODO: replace by `renderLabeledIcon()`?
 								htmlBuilder.newElement("div.flex-fill.click",
 									subCategory.label),
 								htmlBuilder.newElement("div.amt", myx.formatAmountLocale(subCat[k])
@@ -382,7 +382,7 @@ function myxStatistics ()
 				let div = htmlBuilder.newElement(
 					"div.item.click" + (catAggr.sum === 0 ? ".zero-sum" : ""),
 					{ onclick: () => toggleSubcategoryVisibility(catAggr.catId) },
-					category.renderIcon(),
+					category.renderIcon(), // TODO: replace by `renderLabeledIcon()`?
 					htmlBuilder.newElement(
 						"div.flex-fill.high-flex",
 						htmlBuilder.newElement(

@@ -1,15 +1,5 @@
 #expense-editor [name="category-selector"] .selector {
-	display: flex;
-	flex-direction: row;
-	padding: 0.5rem 0;
-	overflow: scroll;
-}
-
-#expense-editor [name="category-selector"] .selector > div:first-child {
-	margin-left: 0.5em;
-}
-#expense-editor [name="category-selector"] .selector > div:last-child {
-	margin-right: 0.5em;
+	padding: 0.5rem;
 }
 
 #expense-editor [name="amt"] {
@@ -17,12 +7,11 @@
 	font-size: 1.2rem;
 	padding-left: 1em;
 }
-#expense-editor [name="pmt"] div {
-	margin: 0 1rem;
+#expense-editor [name="pmt"] {
+	padding: 0.5rem 1rem;
 }
 #expense-editor [name="pmt"] div .pmt.icon {
-	font-size: 1.2rem;
-	height: auto;
+	height: 1.5em;
 }
 
 #expense-editor input {

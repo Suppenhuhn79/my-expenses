@@ -129,15 +129,8 @@ body {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	border-radius: 0.3em;
 	padding: 0.3em;
 	justify-content: center;
-}
-.wide-flex .labeled-icon {
-	max-width: 45%;
-}
-.selector .labeled-icon:not(.selected) .icon {
-	opacity: 0.5;
 }
 
 .labeled-icon .label {
@@ -303,7 +296,7 @@ i.fab {
 
 @media (hover: hover) {
 	.buttons > div:hover,
-	.labeled-icon:hover,
+	.selector .item:hover,
 	.menubox .menuitem:hover:not(.disabled),
 	.menubox .menubutton:hover,
 	#expense-editor tbody td:hover {

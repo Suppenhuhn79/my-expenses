@@ -1,4 +1,64 @@
 /**
+ * Any user data items.
+ */
+class UserDataItem
+{
+	static DEFAULT_LABEL = "New item";
+	static DEFAULT_GLYPH = "fas:f128";
+
+	/**
+	 * @param {UserDataItem|EditableIcon} [src] UserDataItem to copy if any
+	 * @param {IdString} [id] Id of the UserDataItem if already known
+	 */
+	constructor(src, id)
+	{
+		/** @type {IdString} */
+		this.id = src?.id || ((!!id) ? id : myx.newId());
+
+		/** @type {String} */
+		this.label = src?.label || this.constructor.DEFAULT_LABEL;
+
+		/** @type {FAGlyph}*/
+		this.glyph = new FAGlyph((src?.glyph instanceof FAGlyph) ? src.glyph.value : (src?.glyph || src?.icon || this.constructor.DEFAULT_GLYPH));
+
+		/** @type {String} */
+		this.color = src?.color || "#888";
+	}
+
+	/**
+	 * Assigns properties from an editable icon to this user data item.
+	 * @param {EditableIcon} icon Editable icon to assign
+	 */
+	assign (icon)
+	{
+		this.label = icon.label;
+		this.glyph = icon.glyph;
+		this._color = (this.isMaster) ? icon.color : undefined;
+	}
+
+	/**
+	 * Returns a HTML element that shows this user item's icon only.
+	 * @returns {HTMLElement}
+	 */
+	renderIcon ()
+	{
+		return htmlBuilder.newElement("div.icon", { style: "color:" + this.color }, this.glyph.render());
+	}
+
+	/**
+	 * Returns a HTML element that shows this user items icon and its label.
+	 * @returns {HTMLElement}
+	 */
+	renderLabeledIcon ()
+	{
+		return htmlBuilder.newElement("div.labeled-icon",
+			this.renderIcon(),
+			htmlBuilder.newElement("div.label", this.label)
+		);
+	}
+}
+
+/**
  * Mode handler for my-expenses tabs.
  * 
  * Preserves data on edits. Updates the UI on switching mode.
@@ -207,85 +267,83 @@ class FA
 };
 
 /**
- * Abstract class for selectors.
+ * Selector base class.
  * 
  * Provides functionality for rendering and selecting items.
- * 
- * @abstract
  */
 class Selector
 {
 	/**
 	 * @param {SelectorCallback} callback Callback on item selection
-	 * @param {Boolean} multiSelect Allow seletion multiple items (`true`) or single item selection (`false`)
-	 * @param {Map<String, ISelectableIcon>} items Items to be availible for selection in this selector
+	 * @param {Array<ISelectableIcon>} items Items to be availible for selection in this selector
+	 * @param {SelectorOptions} [options] Configuration of this selector
 	 */
-	constructor(callback, multiSelect, items)
+	constructor(callback, items, options)
 	{
-		if (this.constructor === Selector)
+		/**
+		 * This instance, to have it in event handlers where `this` is `window`.
+		 * @type {Selector}
+		 */
+		let _this = this;
+
+		/**
+		 * Callback on item selection
+		 * @type {SelectorCallback}
+		 */
+		this.callback = callback;
+
+		/**
+		 * Allow seletion of multiple items or single item selection only
+		 * @type {Boolean}
+		 */
+		this.multiSelect = (options.multiselect === true);
+
+		/**
+		 * Items to be availible for selection in this selector.
+		 * @type {Array<ISelectableIcon>}
+		 */
+		this.items = items;
+
+		/**
+		 * Colors of this selectors items; used for formatting selected items.
+		 * @type {Map<IdString, String>}
+		 */
+		this.itemColors = new Map();
+
+		/**
+		 * Element to render the selection on
+		 * @type {HTMLElement}
+		 */
+		this.element = htmlBuilder.newElement("div.selector." + (options.class || "").replaceAll(/\s+/g, ".") + ((this.multiSelect) ? ".multiselect" : ""));
+
+		/**
+		 * Event handler for clicking an item.
+		 *
+		 * Calls the `callback` function.
+		 *
+		 * @param {Event} event Triggering event
+		 */
+		this._onItemClick = function (event)
 		{
-			throw new TypeError("Selector is an abstract class");
-		}
-		else
-		{
 			/**
-			 * This instance, to have it in event handlers where `this` is `window`.
-			 * @type {Selector}
-			 */
-			let _this = this;
-
+			 * Actual item.
+			 * @type {HTMLElement} */
+			let eventItem = event.target.closest(".item");
 			/**
-			 * Callback on item selection
-			 * @type {SelectorCallback}
-			 */
-			this.callback = callback;
-
-			/**
-			 * Allow seletion multiple items or single item selection only
-			 */
-			this.multiSelect = multiSelect;
-
-			/**
-			 * Items to be availible for selection in this selector.
-			 * @type {Map<IdString, ISelectableIcon>}
-			 */
-			this.items = items;
-
-			/**
-			 * Element to render the selection on
-			 * @type {HTMLElement}
-			 */
-			this.element = htmlBuilder.newElement("div.selector" + ((this.multiSelect) ? ".multiselect" : ""));
-
-			/**
-			 * Event handler for clicking an item.
-			 *
-			 * Calls the `callback` function.
-			 *
-			 * @param {Event} event Triggering event
-			 */
-			this._onItemClick = function (event)
+			 * Id of the clicked items.
+			 * @type {String} */
+			let id = eventItem.dataset.id;
+			if (_this.multiSelect === true)
 			{
-				/**
-				 * Actual item.
-				 * @type {HTMLElement} */
-				let eventItem = event.target.closest(".item");
-				/**
-				 * Id of the clicked items.
-				 * @type {String} */
-				let id = eventItem.dataset.id;
-				if (_this.multiSelect === true)
-				{
-					eventItem.classList.toggle("selected");
-				}
-				else
-				{
-					_this.highlightItem(id);
-				}
-				eventItem.scrollIntoView();
-				_this.callback(id);
-			};
-		}
+				eventItem.classList.toggle("selected");
+			}
+			else
+			{
+				_this.highlightItem(id);
+			}
+			eventItem.scrollIntoView();
+			_this.callback(id);
+		};
 	}
 
 	/**
@@ -295,22 +353,35 @@ class Selector
 	 */
 	highlightItem (id, scrollIntoView)
 	{
+		/**
+		 * Sets the color style value on all child elements of _ele_.
+		 * @param {HTMLElement} ele 
+		 * @param {String} val 
+		 */
+		function _setChildElementsColor (ele, val)
+		{
+			for (let e of ele.children)
+			{
+				e.style.color = val;
+			}
+		}
 		for (let otherElement of this.element.querySelectorAll("[data-id]"))
 		{
 			otherElement.setStyles({
 				backgroundColor: null,
 				color: null
 			});
-			otherElement.querySelector("i").style.color = null;
+			_setChildElementsColor(otherElement, null);
 		};
+		let color = this.itemColors.get(id);
 		let selectedElement = this.element.querySelector("[data-id='" + id + "']");
 		if (!!selectedElement)
 		{
 			selectedElement.setStyles({
-				backgroundColor: this.items.get(id).color,
+				backgroundColor: color,
 				color: "#fff"
 			});
-			selectedElement.querySelector("i").style.color = "#fff";
+			_setChildElementsColor(selectedElement, "#fff");
 			if (scrollIntoView)
 			{
 				selectedElement.scrollIntoView({ inline: "center" });
@@ -325,12 +396,14 @@ class Selector
 	refresh (selectedId)
 	{
 		htmlBuilder.removeAllChildren(this.element);
-		for (let item of this.items.values())
+		this.itemColors.clear();
+		for (let item of this.items)
 		{
-			this.element.appendChild(htmlBuilder.newElement("div.item.labeled-icon.click",
+			this.itemColors.set(item.id, item.color);
+			this.element.appendChild(htmlBuilder.newElement("div.item.click",
 				{ 'data-id': item.id, onclick: this._onItemClick },
-				item.renderIcon(),
-				htmlBuilder.newElement("div.label", item.label)));
+				item.renderLabeledIcon())
+			);
 		}
 		if (selectedId)
 		{
@@ -370,7 +443,7 @@ class Selector
 	}
 }
 
-// TODO: doc
+// TODO: Drop this and make `IconEditor` more generic.
 class FilterMenu
 {
 	constructor(filter, callback)
@@ -383,13 +456,11 @@ class FilterMenu
 
 		this.callback = callback;
 
-		this.pmtSelector = new PaymentMethodSelector(onMenuboxClick, true, false);
-		this.catSelector = new CategorySelector(console.log, true);
-		this.pmtSelector.element.classList.add("wide-flex");
+		this.pmtSelector = new PaymentMethodSelector(onMenuboxClick, { multiselect: true, class: "wide-flex" }, false);
+		this.catSelector = new CategorySelector(console.log, { multiselect: true, class: "wide-flex" });
 		this.pmtSelector.element.style = "padding: 0.5em; max-width: 85vw; overflow-x: scroll;";
 		this.pmtSelector.refresh();
 
-		this.catSelector.element.classList.add("wide-flex");
 		this.catSelector.element.style = "padding: 0.5em; max-width: 85vw; overflow-x: scroll;";
 		this.catSelector.refresh();
 
@@ -405,7 +476,6 @@ class FilterMenu
 				},
 				{
 					html: this.pmtSelector.element,
-					enabled: false
 				},
 				{
 					key: "_cats",
