@@ -208,7 +208,6 @@ let expenseEditor = function ()
 		elements.get("txt").value = currentItem.txt || "";
 		choices.set("active-tab", "expense-editor");
 		categorySelector = new CategorySelector(onCategorySelected, { class: "wide-flex" });
-		categorySelector.refresh(currentItem.cat);
 		htmlBuilder.replaceContent(
 			elements.get("category-selector"),
 			categorySelector.element
@@ -222,6 +221,7 @@ let expenseEditor = function ()
 			tabMode.set(ExpenseEditorMode.DEFAULT);
 			refreshEditor();
 		}
+		categorySelector.refresh(currentItem.cat);
 	};
 
 	/**

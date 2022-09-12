@@ -220,7 +220,7 @@ class CategorySelector extends Selector
 			), this.element.firstElementChild);
 			if (this.multiSelect !== true)
 			{
-				super.highlightItem(selectedId);
+				super.highlightItem(selectedId, true);
 			}
 		}
 		else
