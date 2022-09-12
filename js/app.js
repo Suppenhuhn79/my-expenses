@@ -331,11 +331,7 @@ let myx = function ()
 		newId: newIdString,
 		formatAmountLocale: formatAmountLocale,
 		showNotification: showNotification,
-		/**
-		 * User defined expenses filters.
-		 * @type {Map<String, ExpensesFilter>}
-		 */
-		userFilters: new Map(),
+		defaultFilter: new ExpensesFilter(),
 		xhrBegin: xhrBegin,
 		xhrSuccess: xhrSuccess,
 		xhrError: xhrError

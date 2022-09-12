@@ -200,14 +200,14 @@ class ExpensesFilter
 
 	/**
 	 * Imports categories and payment methods from an object.
-	 * @param {{name: String, cats: Iterable<IdString>, pmts: Iterable<IdString>}} obj Object to be imported
+	 * @param {{name: String?, cats: Iterable<IdString>?, pmts: Iterable<IdString>?}} obj Object to be imported
 	 * @returns {ExpensesFilter} This
 	 */
 	from (obj)
 	{
-		this.name = obj.name;
-		this.cats = new Set(obj.cats);
-		this.pmts = new Set(obj.pmts);
+		this.name = obj.name || ExpensesFilter.DEFAULT_NAME;
+		this.cats = new Set(obj.cats) || [];
+		this.pmts = new Set(obj.pmts) || [];
 		return this;
 	}
 

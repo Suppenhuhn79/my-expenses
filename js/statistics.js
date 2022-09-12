@@ -176,9 +176,15 @@ function myxStatistics ()
 	let calcMode;
 
 	/**
+	 * User defined filters.
+	 * @type {Array<ExpensesFilter>}
+	 */
+	let userFilters = [];
+
+	/**
 	 * Filter to exclude categories or payment methods.
 	 */
-	let filter = new ExpensesFilter();
+	let currentFilter = new ExpensesFilter();
 
 	/** @type {AggregationResult} */
 	let data;
@@ -306,7 +312,7 @@ function myxStatistics ()
 					actualCalculatedMonths.splice(0, actualCalculatedMonths.indexOf(todayMonth) + 1);
 				}
 			}
-			aggregator.calc(filter, actualCalculatedMonths, calcMode).then((aggregates) =>
+			aggregator.calc(currentFilter, actualCalculatedMonths, calcMode).then((aggregates) =>
 			{
 				data = aggregates;
 				myxDebug.publish(data, "aggrs");
@@ -476,6 +482,8 @@ function myxStatistics ()
 		get elements () { return elements; }, // debug_only
 		get moduleName () { return MODULE_NAME; },
 		enter: enter,
+		get userFilters () { return userFilters; },
+		set userFilters (val) { userFilters = val; },
 		renderPercentBar: renderPercentBar // TODO: should not be borrowed from this module
 		/*
 		getMonthsInYear: (year) =>
