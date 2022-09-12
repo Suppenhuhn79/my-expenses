@@ -819,6 +819,7 @@ function myxExpenses ()
 					{
 						data[originalMonth][dataIndex] = new Expense(editedItem);
 						sortItems(originalMonth);
+						saveToFile(data[originalMonth][dataIndex]);
 					}
 					else
 					{
