@@ -276,16 +276,13 @@ function expenseEditor ()
 
 	/**
 	 * Event handler for key strikes while the annotation text is focused. Handles certain keys to leave the input.
-	 * @param {KeyboardEvent} event Triggering event.
+	 * @param {KeyboardEvent} keyEvent Triggering event.
 	 */
 	function onTxtKeydown (keyEvent) 
 	{
-		switch (keyEvent.keyCode) // DEPRECATED: use https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code instead
+		if (["Escape", "Enter"].includes(keyEvent.code))
 		{
-			case 13:
-			case 27:
-				elements.get("txt").blur();
-				break;
+			elements.get("txt").blur();
 		};
 	};
 
