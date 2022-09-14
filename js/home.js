@@ -11,7 +11,7 @@ const myxHome = function ()
 	let elements = document.getElementById("home-tab").getNamedChildren();
 
 	/**
-	 * @type {Number?}
+	 * @type {number?}
 	 */
 	let userBudget;
 
@@ -22,6 +22,7 @@ const myxHome = function ()
 
 	/**
 	 * Action for clicking the this months total filter icon.
+	 * 
 	 * Switches to statistics tab.
 	 */
 	elements.get("filter-sum-button").onclick = function onFilterSumButtonClick (event)
@@ -33,6 +34,7 @@ const myxHome = function ()
 
 	/**
 	 * Action for clicking the this months total number.
+	 * 
 	 * Switches to statistics tab.
 	 */
 	elements.get("this-month-total").onclick = function onThisMonthTotalClick ()
@@ -42,6 +44,7 @@ const myxHome = function ()
 
 	/**
 	 * Action for clicking the "forward to expenses" icon.
+	 * 
 	 * Switches to expenses tab.
 	 */
 	elements.get("goto-expenses-button").onclick = elements.get("latest-expense-wrapper").onclick = function onGotoExpensesButtonClick ()
@@ -51,6 +54,7 @@ const myxHome = function ()
 
 	/**
 	 * Action for clicking the "edit categories" icon.
+	 * 
 	 * Switches to categories tab.
 	 */
 	elements.get("goto-categories-button").onclick = function onGotoCategoriesButtonClick ()
@@ -61,7 +65,7 @@ const myxHome = function ()
 	/**
 	 * Loads user data from cache or remote file (if modified).
 	 * @async
-	 * @returns {Promise<void>} Promise
+	 * @returns {Promise<void>} Void promise.
 	 */
 	function fetchData ()
 	{
@@ -185,7 +189,7 @@ const myxHome = function ()
 	 * 
 	 * Pops up the ExpenseEditor with the selected category pre-set.
 	 * 
-	 * @param {IdString} catId Id of selected category
+	 * @param {IdString} catId Id of selected category.
 	 */
 	function onCategoryItemClick (event)
 	{

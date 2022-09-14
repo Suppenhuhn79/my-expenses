@@ -8,8 +8,8 @@ class PaymentMethod extends UserDataItem
 	static DEFAULT_GLYPH = "fas:f555";
 
 	/**
-	 * @param {PaymentMethod|EditableIcon} [src] Payment method to copy; if omitted, a new payment method is created
-	 * @param {IdString} [id] Id of the src payment method if it is an `EditableIcon`
+	 * @param {PaymentMethod|EditableIcon} [src] Payment method to copy; if omitted, a new payment method is created.
+	 * @param {IdString} [id] Id of the src payment method if it is an `EditableIcon`.
 	 */
 	constructor(src, id)
 	{
@@ -17,14 +17,14 @@ class PaymentMethod extends UserDataItem
 
 		/**
 		 * Whether this payment method is disabled (`true`) or active (`false`).
-		 * @type {Boolean}
+		 * @type {boolean}
 		 */
 		this.isDisabled = false;
 	}
 
 	/**
-	 * Returns a HTML element that shows this payment methods icon.
-	 * @returns {HTMLElement}
+	 * Provides a HTML `<div>` element that shows this payment methods icon.
+	 * @returns {HTMLElement} HTML element that shows this payment methods icon.
 	 */
 	renderIcon ()
 	{
@@ -33,7 +33,7 @@ class PaymentMethod extends UserDataItem
 
 	/**
 	 * Returns a simplified payment method object for serialisation.
-	 * @returns {Object} Simplified payment method object for serialisation
+	 * @returns {Object} Simplified payment method object for serialisation.
 	 */
 	toJSON ()
 	{
@@ -54,7 +54,7 @@ class PaymentMethodSelector extends Selector
 	/**
 	 * @param {SelectorCallback} callback Function to call on selection
 	 * @param {SelectorOptions} options Configuration of the payment method selector
-	 * @param {Boolean} activeOnly Provide only active payment methods for selection (`true`) or also include disabled payment methods (`false`)
+	 * @param {boolean} activeOnly Provide only active payment methods for selection (`true`) or also include disabled payment methods (`false`)
 	 */
 	constructor(callback, options, activeOnly)
 	{
@@ -72,7 +72,6 @@ const PaymentMethodTabMode = {
 
 /**
  * my-expenses "payment methods" module.
- * @namespace
  */
 function myxPaymentMethods ()
 {
@@ -127,7 +126,7 @@ function myxPaymentMethods ()
 	/**
 	 * Loads _payment methods_ from cache or remote file (if modified).
 	 * @async
-	 * @returns {Promise<void>} Promise
+	 * @returns {Promise<void>} Void promise.
 	 */
 	function fetchData ()
 	{
@@ -142,7 +141,7 @@ function myxPaymentMethods ()
 
 	/**
 	 * Converts a generic object into payment method data.
-	 * @param {Object} obj Generic object that contains payment method data
+	 * @param {Object} obj Generic object that contains payment method data.
 	 */
 	function fromObject (obj)
 	{
@@ -162,8 +161,8 @@ function myxPaymentMethods ()
 
 	/**
 	 * Returns an ordered array of payment methods.
-	 * @param {Boolean} includeDisabled Whether to include disabled payment methods into the result (`true`) or get only active payment methods (`false`)
-	 * @returns {Array<PaymentMethod>} ordered array of payment methods
+	 * @param {boolean} includeDisabled Whether to include disabled payment methods into the result (`true`) or get only active payment methods (`false`).
+	 * @returns {Array<PaymentMethod>} Ordered array of payment methods.
 	 */
 	function getOrderedPaymentMethods (includeDisabled)
 	{
@@ -182,8 +181,8 @@ function myxPaymentMethods ()
 	}
 	/**
 	 * Pops up a menu to prompt for a payment method.
-	 * @param {HTMLElement} alignElement Element to align the menu to
-	 * @param {SelectorCallback} callback Function to call on selection
+	 * @param {HTMLElement} alignElement Element to align the menu to.
+	 * @param {SelectorCallback} callback Function to call on selection.
 	 */
 	function prompt (alignElement, callback)
 	{
@@ -209,14 +208,14 @@ function myxPaymentMethods ()
 	/**
 	 * Puts a list of all payment methods to the "content"-element.
 	 * Item elements will contain all functionality for all modes.
-	 * @param {PaymentMethodTabMode} [mode] Mode to set for the list; default is the current mode
+	 * @param {PaymentMethodTabMode} [mode] Mode to set for the list; default is the current mode.
 	 */
 	function renderList (mode = tabMode.get())
 	{
 		/**
 		 * Actually does render the list items.
-		 * @param {Array<IdString>} pmtIds Array that hold the pmt-ids to render
-		 * @param {Boolean} active Whether this are active or disabled. Affects the items capatibilities
+		 * @param {Array<IdString>} pmtIds Array that hold the pmt-ids to render.
+		 * @param {boolean} active Whether this are active or disabled. Affects the items capatibilities.
 		 */
 		function _renderList (pmtIds, active)
 		{
@@ -267,8 +266,10 @@ function myxPaymentMethods ()
 
 	/**
 	 * Opens the IconEditor for modifing a payment method or creating a new one.
-	 * Changes are not saved until `applyEdits()` is called!
-	 * @param {IdString} [id] Id of payment method to edit; if empty, a new payment method will be created
+	 * 
+	 * Changes are not saved until `saveToFile()` is called!
+	 * 
+	 * @param {IdString} [id] Id of payment method to edit; if empty, a new payment method will be created.
 	 */
 	function promptEditor (id)
 	{
@@ -323,8 +324,8 @@ function myxPaymentMethods ()
 	/**
 	 * Event handler for clicking on items in the list depending on the current mode:
 	 * - "edit": pops up the IconEditor to edit the payment method.
-	 * - "search": sets the expenses filter to the payment method and switches to the expenses module
-	 * @param {MouseEvent} mouseEvent Triggering event
+	 * - "search": sets the expenses filter to the payment method and switches to the expenses module.
+	 * @param {MouseEvent} mouseEvent Triggering event.
 	 */
 	function onItemClick (mouseEvent)
 	{
@@ -344,7 +345,7 @@ function myxPaymentMethods ()
 	/**
 	 * Event handler for clicking the "set as default" star in edit mode.
 	 * Sets the selected payment method as default.
-	 * @param {Event} event Triggering event
+	 * @param {Event} event Triggering event.
 	 */
 	function onSetDefaultClick (event)
 	{
@@ -355,8 +356,8 @@ function myxPaymentMethods ()
 	/**
 	 * Event handler for clicking the "trash" button in the icon editor.
 	 * Puts the item at the top of the disabled items.
-	 * @param {Event} [event] Triggering event; not used, but required by interface
-	 * @param {IdString} pmtId Id of the affected payment method
+	 * @param {Event} [event] Triggering event; not used, but required by interface.
+	 * @param {IdString} pmtId Id of the affected payment method.
 	 */
 	function onTrashClick (event, pmtId)
 	{
@@ -376,7 +377,7 @@ function myxPaymentMethods ()
 	/**
 	 * Event handler for clicking the "untrash" icon on a disabled item.
 	 * Puts the item at the end of active payment methods.
-	 * @param {Event} event Triggering event
+	 * @param {Event} event Triggering event.
 	 */
 	function onUntrashClick (event)
 	{

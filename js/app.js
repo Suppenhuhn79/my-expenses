@@ -29,7 +29,7 @@ let myx = function ()
 
 	/**
 	 * Timestamps of when a file was loaded.
-	 * @type {Map<String, Date>} 
+	 * @type {Map<string, Date>} 
 	 */
 	let filesLoadTimestamps = new Map();
 
@@ -102,10 +102,10 @@ let myx = function ()
 	 * If the file already has been loaded and wasn't modified since then, nothing happens.
 	 * 
 	 * @async
-	 * @param {String} name Name of file to load
-	 * @param {any} defaults Default data if file does not exists or is empty
-	 * @param {Function} callback Function `f(data: any)` to call after the file has loaded
-	 * @returns {Promise<void>} Promise
+	 * @param {string} name Name of file to load.
+	 * @param {any} defaults Default data if file does not exists or is empty.
+	 * @param {Function} callback Function `f(data: any)` to call after the file has loaded.
+	 * @returns {Promise<void>} Void promise.
 	 */
 	function loadFile (name, defaults, callback)
 	{
@@ -161,8 +161,8 @@ let myx = function ()
 	 * 
 	 * If the tab is an editor, the bottom buttons are hidden.
 	 * 
-	 * @param {String} tabName Name of the chosen tab
-	 * @param {Boolean} interactive `true` the choice was set by a (user) event, otherwise `false`
+	 * @param {string} tabName Name of the chosen tab.
+	 * @param {boolean} interactive `true` the choice was set by a (user) event, otherwise `false`.
 	 */
 	function onTabChosen (tabName, interactive)
 	{
@@ -206,7 +206,7 @@ let myx = function ()
 	 * 
 	 * Switches to the selected tab.
 	 * 
-	 * @param {Object} menuItemData Data provided by the menubox
+	 * @param {Object} menuItemData Data provided by the menubox.
 	 */
 	function dataSelectionMenuItemCallback (menuItemData)
 	{
@@ -215,7 +215,7 @@ let myx = function ()
 
 	/**
 	 * Gives an identifier string.
-	 * @return {IdString} New identifier
+	 * @return {IdString} New identifier.
 	 */
 	function newIdString ()
 	{
@@ -224,8 +224,8 @@ let myx = function ()
 
 	/**
 	 * Formats an expense amount as a string with locale separators and currency symbol.
-	 * @param {Number} num Number to format as locale currency amount
-	 * @returns {String} Formated amount
+	 * @param {number} num Number to format as locale currency amount.
+	 * @returns {string} Formated amount.
 	 */
 	function formatAmountLocale (num)
 	{
@@ -234,7 +234,7 @@ let myx = function ()
 
 	/**
 	 * Pops up a notification bubble. This does vanish after a while through CSS animation.
-	 * @param {String} text Notification message
+	 * @param {string} text Notification message.
 	 */
 	function showNotification (text)
 	{

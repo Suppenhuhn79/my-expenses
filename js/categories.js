@@ -15,8 +15,8 @@ class Category extends UserDataItem
 	static DEFAULT_GLYPH = "fas:f07a";
 
 	/**
-	 * @param {Category|EditableIcon} [src] Category to copy; if omitted, a new category is created
-	 * @param {IdString} [id] Id of the src category if it is an `EditableIcon`
+	 * @param {Category|EditableIcon} [src] Category to copy; if omitted, a new category is created.
+	 * @param {IdString} [id] Id of the src category if it is an `EditableIcon`.
 	 */
 	constructor(src, id)
 	{
@@ -24,7 +24,7 @@ class Category extends UserDataItem
 
 		/** 
 		 * @private Use `color` getter instead.
-		 * @type {String?} */
+		 * @type {string?} */
 		this._color = src?.color || "#808080";
 
 		/** @type {Category?} */
@@ -35,8 +35,10 @@ class Category extends UserDataItem
 	}
 
 	/**
-	 * Color of the category. Only master categories do have own colors. Sub-categories inherit their masters color.
-	 * @returns {String}
+	 * Provides the color of the category.
+	 * 
+	 * Only master categories do have own colors. Sub-categories inherit their masters color.
+	 * @returns {string} This categorys color.
 	 */
 	get color ()
 	{
@@ -44,7 +46,7 @@ class Category extends UserDataItem
 	}
 
 	/**
-	 * Sets this categorys color, it it is a master category.
+	 * Sets this categorys color, if it is a master category.
 	 */
 	set color (val)
 	{
@@ -55,7 +57,11 @@ class Category extends UserDataItem
 	}
 
 	/**
-	 * Full qualified label of this category. If this is a sub-categoy, the label will be prefixed with the master categorys name.
+	 * Gives the full qualified label of this category.
+	 * 
+	 * If this is a sub-categoy, the label will be prefixed with the master categorys name.
+	 * 
+	 * @returns {string} Full qualified label of this category.
 	 */
 	get fullQualifiedLabel ()
 	{
@@ -68,7 +74,11 @@ class Category extends UserDataItem
 	}
 
 	/**
+	 * Tells if this is a master category or not.
+	 * 
 	 * `true` if this is a master category, `false` if this is a sub-category.
+	 * 
+	 * @returns {boolean} Whether this is a master category or not.
 	 */
 	get isMaster ()
 	{
@@ -76,8 +86,8 @@ class Category extends UserDataItem
 	}
 
 	/**
-	 * Ids of this categorys sub-categories.
-	 * @returns {Array<IdString>}
+	 * Ordered array of this categorys sub-category ids.
+	 * @returns {Array<IdString>} Ids of this categorys sub-categories.
 	 */
 	get subCategoriesIds ()
 	{
@@ -92,7 +102,7 @@ class Category extends UserDataItem
 
 	/**
 	 * Adds a category a this categorys sub-category.
-	 * @param {Category} cat Category to add as this sub-category
+	 * @param {Category} cat Category to add as this sub-category.
 	 */
 	addSubCategory (cat)
 	{
@@ -103,8 +113,8 @@ class Category extends UserDataItem
 	}
 
 	/**
-	 * Returns a HTML element that shows this payment methods icon.
-	 * @returns {HTMLElement}
+	 * Provides a HTML `<div>` element that shows this categorys icon.
+	 * @returns {HTMLElement} HTML element that shows this categorys icon.
 	 */
 	renderIcon ()
 	{
@@ -112,8 +122,8 @@ class Category extends UserDataItem
 	}
 
 	/**
-	 * Returns a simplified payment method object for serialisation.
-	 * @returns {Object} Simplified payment method object for serialisation
+	 * Returns a simplified category object for serialisation.
+	 * @returns {Object} Simplified category object for serialisation.
 	 */
 	toJSON ()
 	{
@@ -148,8 +158,8 @@ class Category extends UserDataItem
 class CategorySelector extends Selector
 {
 	/**
-	 * @param {SelectorCallback} callback Callback on item selection
-	 * @param {SelectorOptions} options Configuration of the payment method selector
+	 * @param {SelectorCallback} callback Callback on item selection.
+	 * @param {SelectorOptions} options Configuration of the payment method selector.
 	 */
 	constructor(callback, options)
 	{
@@ -165,7 +175,7 @@ class CategorySelector extends Selector
 		 *
 		 * Calls the `callback` function.
 		 *
-		 * @param {Event} event Triggering event
+		 * @param {Event} event Triggering event.
 		 */
 		this._onItemClick = function (event)
 		{
@@ -175,7 +185,7 @@ class CategorySelector extends Selector
 			let eventItem = event.target.closest("[data-id]");
 			/**
 			 * Id of the clicked items.
-			 * @type {String} */
+			 * @type {string} */
 			let id = eventItem.dataset.id;
 			eventItem.scrollIntoView();
 			if (id === "__back__")
@@ -192,7 +202,7 @@ class CategorySelector extends Selector
 			}
 			if (_this.multiSelect === true)
 			{
-				// TODO: aint enough setting the class, because we can not net all selected items from the existing elements, but must have a set in this class
+				// TODO: aint enough setting the class, because we can not get all selected items from the existing elements, but must have a set in this class
 				eventItem.classList.toggle("selected");
 			}
 			else
@@ -205,7 +215,7 @@ class CategorySelector extends Selector
 
 	/**
 	 * Renders the items as _labled icons_ on this selectors element.
-	 * @param {IdString} [selectedId] Id of the pre-selected item; no selection if omitted
+	 * @param {IdString} [selectedId] Id of the pre-selected item; no selection if omitted.
 	 */
 	refresh (selectedId)
 	{
@@ -280,7 +290,7 @@ function myxCategories ()
 	/**
 	 * Loads _categories_ from cache or remote file (if modified).
 	 * @async
-	 * @returns {Promise<void>} Promise
+	 * @returns {Promise<void>} Void promise.
 	 */
 	function fetchData ()
 	{
@@ -295,7 +305,7 @@ function myxCategories ()
 
 	/**
 	 * Converts a generic object into categories data.
-	 * @param {Object} obj Generic object that categories method data
+	 * @param {Object} obj Generic object that has categories properties.
 	 */
 	function fromObject (obj)
 	{
@@ -316,8 +326,10 @@ function myxCategories ()
 
 	/**
 	 * Puts a list of all categories to the "content"-element.
+	 * 
 	 * Item elements will contain all functionality for all modes.
-	 * @param {String} [mode] Mode to set for the list; default is the current mode
+	 * 
+	 * @param {string} [mode] Mode to set for the list; remains at current mode if omitted.
 	 */
 	function renderList (mode = tabMode.get())
 	{
@@ -336,7 +348,7 @@ function myxCategories ()
 			{
 				subCatDiv.appendChild(htmlBuilder.newElement("div.subcat.click",
 					{ 'data-id': subCategory.id, 'data-master-id': id, onclick: onItemClick },
-					subCategory.renderIcon(), // TODO: replace by `renderLabeledIcon()`?
+					subCategory.renderIcon(),
 					htmlBuilder.newElement("span.grey", subCategory.label),
 					htmlBuilder.newElement("div.for-mode.edit-mode.dragger-ew.fas", FA.toHTML("sort"))
 				));
@@ -346,7 +358,7 @@ function myxCategories ()
 				FA.toHTML("plus-square")));
 			labelElement.appendChild(subCatDiv);
 			let div = htmlBuilder.newElement("div.item",
-				category.renderIcon(), // TODO: replace by `renderLabeledIcon()`?
+				category.renderIcon(),
 				labelElement,
 				htmlBuilder.newElement("i.for-mode.edit-mode.dragger-ns.fas", FA.toHTML("sort"))
 			);
@@ -366,9 +378,11 @@ function myxCategories ()
 
 	/**
 	 * Opens the IconEditor for modifing a category or creating a new one.
-	 * Changes are not saved until `applyEdits()` is called!
-	 * @param {IdString} [id] Id of category to edit; if empty, a new category will be created
-	 * @param {IdString} [masterId] Id of the categorys master category (if it's a sub-category)
+	 * 
+	 * Changes are not saved until `saveToFile()` is called!
+	 * 
+	 * @param {IdString} [id] Id of category to edit; if empty, a new category will be created.
+	 * @param {IdString} [masterId] Id of the categorys master category (if it's a sub-category).
 	 */
 	function promptEditor (id, masterId)
 	{
@@ -430,8 +444,8 @@ function myxCategories ()
 	}
 
 	/**
-	 * Returns an ordered array with all master categories.
-	 * @returns {Array<Category>} Ordered array with all master categories
+	 * Returns an ordered array of all master categories.
+	 * @returns {Array<Category>} All master categories.
 	 */
 	function getMasters ()
 	{
@@ -473,7 +487,7 @@ function myxCategories ()
 	 * - "default": pops up the "add expense" page
 	 * - "edit": pops up the IconEditor to edit the payment method
 	 * - "search": sets the expenses filter to the category and switches to expenses
-	 * @param {MouseEvent} event Triggering event
+	 * @param {MouseEvent} event Triggering event.
 	 */
 	function onItemClick (event)
 	{
@@ -499,7 +513,7 @@ function myxCategories ()
 	 * 
 	 * Pops up the editor to add a nwe sub-category.
 	 * 
-	 * @param {MouseEvent} event Triggering event
+	 * @param {MouseEvent} event Triggering event.
 	 */
 	function onAddSubCategoryClick (event)
 	{
@@ -509,7 +523,9 @@ function myxCategories ()
 
 	/**
 	 * Handles clicks on master categoris asterisk in "search" mode.
+	 * 
 	 * Sets expenses filter to the master category and all sub-categories and switches to expenses tab.
+	 * 
 	 * @param {MouseEvent} event Triggering event
 	 */
 	function onSearchAllClick (event)

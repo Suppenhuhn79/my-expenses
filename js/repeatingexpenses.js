@@ -4,32 +4,32 @@
 class RepeatingInterval
 {
 	/**
-	 * @param {RepeatingInterval} [src] Repeating interval to copy. If ommitted, the interval is set to "every month"
+	 * @param {RepeatingInterval} [src] Repeating interval to copy. If ommitted, the interval is set to "every month".
 	 */
 	constructor(src)
 	{
 		/**
 		 * Count of months between interval points.
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.months = (src?.months > 0) ? src.months : undefined;
 
 		/**
 		* Day of month for a monthly interval to trigger (for preserving execution on last-of-month).
-		* @type {Number}
+		* @type {number}
 		*/
 		this.dayOfMonth = (src?.months > 0) ? src?.originalDate || src?.originalDay || src?.dayOfMonth || 1 : undefined; // TODO: remove deprecated property names
 
 		/**
 		 * Count of weeks between interval points.
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.weeks = src?.weeks || undefined;
 	}
 
 	/**
 	 * Checks if this interval is valid. Valid intervals do have eithter _months_ or _weeks_ set to a positive integer.
-	 * @returns {Boolean} Whether this is a valid interval or not
+	 * @returns {boolean} Whether this is a valid interval or not.
 	 */
 	isValid ()
 	{
@@ -38,9 +38,9 @@ class RepeatingInterval
 
 	/**
 	 * Sets the count of months for this interval. Weeks will be set to `undefined`.
-	 * @param {Number} count Count of months between interval points
-	 * @param {Number} dayOfMonth Day of months on that the expense is executed
-	 * @returns {RepeatingInterval} This interval
+	 * @param {number} count Count of months between interval points.
+	 * @param {number} dayOfMonth Day of months on that the expense is executed.
+	 * @returns {RepeatingInterval} This interval.
 	 */
 	setMonths (count, dayOfMonth)
 	{
@@ -52,8 +52,8 @@ class RepeatingInterval
 
 	/**
 	 * Sets the count of weeks for this interval. Months will be set to `undefined`.
-	 * @param {Number} count Count of weeks between interval points
-	 * @returns {RepeatingInterval} This interval
+	 * @param {number} count Count of weeks between interval points.
+	 * @returns {RepeatingInterval} This interval.
 	 */
 	setWeeks (count)
 	{
@@ -64,7 +64,7 @@ class RepeatingInterval
 
 	/**
 	 * Clears the interval (months and weeks are set to `undefined`).
-	 * @returns {RepeatingInterval} This interval
+	 * @returns {RepeatingInterval} This interval.
 	 */
 	clear ()
 	{
@@ -76,7 +76,7 @@ class RepeatingInterval
 
 	/**
 	 * Gives a super short text hat describes this interval.
-	 * @returns {String} Super short interval text
+	 * @returns {string} Super short interval text.
 	 */
 	getSupershortText ()
 	{
@@ -90,7 +90,7 @@ class RepeatingInterval
 class RepeatingExpense
 {
 	/**
-	 * @param {IdString} [id]
+	 * @param {IdString} [id] // TODO: doc
 	 * @param {Expense} [expense]
 	 * @param {RepeatingInterval} [interval]
 	 */
@@ -112,7 +112,7 @@ class RepeatingExpense
 
 	/**
 	 * Calculates the next execution date for this repeating expense.
-	 * @returns {Date} Next date in interval
+	 * @returns {Date} Next date in interval.
 	 */
 	nextDate (date = this.expense.dat)
 	{
@@ -141,7 +141,6 @@ class RepeatingExpense
 
 /**
  * my-expenses repeating expenses functionality for the "expenses" module.
- * @namespace
  */
 function myxRepeatingExpenses ()
 {
@@ -158,7 +157,7 @@ function myxRepeatingExpenses ()
 	/**
 	* Loads _repeating expenses_ from cache or remote file (if modified).
 	 * @async
-	 * @returns {Promise<void>} Promise
+	 * @returns {Promise<void>} Void promise.
 	 */
 	function fetchData ()
 	{
@@ -187,11 +186,11 @@ function myxRepeatingExpenses ()
 
 	/**
 	 * Adds or modifies a repeating expense.
-	 * @param {IdString} [id] Id of repeating expense; if omitted and an interval is given, an new repeating expense is added
-	 * @param {Expense} expense Expense data
-	 * @param {RepeatingInterval} [interval] New repeating interval for the expense; if omitted, the repeating expense is deleted
-	 * @param {Boolean} [autosave] Whether to save repeating expenses to file, or not. Default `true`, set to `false` when performing bulk operations
-	 * @returns {IdString} Id of the modified/added expense; empty string if repeating expense has been deleted or does not exist
+	 * @param {IdString} [id] Id of repeating expense; if omitted and an interval is given, an new repeating expense is added.
+	 * @param {Expense} expense Expense data.
+	 * @param {RepeatingInterval} [interval] New repeating interval for the expense; if omitted, the repeating expense is deleted.
+	 * @param {boolean} [autosave] Whether to save repeating expenses to file, or not. Default `true`, set to `false` when performing bulk operations.
+	 * @returns {IdString} Id of the modified/added expense; empty string if repeating expense has been deleted or does not exist.
 	 */
 	function modify (id, expense, interval, autosave = true)
 	{
@@ -222,12 +221,11 @@ function myxRepeatingExpenses ()
 
 	/**
 	 * Processes all repeating expenses. Checks if a due date has passed (creates an actual expense, if so) and returns a list of all upcoming expenses.
-	 * @param {MonthString} month
+	 * @param {MonthString} month Month to be processed for repating expenses.
 	 * @returns {Array<Expense>} List of all upcoming expenses; **note:** every expense has an additional `rep` member providing the repeating expense id.
 	 */
 	function process (month)
 	{
-		// return [];
 		/** @type {Array<Expense>} */
 		let result = [];
 		/** @type {Date} */
@@ -274,8 +272,8 @@ function myxRepeatingExpenses ()
 
 	/**
 	 * // TODO: implement repeating interval editor
-	 * @param {Expense} expense Origin expense to set as repeating expense
-	 * @param {IdString} [id] Id of already exisintg repeating expense
+	 * @param {Expense} expense Origin expense to set as repeating expense.
+	 * @param {IdString} [id] Id of already exisintg repeating expense.
 	 */
 	function promptEditor (expense, id)
 	{
@@ -299,14 +297,14 @@ function myxRepeatingExpenses ()
 		set: modify,
 		/**
 		 * Returns the interval of a repeating expense.
-		 * @param {IdString} id Repeating expense id
-		 * @returns {RepeatingInterval} Interval of the repeating expense
+		 * @param {IdString} id Repeating expense id.
+		 * @returns {RepeatingInterval} Interval of the repeating expense.
 		 */
 		intervalOf: (id) => { return data.get(id)?.interval || new RepeatingInterval(); },
 		/**
 		 * Returns the last actual execution date of a repeating expense.
-		 * @param {IdString} id Repeating expense id
-		 * @returns {Date} Date of the last actual execution of the repeating expense
+		 * @param {IdString} id Repeating expense id.
+		 * @returns {Date} Date of the last actual execution of the repeating expense.
 		 */
 		lastExecutionDateOf: (id) => { return data.get(id)?.expense.dat; }
 	};

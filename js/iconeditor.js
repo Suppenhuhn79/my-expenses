@@ -1,5 +1,4 @@
 const EditableIconType = {
-	/** @enum {Number} */
 	COLOR_ON_WHITE: 1,
 	WHITE_ON_COLOR: 2
 };
@@ -10,17 +9,17 @@ const EditableIconType = {
 class EditableIcon
 {
 	/**
-	 * @param {{label: String, glyph: FAGlyph, color: String}} src Object from which to create an editable icon
+	 * @param {{label: String, glyph: FAGlyph, color: string}} src Object from which to create an editable icon
 	 */
 	constructor(src)
 	{
-		/** @type {String} */
+		/** @type {string} */
 		this.label = src.label;
 
 		/** @type {FAGlyph} */
 		this.glyph = new FAGlyph(src.glyph.value);
 
-		/** @type {String} */
+		/** @type {string} */
 		this.color = src.color;
 	}
 }
@@ -292,7 +291,7 @@ let iconEditor = new function ()
 
 	/**
 	 * Named child elements of the editor.
-	 * @type {Map<String, HTMLElement>}
+	 * @type {Map<string, HTMLElement>}
 	 */
 	let elements = pageSnippets.iconSelector.produce({
 		onLabelFocus: onLabelFocus,
@@ -319,7 +318,7 @@ let iconEditor = new function ()
 
 	/**
 	 * Name of tab which opend the editor.
-	 * @type {String}
+	 * @type {string}
 	 */
 	let _originTabName;
 
@@ -336,7 +335,7 @@ let iconEditor = new function ()
 
 	/**
 	 * Sets the color of the icon preview.
-	 * @param {String} color Color code of the icon
+	 * @param {string} color Color code of the icon
 	 */
 	function setIconColor (color)
 	{
@@ -361,7 +360,7 @@ let iconEditor = new function ()
 
 	/**
 	 * Paints the icons glyph preview.
-	 * @param {FAGlyph|String} glyph Glyph either as an actual FontAwesome glyph or a glyph code
+	 * @param {FAGlyph|string} glyph Glyph either as an actual FontAwesome glyph or a glyph code
 	 */
 	function renderGlyph (glyph)
 	{
@@ -462,4 +461,26 @@ let iconEditor = new function ()
 		choices.set("iconeditor-tab", "icon-selection");
 	};
 
+	this.getItems = function ()
+	{
+		/** @type {Array<ISelectableIcon>} */
+		let items = [];
+
+		for (let glyphCode of [].concat(...Object.values(ICON_LIBRARAY)))
+		{
+			items.push(new UserDataItem({
+				id: glyphCode,
+				color: "#888",
+				icon: glyphCode
+			}));
+		};
+		let iconSelection = new Selector(console.log, items, { class: "no-labels" });
+		myxDebug.publish(iconSelection, "is");
+		iconSelection.refresh();
+		htmlBuilder.replaceContent(
+			elements.get("icon-list"),
+			iconSelection.element
+		);
+		return items;
+	};
 };

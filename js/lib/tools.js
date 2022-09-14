@@ -8,12 +8,12 @@ let choices = new function ()
 {
 	/**
 	 * Map of choice callbacks.
-	 * @type {Map<String, ChoiceCallback>} */
+	 * @type {Map<string, ChoiceCallback>} */
 	let callbacks = new Map();
 
 	/**
 	 * Map of choice values.
-	 * @type {Map<String, String?>} */
+	 * @type {Map<String, string?>} */
 	let data = new Map();
 
 	window.addEventListener("click", (mouseEvent) =>
@@ -31,8 +31,8 @@ let choices = new function ()
 
 	/**
 	 * Register an event handler to call when a choice is made.
-	 * @param {String} choiceKey Choice key to act on
-	 * @param {ChoiceCallback} callback `function(choiceKey: String, [event: Event])` to call on choice
+	 * @param {string} choiceKey Choice key to act on.
+	 * @param {ChoiceCallback} callback `function(choiceKey: string, interactive: boolean)` to call on choice.
 	 */
 	this.onChoose = function (choiceKey, callback)
 	{
@@ -48,8 +48,8 @@ let choices = new function ()
 
 	/**
 	 * Returns the current value of a chioce.
-	 * @param {String} choiceKey Choice key of the requested choice
-	 * @returns {String?} Current value of the choice
+	 * @param {string} choiceKey Choice key of the requested choice.
+	 * @returns {string?} Current value of the choice.
 	 */
 	this.get = function (choiceKey)
 	{
@@ -58,9 +58,9 @@ let choices = new function ()
 
 	/**
 	 * Sets the value of a chioce. Also calls the callback for that choice key, if defined.
-	 * @param {String} choiceKey Choice key of the choice to set
-	 * @param {String} value Value to set for the choice
-	 * @param {Event} [event] Event that triggered the choice
+	 * @param {string} choiceKey Choice key of the choice to set.
+	 * @param {string} value Value to set for the choice.
+	 * @param {Event} [event] Event that triggered the choice.
 	 */
 	this.set = function (choiceKey, value, event)
 	{
@@ -107,12 +107,12 @@ let checks = new function ()
 
 	/**
 	 * Returns all elements that are 'checked'.
-	 * @param {HTMLElement} [element] Element to get all checked child elements; entire document body if omitted
-	 * @returns {Array<String>} Array with the data values of all checked elements within the element
+	 * @param {HTMLElement} [element] Element to get all checked child elements; entire document body if omitted.
+	 * @returns {Array<string>} Array with the data values of all checked elements within the element.
 	 */
 	this.getAllChecked = function (element = document.body)
 	{
-		/** @type {Array<String>} */
+		/** @type {Array<string>} */
 		let result = [];
 		for (let e of element.querySelectorAll(".checked[data-check]"))
 		{
@@ -123,8 +123,8 @@ let checks = new function ()
 
 	/**
 	 * Gets the 'checked' state of an element.
-	 * @param {HTMLElement} element Element to get the 'checked' state
-	 * @return {Boolean} `true` if the element is checked, otherwiese `false`
+	 * @param {HTMLElement} element Element to get the 'checked' state.
+	 * @return {boolean} `true` if the element is checked, otherwiese `false`.
 	 */
 	this.isChecked = function (element)
 	{
@@ -133,8 +133,8 @@ let checks = new function ()
 
 	/**
 	 * Sets the 'checked' state of an element.
-	 * @param {HTMLElement} element Element to set the 'checked' state
-	 * @param {Boolean} [isChecked] `true` if the element shall be checked (default), `false` if it shall be unchecked
+	 * @param {HTMLElement} element Element to set the 'checked' state.
+	 * @param {boolean} [isChecked] `true` if the element shall be checked (default), `false` if it shall be unchecked.
 	 */
 	this.setChecked = function (element, isChecked = true)
 	{
@@ -165,7 +165,7 @@ let vikb = new function ()
 
 	/**
 	 * Register an event handler to call on virtaul keyboard popping on/off.
-	 * @param {vikbCallback} callback `function(event: String)` to call; where `event` is either `"opened"` or `"closed"`
+	 * @param {vikbCallback} callback `function(event: String)` to call; where `event` is either `"opened"` or `"closed"`.
 	 */
 	this.addEventListener = function (callback)
 	{

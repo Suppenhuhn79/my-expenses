@@ -12,7 +12,8 @@
  * @type {"sum"|"avg"|"mavg"|"count"}
  * 
  * @typedef AggregationResult
- * @property {Map<MonthString, Array<CategoryAggregate>} months Monthly aggregates per category
- * @property {Array<CategoryAggregate>} total Sums per category for all months
- * @property {CategoryAggregate} meta Aggregate of all categories and all months
+ * Result of the `StatisticAggregator.calc()` method.
+ * @property {Map<MonthString, Array<CategoryAggregate>} months Monthly aggregates per category.
+ * @property {Array<CategoryAggregate>} total Sums per category for all months.
+ * @property {CategoryAggregate} meta Aggregate of all categories and all months.
  */

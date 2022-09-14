@@ -4,14 +4,14 @@
 class Expense
 {
 	/**
-	 * Order of keys for conversion from/to csv
-	 * @type {Array<String>}
+	 * Order of keys for conversion from/to csv.
+	 * @type {Array<string>}
 	 */
 	static KEY_ORDER = ["dat", "amt", "cat", "txt", "pmt", "rep"];
 
 	/**
-	 * @param {Expense|String} [src] Csv string to parse or expense to copy
-	 * @param {Object} [override] Optional values to override default/source value
+	 * @param {Expense|string} [src] Csv string to parse or expense to copy.
+	 * @param {Object} [override] Optional values to override default/source value.
 	 */
 	constructor(src, override)
 	{
@@ -22,31 +22,31 @@ class Expense
 		this.dat = new Date();
 
 		/**
-		 * Expense amount
-		 * @type {Number}
+		 * Expense amount.
+		 * @type {number}
 		 */
 		this.amt = 0;
 
 		/**
-		 * Expense category - id reference to categories
+		 * Expense category - id reference to categories.
 		 * @type {IdString}
 		 */
 		this.cat = "";
 
 		/**
-		 * Additional text
-		 * @type {String}
+		 * Additional descriptive text.
+		 * @type {string}
 		 */
 		this.txt = "";
 
 		/**
-		 * Used payment method - id reference to payment methods
+		 * Used payment method - id reference to payment methods.
 		 * @type {IdString}
 		 */
 		this.pmt = "";
 
 		/**
-		 * Repeating expense - id reference to repeating expenses
+		 * Repeating expense - id reference to repeating expenses.
 		 * @type {IdString}
 		 */
 		this.rep = "";
@@ -88,8 +88,8 @@ class Expense
 
 	/**
 	 * Compares two expenses if they are equal (date, amount, category, etc.)
-	 * @param {Expense} otherExpense Second expense to compare
-	 * @returns {Boolean} `true` if both expenses are equal, otherwise `false`
+	 * @param {Expense} otherExpense Second expense to compare.
+	 * @returns {boolean} `true` if both expenses are equal, otherwise `false`.
 	 */
 	equals (otherExpense)
 	{
@@ -103,7 +103,7 @@ class Expense
 
 	/**
 	 * Returns a serializable object of this expense.
-	 * @returns {Object} Serializable object
+	 * @returns {Object} Serializable object.
 	 */
 	toJSON ()
 	{
@@ -124,8 +124,8 @@ class Expense
 	};
 
 	/**
-	 * Gives a csv line for the expense.
-	 * @returns {String}
+	 * Gives a CSV line for the expense.
+	 * @returns {string} CSV string.
 	 */
 	toString ()
 	{
@@ -141,8 +141,8 @@ class ExpensesFilter
 	static DEFAULT_NAME = "New expenses filter";
 
 	/**
-	 * Returns ids of all categories.
-	 * @returns {Set<IdString>}
+	 * Returns an unordered set of all categories ids.
+	 * @returns {Set<IdString>} All categoies ids.
 	 */
 	static get allCategories ()
 	{
@@ -150,8 +150,8 @@ class ExpensesFilter
 	}
 
 	/**
-	 * Returns ids of all (active and disabled) payment methods.
-	 * @returns {Set<IdString>}
+	 * Returns an unordered set of all (active and disabled) payment methods ids.
+	 * @returns {Set<IdString>} All payment methods ids.
 	 */
 	static get allPaymentMethods ()
 	{
@@ -160,7 +160,10 @@ class ExpensesFilter
 
 	constructor()
 	{
-		/** @type {String} */
+		/** 
+		 * This filters name.
+		 * @type {string}
+		 */
 		this.name = ExpensesFilter.DEFAULT_NAME;
 
 		/**
@@ -178,8 +181,8 @@ class ExpensesFilter
 
 	/**
 	 * Sets categories to be excluded.
-	 * @param {Iterable<IdString>} categories Category ids to add to filter to be excluded
-	 * @returns {ExpensesFilter} This
+	 * @param {Iterable<IdString>} categories Category ids to add to filter to be excluded.
+	 * @returns {ExpensesFilter} This filter.
 	 */
 	excludeCategories (categories)
 	{
@@ -189,8 +192,8 @@ class ExpensesFilter
 
 	/**
 	 * Sets payment methods to be excluded.
-	 * @param {Iterable<IdString>} paymentMethods Payment method ids to add to filter to be excluded
-	 * @returns {ExpensesFilter} This
+	 * @param {Iterable<IdString>} paymentMethods Payment method ids to add to filter to be excluded.
+	 * @returns {ExpensesFilter} This filter.
 	 */
 	excludePaymentMethods (paymentMethods)
 	{
@@ -200,8 +203,8 @@ class ExpensesFilter
 
 	/**
 	 * Imports categories and payment methods from an object.
-	 * @param {{name: String?, cats: Iterable<IdString>?, pmts: Iterable<IdString>?}} obj Object to be imported
-	 * @returns {ExpensesFilter} This
+	 * @param {{name: string?, cats: Iterable<IdString>?, pmts: Iterable<IdString>?}} obj Object to be imported.
+	 * @returns {ExpensesFilter} This filter.
 	 */
 	from (obj)
 	{
@@ -213,7 +216,7 @@ class ExpensesFilter
 
 	/**
 	 * Returns a serializable object of this expense.
-	 * @returns {Object} Serializable object
+	 * @returns {Object} Serializable object.
 	 */
 	toJSON ()
 	{
@@ -237,9 +240,9 @@ const ExpensesTabMode = {
 function myxExpenses ()
 {
 	const MODULE_NAME = "expenses-tab";
-	/** Time in milliseconds of mousedown hold to switch to "multiselect" mode */
+	/** Time in milliseconds of mousedown hold to switch to "multiselect" mode. */
 	const LONG_MOUSEDOWN_TIMEOUT_MS = 750;
-	/** Key in `data` where the preview expenses are stored temporary */
+	/** Key in `data` where the preview expenses are stored temporary. */
 	const PREVIEW = "preview";
 	/** @type {Record<MonthString, Array<Expense>>} */
 	let data = {};
@@ -254,15 +257,15 @@ function myxExpenses ()
 	let selectedMonth = new Date();
 	/**
 	 * Tab mode that was active before multiselect.
-	 * @type {String} */
+	 * @type {string} */
 	let preMultiselectTabMode;
 	/**
 	 * Id of the long-mousedown timeout.
-	 * @type {Number} */
+	 * @type {number} */
 	let longMousedownTimeoutId;
 	/**
 	 * For ignoring mouseup on long-mousedown.
-	 * @type {Boolean} */
+	 * @type {boolean} */
 	let ignoreMouseup = false;
 
 	elements.get("back-search-button").onclick = function onSearchButtonClick () { choices.set("active-tab", filter._origin); };
@@ -275,7 +278,7 @@ function myxExpenses ()
 	/**
 	 * Initializes the module.
 	 * @async
-	 * @returns {Promise<void>} Promise
+	 * @returns {Promise<void>} Void promise.
 	 */
 	function init ()
 	{
@@ -295,14 +298,14 @@ function myxExpenses ()
 	/**
 	 * Loads _expenses_ and _repeating expenses_ from cache or remote files (if modified).
 	 * @async
-	 * @returns {Promise<void>} Promise
+	 * @returns {Promise<void>} Void promise.
 	 */
 	function fetchData ()
 	{
 		return new Promise((resolve) => 
 		{
 			/**
-			 * Iterable promises of all file load actions
+			 * Iterable promises of all file load actions.
 			 * @type {Array<Promise>} */
 			let asyncCalls = [];
 			asyncCalls.push(myx.repeatings.fetchData());
@@ -325,8 +328,8 @@ function myxExpenses ()
 	 * 
 	 * Also registers months and file numbers.
 	 * 
-	 * @param {Number} fileIndex Index (`1..x`) of the file where the data came from
-	 * @param {String} csvString Native csv data (as in a file)
+	 * @param {number} fileIndex Index (`1..x`) of the file where the data came from.
+	 * @param {string} csvString Native csv data (as in a file).
 	 */
 	function importFileContent (fileIndex, csvString)
 	{
@@ -361,8 +364,8 @@ function myxExpenses ()
 
 	/**
 	 * Provides all expenses of a month as CSV.
-	 * @param {MonthString} month Month to get data
-	 * @returns {String} All expenses in given month as CSV
+	 * @param {MonthString} month Month to get data.
+	 * @returns {string} All expenses in given month as CSV.
 	 */
 	function getCsv (month)
 	{
@@ -376,22 +379,24 @@ function myxExpenses ()
 
 	/**
 	 * Saves expenses to a file.
+	 * 
 	 * More exactly: saves expenses of all months, that are in the same files as the given dates.
+	 * 
 	 * @async
-	 * @param {Expense|Array<Expense>} expenses Months to save data
+	 * @param {Expense|Array<Expense>} expenses Months to save data.
 	 */
 	async function saveToFile (expenses)
 	{
 		/** 
-		 * Months to be saved
+		 * Months to be saved.
 		 * @type {Array<MonthString>} */
 		let months = [];
 		/**
-		 * Indexes of affected files
-		 * @type {Array<Number>} */
+		 * Indexes of affected files.
+		 * @type {Array<number>} */
 		let fileIndexes = [];
 		/**
-		 * XHR operation promises
+		 * XHR operation promises.
 		 * @type {Array<Promise>} */
 		let ops = [];
 		myx.xhrBegin();
@@ -432,7 +437,7 @@ function myxExpenses ()
 
 	/**
 	 * Adds expenses to `data` and saves files.
-	 * @param {Expense|Array<Expense>} expenses Expenses to add
+	 * @param {Expense|Array<Expense>} expenses Expenses to add.
 	 */
 	function add (expenses)
 	{
@@ -460,7 +465,7 @@ function myxExpenses ()
 
 	/**
 	 * Sorts expenses of a month, descending by date.
-	 * @param {MonthString} month Month to get expenses sorted
+	 * @param {MonthString} month Month to get expenses sorted.
 	 */
 	function sortItems (month)
 	{
@@ -469,8 +474,8 @@ function myxExpenses ()
 
 	/**
 	 * Checks whether there are actual expenses in a certain month or not.
-	 * @param {MonthString|Date} month Month to check for data
-	 * @returns {Boolean} `true` if there is any actual data for the month, `false` if there is no or only preview data
+	 * @param {MonthString|Date} month Month to check for data.
+	 * @returns {boolean} `true` if there is any actual data for the month, `false` if there is no or only preview data.
 	 */
 	function hasActualData (month)
 	{
@@ -483,8 +488,8 @@ function myxExpenses ()
 
 	/**
 	 * Returns the expense that is bound to a list element.
-	 * @param {HTMLElement} element HTML element of the expenses list
-	 * @returns {Expense} Expense that is bound to the element
+	 * @param {HTMLElement} element HTML element of the expenses list.
+	 * @returns {Expense} Expense that is bound to the element.
 	 */
 	function getExpenseOfElement (element)
 	{
@@ -504,8 +509,8 @@ function myxExpenses ()
 	 * Mode will be set to "search" if there is at least a _pmt_ or a _cat_ filter. Also the title will get a seach hint.
 	 * Otherwise the mode will be "default".
 	 * 
-	 * @param {ExpensesFilter} filterObj Filters to set
-	 * @param {String} originModuleName Module name where the filter came from (where to return to)
+	 * @param {ExpensesFilter} filterObj Filters to set.
+	 * @param {string} originModuleName Module name where the filter came from (where to return to).
 	 */
 	function setFilter (filterObj, originModuleName)
 	{
@@ -568,7 +573,7 @@ function myxExpenses ()
 
 	/**
 	 * Sets the current month and also filters on the current month and renders the list via `setFilter()`.
-	 * @param {Date} month Month to set
+	 * @param {Date} month Month to set.
 	 */
 	function setMonth (month)
 	{
@@ -581,8 +586,8 @@ function myxExpenses ()
 	 * 
 	 * If the current month has no data and the target month has no data, too, the element gets hidden.
 	 * 
-	 * @param {HTMLDivElement} navElement HTML element to update
-	 * @param {Date} targetMonth Month to be represented by the nav element
+	 * @param {HTMLDivElement} navElement HTML element to update.
+	 * @param {Date} targetMonth Month to be represented by the nav element.
 	 */
 	function renderNavItem (navElement, targetMonth)
 	{
@@ -598,8 +603,8 @@ function myxExpenses ()
 
 	/**
 	 * Provides a headline `<div>` element for a date.
-	 * @param {Date} date Date to render the headline for
-	 * @returns {HTMLDivElement} Headline `<div>` containing a nice date text
+	 * @param {Date} date Date to render the headline for.
+	 * @returns {HTMLDivElement} Headline `<div>` containing a nice date text.
 	 */
 	function renderHeadline (date)
 	{
@@ -611,9 +616,9 @@ function myxExpenses ()
 
 	/**
 	 * Provides a HTML element representing an expense.
-	 * @param {Expense} item Expense to render
-	 * @param {Number} dataIndex Array index (`0..x`) of the current month subset of `data`
-	 * @returns {HTMLDivElement} `<div>` element
+	 * @param {Expense} item Expense to render.
+	 * @param {number} dataIndex Array index (`0..x`) of the current month subset of `data`.
+	 * @returns {HTMLDivElement} `<div>` element.
 	 */
 	function renderItem (item, dataIndex)
 	{
@@ -645,7 +650,7 @@ function myxExpenses ()
 	 * 
 	 * Also navigation items will be updated.
 	 * 
-	 * @param {Date} [scrollToDate] Date to be scrolled to; if omitted, list will try to scroll to _today_
+	 * @param {Date} [scrollToDate] Date to be scrolled to; if omitted, list will try to scroll to _today_.
 	 */
 	function renderList (scrollToDate)
 	{
@@ -665,7 +670,7 @@ function myxExpenses ()
 		for (let month of filter.months.sort().reverse())
 		{
 			data[PREVIEW] = (tabMode.is(ExpensesTabMode.DEFAULT)) ? myx.repeatings.process(month) : [];
-			/** @type {Number} */
+			/** @type {number} */
 			let currentDay = 0;
 			/** @type {HTMLElement} */
 			let headline;
@@ -673,7 +678,7 @@ function myxExpenses ()
 			let actualExpenses = data[month] || [];
 			/** @type {Array<Expense>} */
 			let items = actualExpenses.concat(data[PREVIEW]);
-			/** @type {Number} */
+			/** @type {number} */
 			let actualCount = actualExpenses.length;
 			for (let i = items.length - 1; i >= 0; i -= 1)
 			{
@@ -750,8 +755,8 @@ function myxExpenses ()
 	{
 		/**
 		 * Find the closest header element for a date.
-		 * @param {Date} forDate 
-		 * @returns {HTMLElement}
+		 * @param {Date} forDate Date for which to get to closest header.
+		 * @returns {HTMLElement} Closest header element for the given date.
 		 */
 		function findClosestHeader (forDate)
 		{
@@ -789,8 +794,8 @@ function myxExpenses ()
 	 * 
 	 * Renders the expenses list afterwards.
 	 * 
-	 * @param {Expense} [expense] Expense to edit; if omitted, a new expense will be created
-	 * @param {Number} [dataIndex] Array index (`0..x`) of the current month subset of `data`; required if editing existing data, otherwise to be omitted
+	 * @param {Expense} [expense] Expense to edit; if omitted, a new expense will be created.
+	 * @param {number} [dataIndex] Array index (`0..x`) of the current month subset of `data`; required if editing existing data, otherwise to be omitted.
 	 */
 	function popupEditor (expense, dataIndex)
 	{
@@ -800,11 +805,11 @@ function myxExpenses ()
 		let originalMonth = originalItem.dat.toMonthString();
 		editor.popup(originalItem, dataIndex,
 			/**
-			 * Expense editor callback
-			 * @param {Expense} editedItem Edited expense
-			 * @param {ExpenseEditorAction} action
+			 * Expense editor callback.
+			 * @param {Expense} editedItem Edited expense.
+			 * @param {ExpenseEditorAction} action Action of the expense editor.
 			 */
-			(editedItem, action) =>
+			function onExpenseEditorEnd (editedItem, action)
 			{
 				/** @type {Date} */
 				let scrollToDate = (action !== ExpenseEditorAction.NONE) ? editedItem?.dat : originalItem.dat;
@@ -846,9 +851,9 @@ function myxExpenses ()
 
 	/**
 	 * Pops up a `Menubox` to select a month from all availible months.
-	 * @param {Event} event Event that triggered the popup (required to stop propagation)
-	 * @param {HTMLElement} alignElement Element to align the menu to (centered below bottom)
-	 * @param {Function} callback `function(selectedMonth: Date)` to call on month selection
+	 * @param {Event} event Event that triggered the popup (required to stop propagation).
+	 * @param {HTMLElement} alignElement Element to align the menu to (centered below bottom).
+	 * @param {function(Date): void} callback `function(selectedMonth: Date)` to call on month selection.
 	 */
 	function popupAvalibleMonthsMenu (event, alignElement, callback)
 	{
@@ -881,7 +886,7 @@ function myxExpenses ()
 
 	/**
 	 * Event handler for clicks on the "current month" nav item.
-	 * @param {MouseEvent} mouseEvent Triggering event
+	 * @param {MouseEvent} mouseEvent Triggering event.
 	 */
 	function onNavCurrentClick (mouseEvent)
 	{
@@ -893,7 +898,9 @@ function myxExpenses ()
 	};
 
 	/**
-	 * Event handler for clicking the "add expense" button. Pops up the ExpenseEditor for new expense.
+	 * Event handler for clicking the "add expense" button.
+	 * 
+	 * Pops up the ExpenseEditor for new expense.
 	 */
 	function onAddExpenseClick ()
 	{
@@ -919,7 +926,7 @@ function myxExpenses ()
 	 * 
 	 * Starts timeout for long-mousedown switching to "multiselect" mode.
 	 * 
-	 * @param {Event} event Triggering event
+	 * @param {Event} event Triggering event.
 	 */
 	function onItemPointerDown (event)
 	{
@@ -937,7 +944,7 @@ function myxExpenses ()
 	 * 
 	 * Redirects to `onItemClick()` event handler if necessary.
 	 * 
-	 * @param {Event} event Triggering event
+	 * @param {Event} event Triggering event.
 	 */
 	function onItemPointerUp (event)
 	{
@@ -955,7 +962,7 @@ function myxExpenses ()
 	 * - In "default" mode, it pops up the ExpenseEditor.
 	 * - In "multiselect" mode, is selects/deselects the expense.
 	 * 
-	 * @param {Event} event Triggering event
+	 * @param {Event} event Triggering event.
 	 */
 	function onItemClick (event)
 	{

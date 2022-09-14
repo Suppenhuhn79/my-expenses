@@ -4,25 +4,25 @@
 class AggregateAtom
 {
 	/**
-	 * @param {Number} [sum] Sum of expenses, default `0`
-	 * @param {Number} [count] Count of expenses, default `0`
+	 * @param {number} [sum] Sum of expenses, default `0`.
+	 * @param {number} [count] Count of expenses, default `0`.
 	 */
 	constructor(sum, count)
 	{
 		/**
 		 * Sum of all items added to this aggregate atom.
-		 * @type {Number} */
+		 * @type {number} */
 		this.sum = sum || 0;
 
 		/**
 		 * Count of all items added to this aggregate atom.
-		 * @type {Number} */
+		 * @type {number} */
 		this.count = count || 0;
 	}
 
 	/**
 	 * Average value of all items added to this aggregate atom.
-	 * @type {Number}
+	 * @type {number}
 	 */
 	get avg ()
 	{
@@ -31,8 +31,8 @@ class AggregateAtom
 
 	/**
 	 * Adds the sum and count of an other aggregate atom.
-	 * @param {AggregateAtom} agg Aggregate atom to add
-	 * @returns {AggregateAtom} Returns this aggregate atom
+	 * @param {AggregateAtom} agg Aggregate atom to add.
+	 * @returns {AggregateAtom} This aggregate atom.
 	 */
 	add (agg)
 	{
@@ -58,9 +58,9 @@ class CategoryAggregate extends AggregateAtom
 	 * To use in an `<array>.sort()` context.
 	 * 
 	 * @static
-	 * @param {CategoryAggregate} a First value to compare
-	 * @param {CategoryAggregate} b Second value to compare
-	 * @returns {Number} Number to indicate whether `a` is to sort before, after or equal to `b`
+	 * @param {CategoryAggregate} a First value to compare.
+	 * @param {CategoryAggregate} b Second value to compare.
+	 * @returns {number} Number to indicate whether `a` is to sort before, after or equal to `b`.
 	 */
 	static compare (a, b)
 	{
@@ -74,9 +74,9 @@ class CategoryAggregate extends AggregateAtom
 	 * To use in an `<array>.reduce()` context.
 	 * 
 	 * @static
-	 * @param {CategoryAggregate} prev Previuos object
-	 * @param {CategoryAggregate} curr Current object to add to the previous one
-	 * @returns {CategoryAggregate} Result of the addition
+	 * @param {CategoryAggregate} prev Previuos object.
+	 * @param {CategoryAggregate} curr Current object to add to the previous one.
+	 * @returns {CategoryAggregate} Result of the addition.
 	 */
 	static reduce (prev, curr)
 	{
@@ -86,9 +86,9 @@ class CategoryAggregate extends AggregateAtom
 	}
 
 	/**
-	 * @param {String} catId Category id of which category this aggregate is
-	 * @param {Number} monthCount Count of months of this aggregate
-	 * @param {AggregateAtom} [agg] Aggregate atom to get initial values
+	 * @param {string} catId Category id of which category this aggregate is.
+	 * @param {number} monthCount Count of months of this aggregate.
+	 * @param {AggregateAtom} [agg] Aggregate atom to get initial values.
 	 */
 	constructor(catId, monthCount, agg)
 	{
@@ -101,7 +101,7 @@ class CategoryAggregate extends AggregateAtom
 
 		/**
 		 * Count of months aggregated in this.
-		 * @type {Number} */
+		 * @type {number} */
 		this.monthCount = monthCount;
 
 		/**
@@ -112,7 +112,7 @@ class CategoryAggregate extends AggregateAtom
 
 	/**
 	 * Average sum per month.
-	 * @type {Number}
+	 * @type {number}
 	 */
 	get mavg ()
 	{
@@ -122,7 +122,6 @@ class CategoryAggregate extends AggregateAtom
 
 /**
  * my-expenses expenses aggregation functionality for the "statistics" module.
- * @namespace
  */
 function myxStatisticAggregator ()
 {
@@ -133,7 +132,7 @@ function myxStatisticAggregator ()
 
 	/**
 	 * Count of months to aggregate; used to calculate monthly averages.
-	 * @type {Number}
+	 * @type {number}
 	 */
 	let _monthsCount;
 
@@ -152,9 +151,9 @@ function myxStatisticAggregator ()
 	 * 
 	 * To use in an `<array>.reduce()` only.
 	 * 
-	 * @param {AggregatesMap} prev Summed up expenses so far
-	 * @param {Expense} curr Current expense to add
-	 * @returns {AggregatesMap} Record with aggregated expenses per caetgory
+	 * @param {AggregatesMap} prev Summed up expenses so far.
+	 * @param {Expense} curr Current expense to add.
+	 * @returns {AggregatesMap} Record with aggregated expenses per caetgory.
 	 */
 	function reduceExpenses (prev, curr)
 	{
@@ -172,9 +171,9 @@ function myxStatisticAggregator ()
 
 	/**
 	 * Converts an `AggregatesMap` object to a `CategoryAggregate` array.
-	 * @param {AggregatesMap} categoriesAggregates Aggregates to convert to an array
-	 * @param {Boolean} sumupTotals If `true`, it also sums up data into `totalsPerCategory`
-	 * @returns {Array<CategoryAggregate>} An array of aggregates
+	 * @param {AggregatesMap} categoriesAggregates Aggregates to convert to an array.
+	 * @param {boolean} sumupTotals If `true`, it also sums up data into `totalsPerCategory`.
+	 * @returns {Array<CategoryAggregate>} An array of aggregates.
 	 */
 	function aggregatesToSortedArray (categoriesAggregates, sumupTotals)
 	{
@@ -214,8 +213,8 @@ function myxStatisticAggregator ()
 	 * Puts the calculation result as an array of `CategoryAggreagte` into `categoriesPerMonth` for this month.
 	 * 
 	 * @async
-	 * @param {MonthString} month Month to aggregate expenses
-	 * @returns {Promise} Promise
+	 * @param {MonthString} month Month to aggregate expenses.
+	 * @returns {Promise<void>} Void promise.
 	 */
 	function calcMonth (month)
 	{
@@ -235,10 +234,10 @@ function myxStatisticAggregator ()
 	 * Returns an `AggregationResult` object with all data sorted by the given sort key.
 	 * 
 	 * @async
-	 * @param {ExpensesFilter} filter Filter to exclude payment methods or categories
-	 * @param {Array<MonthString>} months Months to calculate
-	 * @param {AggregatesCompareProperty} sortKey Whether to sort results by sum (default) or average
-	 * @returns {Promise<AggregationResult>} Promise
+	 * @param {ExpensesFilter} filter Filter to exclude payment methods or categories.
+	 * @param {Array<MonthString>} months Months to calculate.
+	 * @param {AggregatesCompareProperty} sortKey Whether to sort results by sum (default) or average.
+	 * @returns {Promise<AggregationResult>} Promise of object that contains the calculation result in various aggregation deepths, each sorted by the given key.
 	 */
 	function calc (filter, months, sortKey)
 	{

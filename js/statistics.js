@@ -16,15 +16,15 @@ function myxStatisticsTimerange ()
 	/** @type {TimerangeMode} */
 	let mode = "month";
 	/**
-	 * 
-	 * @readonly To set use `setSelectedMonths()`
+	 * Selected months for statistics calculation.
+	 * @readonly To set use `setSelectedMonths()`.
 	 * @type {Array<MonthString>}
 	 */
 	let selectedMonths;
 
 	/**
 	 * Sets the given timerange mode. Affects the selected months.
-	 * @param {TimerangeMode} newMode Mode to set
+	 * @param {TimerangeMode} newMode Mode to set.
 	 */
 	function setMode (newMode)
 	{
@@ -46,7 +46,7 @@ function myxStatisticsTimerange ()
 	/**
 	 * Set the time range to a single month.
 	 * @param {Date} newMonth New month to set.
-	 * @param {Boolean} [fromExternal] Whether setting month was triggered from outside this module (`true`) or not (`false`, default). If this is `false` the selected month in the _expenses_ module will be updated.
+	 * @param {boolean} [fromExternal] Whether setting month was triggered from outside this module (`true`) or not (`false`, default). If this is `false` the selected month in the _expenses_ module will be updated.
 	 */
 	function setMonth (newMonth, fromExternal = false)
 	{
@@ -59,7 +59,7 @@ function myxStatisticsTimerange ()
 
 	/**
 	 * Sets the time range to a full year.
-	 * @param {Number} newYear New year to set
+	 * @param {number} newYear New year to set.
 	 */
 	function setYear (newYear)
 	{
@@ -102,8 +102,8 @@ function myxStatisticsTimerange ()
 
 	/**
 	 * Returns the adjacent time range (previous or following) for the current monht/year and mode.
-	 * @param {-1|1} direction Whether to calculate the previous (`-1`) or the following (`+1`) time range
-	 * @returns {Date}
+	 * @param {-1|1} direction Whether to calculate the previous (`-1`) or the following (`+1`) time range.
+	 * @returns {Date} Date of the adjectand month o year in the given direction.
 	 */
 	function getAdjacentTimerange (direction)
 	{
@@ -154,7 +154,6 @@ function myxStatisticsTimerange ()
 
 /**
  * my-expenses "statistics" module.
- * @namespace
  */
 function myxStatistics ()
 {
@@ -165,7 +164,7 @@ function myxStatistics ()
 
 	/**
 	 * Prevents calculation while setting modes on module entering.
-	 * @type {Boolean}
+	 * @type {boolean}
 	 */
 	let entering;
 
@@ -322,11 +321,11 @@ function myxStatistics ()
 	}
 
 	/**
-	 * Provides a HTML element that draws a progress bar.
-	 * @param {String} baseClass CSS class name for percent bar element
-	 * @param {Number} ratio Percentage (`0<n<1`) filled on the bar
-	 * @param {String} color CSS color value for percentage
-	 * @returns {HTMLDivElement}
+	 * Provides a HTML `<div>` element that draws a progress bar.
+	 * @param {string} baseClass CSS class name for percent bar element.
+	 * @param {number} ratio Percentage (`0<n<1`) filled on the bar.
+	 * @param {string} color CSS color value for percentage.
+	 * @returns {HTMLDivElement} HTML element that draws a progress bar.
 	 */
 	function renderPercentBar (baseClass, ratio, color)
 	{
@@ -343,6 +342,7 @@ function myxStatistics ()
 		);
 	}
 
+	// TODO: doc
 	function getHeadline ()
 	{
 		let result = (new Date(actualCalculatedMonths[0])).format("mmmyy");
@@ -355,6 +355,7 @@ function myxStatistics ()
 		return result;
 	}
 
+	// TODO: doc
 	function getTitle ()
 	{
 		let result = "";
@@ -364,6 +365,7 @@ function myxStatistics ()
 		return result[0].toUpperCase() + result.substring(1);
 	}
 
+	// TODO: doc
 	function renderContent ()
 	{
 		if (myx.expenses.hasActualData(myx.expenses.selectedMonth.toMonthString()))
@@ -421,6 +423,7 @@ function myxStatistics ()
 		}
 	}
 
+	// TODO: doc
 	function enter ()
 	{
 		entering = true;
@@ -433,7 +436,7 @@ function myxStatistics ()
 
 	/**
 	 * Toggles visibility of subcategories on a master category.
-	 * @param {String} catId Master category id to show/hide subcategories
+	 * @param {string} catId Master category id to show/hide subcategories.
 	 */
 	function toggleSubcategoryVisibility (catId)
 	{
@@ -442,8 +445,8 @@ function myxStatistics ()
 
 	/**
 	 * Handles clicks on subcategory items in the list.
-	 * - default: sets the expenses filter to the category and selected time range and switches to expenses
-	 * @param {MouseEvent} mouseEvent Mouse event triggered by the click
+	 * - default: sets the expenses filter to the category and selected time range and switches to expenses.
+	 * @param {MouseEvent} mouseEvent Triggering event.
 	 */
 	function onSubcategoryClick (mouseEvent)
 	{
@@ -501,4 +504,3 @@ function myxStatistics ()
 		*/
 	};
 };
-

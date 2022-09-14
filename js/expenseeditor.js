@@ -1,5 +1,5 @@
 const ExpenseEditorAction = {
-	/** @enum {String} */
+	/** @enum {string} */
 	ADD: "add",
 	MODIFY: "modify",
 	DELETE: "delete",
@@ -8,21 +8,21 @@ const ExpenseEditorAction = {
 };
 
 const ExpenseEditorMode = {
-	/** @enum {String} */
+	/** @enum {string} */
 	DEFAULT: "default",
 	REPEATING: "repeat"
 };
 
 /**
  * @callback ExpenseEditorCallback
- * @param {Expense} editedExpense Expense with the edited properties
- * @param {ExpenseEditorAction} action Action to perform (add, modify, delete the expense etc.)
+ * @param {Expense} editedExpense Expense with the edited properties.
+ * @param {ExpenseEditorAction} action Action to perform (add, modify, delete the expense etc.).
  */
 
 /**
  * my-expenses "expense editor" module.
  */
-let expenseEditor = function ()
+function expenseEditor ()
 {
 	let elements = pageSnippets.expenseEditor.produce({
 		onApplyClick: onApplyClick,
@@ -38,7 +38,7 @@ let expenseEditor = function ()
 
 	/**
 	 * Name of the tab that called the editor.
-	 * @type {String} */
+	 * @type {string} */
 	let originTabName;
 
 	/**
@@ -49,7 +49,7 @@ let expenseEditor = function ()
 	/**
 	 * Current index of the expense in the expenses `data`. Does indicates whether an existing expense (a non-negative integer)
 	 * or a new/cloned expense (`null`) is being edited.
-	 * @type {Number?} */
+	 * @type {number?} */
 	let currentDataIndex;
 
 	/**
@@ -91,7 +91,7 @@ let expenseEditor = function ()
 
 	/**
 	 * Checks if an existing expense is being edited. For an existing expense `currentDataIndex` is a non-negative integer.
-	 * @returns {Boolean} `true` if an existing expense is being edited, otherwise `false`
+	 * @returns {boolean} `true` if an existing expense is being edited, otherwise `false`.
 	 */
 	function isExistingExpense ()
 	{
@@ -99,9 +99,9 @@ let expenseEditor = function ()
 	}
 
 	/**
-	 * Checks if an element is enabled (having or having not the `"disabled"` CSS class.).
-	 * @param {HTMLElement} element Element to check if it is enabled
-	 * @return {Boolean} Whether the element is enabled (`true`) or not (`false`)
+	 * Checks if an element is enabled (having or having not the `"disabled"` CSS class).
+	 * @param {HTMLElement} element Element to check if it is enabled.
+	 * @return {boolean} Whether the element is enabled (`true`) or not (`false`).
 	 */
 	function isEnabled (element)
 	{
@@ -116,7 +116,7 @@ let expenseEditor = function ()
 		/**
 		 * Sets an element enabled/disabled by toggeling the `"disabled"` CSS class.
 		 * @param {HTMLElement} element 
-		 * @param {Boolean} enabled 
+		 * @param {boolean} enabled 
 		 */
 		function _setElementEnabled (element, enabled)
 		{
@@ -153,6 +153,7 @@ let expenseEditor = function ()
 
 	/**
 	 * Switches from _default_ mode to _repeat_ mode. In repeat mode the repeating expense is edited, no more the original actual expense.
+	 * 
 	 * This is an one way action.
 	 */
 	function switchToRepeatMode ()
@@ -190,7 +191,7 @@ let expenseEditor = function ()
 	/**
 	 * Sets the expense editor the current UI tab.
 	 * @param {Expense} [item] Expense to edit. If omited, a new expense is being created.
-	 * @param {Number} [dataIndex] Index of the expense in the expenses `data`
+	 * @param {number} [dataIndex] Index of the expense in the expenses `data`.
 	 * @param {ExpenseEditorCallback} callback Function to call on applying edits.
 	 */
 	function popup (item, dataIndex, callback)
@@ -250,6 +251,7 @@ let expenseEditor = function ()
 
 	/**
 	 * Event handler for changing the expense date.
+	 * @param {Event} event Triggering event.
 	 */
 	function onDatChange (event)
 	{
@@ -260,6 +262,7 @@ let expenseEditor = function ()
 	/**
 	 * Event handler for clicking on the "payment method" button.
 	 * Pops up a menubox for selecting a payment method and applys the selection to the currently edited expense.
+	 * @param {Event} event Triggering event.
 	 */
 	function onPmtClick (event) 
 	{
@@ -273,10 +276,11 @@ let expenseEditor = function ()
 
 	/**
 	 * Event handler for key strikes while the annotation text is focused. Handles certain keys to leave the input.
+	 * @param {KeyboardEvent} event Triggering event.
 	 */
 	function onTxtKeydown (keyEvent) 
 	{
-		switch (keyEvent.keyCode)
+		switch (keyEvent.keyCode) // DEPRECATED: use https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code instead
 		{
 			case 13:
 			case 27:
@@ -330,8 +334,9 @@ let expenseEditor = function ()
 	};
 
 	/**
-	* Event handler for clicking any button on the keypad (numbers, actions etc.)
-	*/
+	 * Event handler for clicking any button on the keypad (numbers, actions etc.).
+	 * @param {Event} mouseEvent Triggering event.
+	 */
 	function onKeypadClick (mouseEvent)
 	{
 		let code = mouseEvent.target.closest("td").dataset.keycode;

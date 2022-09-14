@@ -7,27 +7,27 @@ class UserDataItem
 	static DEFAULT_GLYPH = "fas:f128";
 
 	/**
-	 * @param {UserDataItem|EditableIcon} [src] UserDataItem to copy if any
-	 * @param {IdString} [id] Id of the UserDataItem if already known
+	 * @param {UserDataItem|EditableIcon} [src] UserDataItem to copy if any.
+	 * @param {IdString} [id] Id of the UserDataItem if already known.
 	 */
 	constructor(src, id)
 	{
 		/** @type {IdString} */
 		this.id = src?.id || ((!!id) ? id : myx.newId());
 
-		/** @type {String} */
+		/** @type {string} */
 		this.label = src?.label || this.constructor.DEFAULT_LABEL;
 
 		/** @type {FAGlyph}*/
 		this.glyph = new FAGlyph((src?.glyph instanceof FAGlyph) ? src.glyph.value : (src?.glyph || src?.icon || this.constructor.DEFAULT_GLYPH));
 
-		/** @type {String} */
+		/** @type {string} */
 		this.color = src?.color || "#888";
 	}
 
 	/**
 	 * Assigns properties from an editable icon to this user data item.
-	 * @param {EditableIcon} icon Editable icon to assign
+	 * @param {EditableIcon} icon Editable icon to assign.
 	 */
 	assign (icon)
 	{
@@ -37,8 +37,8 @@ class UserDataItem
 	}
 
 	/**
-	 * Returns a HTML element that shows this user item's icon only.
-	 * @returns {HTMLElement}
+	 * Returns a HTML `<div>` element that shows this user item's icon only.
+	 * @returns {HTMLElement} HTML element that shows this user item's icon only.
 	 */
 	renderIcon ()
 	{
@@ -46,8 +46,8 @@ class UserDataItem
 	}
 
 	/**
-	 * Returns a HTML element that shows this user items icon and its label.
-	 * @returns {HTMLElement}
+	 * Returns a HTML `<div>` element that shows this user items icon and its label.
+	 * @returns {HTMLElement} HTML element that shows this user items icon and its label.
 	 */
 	renderLabeledIcon ()
 	{
@@ -67,18 +67,18 @@ class TabModeHandler
 {
 	/**
 	 * Serialized tab data before entering "edit" mode.
-	 * @type {String}
+	 * @type {string}
 	 */
 	_dataBeforeEdit;
 
 	/**
 	 * @param {HTMLElement} element Element that contains tab items
-	 * @param {Function} dataGetter `function(): Object` to get the current tab data before switching to "edit" mode
-	 * @param {Function} dataSetter `function(data: Object)` to call to reset modified data when cancelling "edit" mode
+	 * @param {function(): Object} dataGetter `function(): Object` to get the current tab data before switching to "edit" mode.
+	 * @param {function(Object): void} dataSetter `function(data: Object)` to call to reset modified data when cancelling "edit" mode.
 	 */
 	constructor(element, dataGetter, dataSetter)
 	{
-		/** @type {String} */
+		/** @type {string} */
 		this.currentMode = "default";
 
 		/** @type {HTMLElement} */
@@ -100,7 +100,7 @@ class TabModeHandler
 	 * If Switching from "edit" to "default" mode (which means the edit mode was cancelled), the tab data
 	 * is restored to backup via `dataSetter()`.
 	 *
-	 * @param {String} newMode New mode to set
+	 * @param {string} newMode New mode to set.
 	 */
 	set (newMode)
 	{
@@ -130,8 +130,8 @@ class TabModeHandler
 
 	/**
 	 * Checks if the current mode is equal to the check mode.
-	 * @param {String} mode Mode to check
-	 * @returns {Boolean} `true` if the current mode is the checked mode, otherwise `false`
+	 * @param {string} mode Mode to check.
+	 * @returns {boolean} `true` if the current mode is the checked mode, otherwise `false`.
 	 */
 	is (mode)
 	{
@@ -140,7 +140,7 @@ class TabModeHandler
 
 	/**
 	 * Returns the current mode.
-	 * @returns {String} Current mode
+	 * @returns {string} Current mode.
 	 */
 	get ()
 	{
@@ -154,7 +154,7 @@ class TabModeHandler
 class FAGlyph
 {
 	/**
-	 * @param {String} glyphCode Code of the glyph to be created as combination of a CSS style and unicode codepoint, e.g. `"fas:f100"`
+	 * @param {string} glyphCode Code of the glyph to be created as combination of a CSS style and unicode codepoint, e.g. `"fas:f100"`
 	 */
 	constructor(glyphCode)
 	{
@@ -166,7 +166,7 @@ class FAGlyph
 
 	/**
 	 * Returns the glyph code of this FontAwesome glyph.
-	 * @returns {String}
+	 * @returns {string}
 	 */
 	valueOf ()
 	{
@@ -174,8 +174,8 @@ class FAGlyph
 	};
 
 	/**
-	 * Returns an `<i>` element that shows this glyphs image.
-	 * @returns {HTMLElement}
+	 * Returns an HTML `<i>` element that shows this glyphs image.
+	 * @returns {HTMLElement} HTML element that shows this glyphs image.
 	 */
 	render ()
 	{
@@ -238,7 +238,7 @@ class FA
 
 	/**
 	 * On the given element, all `<i data-icon="...">` children will receive the desired icon as its content.
-	 * @param {HTMLElement} element Element to put FontAwesome glyphs on
+	 * @param {HTMLElement} element Element to put FontAwesome glyphs on.
 	 */
 	static applyOn (element)
 	{
@@ -250,8 +250,8 @@ class FA
 
 	/**
 	 * Returns the HTML entity for a known FontAwesome icon.
-	 * @param {String} name Name of desired FontAwesome icon
-	 * @returns {String} HTML entity of the requested icon; or icon name if it is not known
+	 * @param {string} name Name of desired FontAwesome icon.
+	 * @returns {string} HTML entity of the requested icon; or icon name if it is not known.
 	 */
 	static toHTML (name)
 	{
@@ -274,9 +274,9 @@ class FA
 class Selector
 {
 	/**
-	 * @param {SelectorCallback} callback Callback on item selection
-	 * @param {Array<ISelectableIcon>} items Items to be availible for selection in this selector
-	 * @param {SelectorOptions} [options] Configuration of this selector
+	 * @param {SelectorCallback} callback Callback on item selection.
+	 * @param {Array<ISelectableIcon>} items Items to be availible for selection in this selector.
+	 * @param {SelectorOptions} [options] Configuration of this selector.
 	 */
 	constructor(callback, items, options)
 	{
@@ -287,14 +287,14 @@ class Selector
 		let _this = this;
 
 		/**
-		 * Callback on item selection
+		 * Callback on item selection.
 		 * @type {SelectorCallback}
 		 */
 		this.callback = callback;
 
 		/**
-		 * Allow seletion of multiple items or single item selection only
-		 * @type {Boolean}
+		 * Allow seletion of multiple items or single item selection only.
+		 * @type {boolean}
 		 */
 		this.multiSelect = (options.multiselect === true);
 
@@ -306,12 +306,12 @@ class Selector
 
 		/**
 		 * Colors of this selectors items; used for formatting selected items.
-		 * @type {Map<IdString, String>}
+		 * @type {Map<IdString, string>}
 		 */
 		this.itemColors = new Map();
 
 		/**
-		 * Element to render the selection on
+		 * Element to render the selection on.
 		 * @type {HTMLElement}
 		 */
 		this.element = htmlBuilder.newElement("div.selector." + (options.class || "").replaceAll(/\s+/g, ".") + ((this.multiSelect) ? ".multiselect" : ""));
@@ -321,7 +321,7 @@ class Selector
 		 *
 		 * Calls the `callback` function.
 		 *
-		 * @param {Event} event Triggering event
+		 * @param {Event} event Triggering event.
 		 */
 		this._onItemClick = function (event)
 		{
@@ -331,7 +331,7 @@ class Selector
 			let eventItem = event.target.closest(".item");
 			/**
 			 * Id of the clicked items.
-			 * @type {String} */
+			 * @type {string} */
 			let id = eventItem.dataset.id;
 			if (_this.multiSelect === true)
 			{
@@ -348,15 +348,15 @@ class Selector
 
 	/**
 	 * Selects (highlights) a item within the selection.
-	 * @param {IdString} id Category id to select
-	 * @param {Boolean} [scrollIntoView] Wheter to scroll the selected item into view (`true`) or not (`false`, default)
+	 * @param {IdString} id Category id to select.
+	 * @param {boolean} [scrollIntoView] Wheter to scroll the selected item into view (`true`) or not (`false`, default).
 	 */
 	highlightItem (id, scrollIntoView)
 	{
 		/**
 		 * Sets the color style value on all child elements of _ele_.
 		 * @param {HTMLElement} ele 
-		 * @param {String} val 
+		 * @param {string} val 
 		 */
 		function _setChildElementsColor (ele, val)
 		{
@@ -391,7 +391,7 @@ class Selector
 
 	/**
 	 * Renders the items as _labled icons_ on this selectors element.
-	 * @param {IdString} [selectedId] Id of the pre-selected item; no selection if omitted
+	 * @param {IdString} [selectedId] Id of the pre-selected item; no selection if omitted.
 	 */
 	refresh (selectedId)
 	{
@@ -417,7 +417,7 @@ class Selector
 
 	/**
 	 * Sets items as "selected".
-	 * @param {Set<IdString>} ids Ids of items to set "selected"
+	 * @param {Set<IdString>} ids Ids of items to set "selected".
 	 */
 	select (ids)
 	{
@@ -429,7 +429,7 @@ class Selector
 
 	/**
 	 * Returns the ids of all selected items in this selector.
-	 * @returns {Set<IdString>} Ids all selected items
+	 * @returns {Set<IdString>} Ids all selected items.
 	 */
 	getSelectedIds ()
 	{

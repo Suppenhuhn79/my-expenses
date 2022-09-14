@@ -36,7 +36,7 @@ let myxDebug = {
 	/**
 	 * Publishes any data as a property of `window`.
 	 * @param {any} data Data to publish
-	 * @param {String} name Window variable name fot the data
+	 * @param {string} name Window variable name fot the data
 	 */
 	publish: function (data, name)
 	{

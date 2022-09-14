@@ -1,22 +1,22 @@
 /**
  * @typedef RegisteredFile
  * @type {Object}
- * @property {String} id The files id on GoogleDrive
- * @property {String} mimeType The files mime type
+ * @property {string} id The files id on GoogleDrive
+ * @property {string} mimeType The files mime type
  * @property {Date} modifiedTime The date of the files latest modification
- * @property {Number} size The files size in bytes.
+ * @property {number} size The files size in bytes.
  *
  * @typedef XhrQueryDefinition
  * @type {Object}
- * @property {String} method HTTP request method to use (`GET`, `PUT`, `POST`, `DELETE` etc.)
+ * @property {string} method HTTP request method to use (`GET`, `PUT`, `POST`, `DELETE` etc.)
  * @property {DOMString} url URL to send the request to
  * @property {Object} [headers] Additional headers as `key=value`-pairs
  * @property {Document|XMLHttpRequestBodyInit} [body] Body data to send
  * 
  * @typedef XhrErrorResponse
  * @type {Object}
- * @property {Number} status The returned HTTP status code
- * @property {String} text The returned status text
+ * @property {number} status The returned HTTP status code
+ * @property {string} text The returned status text
  * @property {any} response The original server response
  */
 
@@ -29,9 +29,9 @@ const googleAppApi = {
 	SCOPES: "https://www.googleapis.com/auth/drive.appdata",
 	REDIRECT_URI: window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf("/") + 1) + "re_google.html",
 
-	/** @type {String} */
+	/** @type {string} */
 	accessToken: null,
-	/** @type {Map<String, RegisteredFile>} */
+	/** @type {Map<string, RegisteredFile>} */
 	files: new Map(),
 
 	tokenCookie: {
@@ -135,7 +135,7 @@ const googleAppApi = {
 	/**
 	* Creates a new file.
 	* The newly created file will be automatically registered within the `files` data.
-	* @param {String} name Name of the file to create
+	* @param {string} name Name of the file to create
 	* @returns {Promise<undefined, XhrErrorResponse>} Returns a Promise: `resolve()` or `reject(XhrErrorResponseObject)`.
 	*/
 	createFile: (name) => new Promise((resolve, reject) =>
@@ -162,8 +162,8 @@ const googleAppApi = {
 
 	/**
 	 * Load a file's content.
-	 * @param {String} name Name of file to load
-	 * @returns {Promise<String|Object, XhrErrorResponse>} Returns a Promise: `resolve(fileContent)` or `reject(XhrErrorResponseObject)`.
+	 * @param {string} name Name of file to load
+	 * @returns {Promise<string|Object, XhrErrorResponse>} Returns a Promise: `resolve(fileContent)` or `reject(XhrErrorResponseObject)`.
 	 */
 	loadFile: (name) => new Promise((resolve, reject) =>
 	{
@@ -184,8 +184,8 @@ const googleAppApi = {
 
 	/**
 	 * Saves data to a file. If the file does not exists, it will be created.
-	 * @param {String} name Name of file to save data to
-	 * @param {String|Object} data Content to write to the file; objects will be automatically serialized
+	 * @param {string} name Name of file to save data to
+	 * @param {string|Object} data Content to write to the file; objects will be automatically serialized
 	 * @returns {Promise<undefined, XhrErrorResponse>} Returns a Promise: `resolve()` or `reject(XhrErrorResponseObject)`.
 	 */
 	saveToFile: (name, data) => new Promise((resolve, reject) =>
@@ -231,7 +231,7 @@ const googleAppApi = {
 
 	/**
 	 * Deletes a file. The deleted file will be removed from `files` data.
-	 * @param {String} name Name of file to delete.
+	 * @param {string} name Name of file to delete.
 	 * @returns {Promise<undefined, XhrErrorResponse>} Returns a Promise: `resolve()` or `reject(XhrErrorResponseObject)`.
 	 */
 	deleteFile: (name) => new Promise((resolve, reject) =>
@@ -281,9 +281,9 @@ const googleAppApi = {
 
 /**
  * Sends a HTTP-request to a server an returns the response.
- * @param {String} method HTTP request method to use (`GET`, `PUT`, `POST`, `DELETE` etc.)
+ * @param {string} method HTTP request method to use (`GET`, `PUT`, `POST`, `DELETE` etc.)
  * @param {DOMString} url URL to send the request to
- * @param {Object<String, String>} [headers] Additional headers as `key: "value"`-pairs
+ * @param {Object<String, string>} [headers] Additional headers as `key: "value"`-pairs
  * @param {Document|XMLHttpRequestBodyInit} [body] Body data to send
  * @returns {Promise<DOMString|Object, XhrErrorResponse>} If the response status code is not a `2xx`, it rejects an `XhrErrorResponseObject`.
  * Otherwise it resolves with the responses content, dependant on it's MIME type as

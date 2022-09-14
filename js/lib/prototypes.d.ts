@@ -6,7 +6,8 @@ interface Array<T> {
 
 	/**
 	 * Removes duplicate items from the array. This affects the actual array.
-	 * Returns the array.
+	 *
+	 * Returns this array.
 	 */
 	removeDuplicates(): Array<T>;
 }
@@ -14,14 +15,14 @@ interface Array<T> {
 interface Date {
 	/**
 	 * Returs the count of days between two dates.
-	 * @param start Start date (earlier) of time period
-	 * @param end End date (later) of time period
+	 * @param start Start date (earlier) of time period.
+	 * @param end End date (later) of time period.
 	 */
 	static daysBetween(start: Date, end: Date): Number;
 
 	/**
 	 * Returns a new date with a count of days added to the current date.
-	 * @param count Count of days to add
+	 * @param count Count of days to add.
 	 */
 	addDays(count: number): Date;
 
@@ -29,21 +30,21 @@ interface Date {
 	 * Returns a new date with a count of months added to the current date.
 	 * This may overflow to the next month, if the current day does not exist in the target month.
 	 *
-	 * See also `shiftMonths()`
-	 * @param count Count of months to add
+	 * See also `shiftMonths()`.
+	 * @param count Count of months to add.
 	 */
 	addMonths(count: number): Date;
 
 	/**
 	 * Returns a new date with a count of years added to the current date.
-	 * @param count Count of years to add
+	 * @param count Count of years to add.
 	 */
 	addYears(count: number): Date;
 
 	/**
 	 * Shifts a date by a count of months.
 	 * In opposite to `addMonths()` it does not overflow to the next month but remains at the last possible day of the desired month.
-	 * @param count Count of months by which to shift the current date
+	 * @param count Count of months by which to shift the current date.
 	 */
 	shiftMonths(count: number): Date;
 
@@ -60,7 +61,7 @@ interface Date {
 	/**
 	 * Formats the date to a string, using locale names.
 	 *
-	 * **Requires** `Date.locales.monthNames: string[]` and `Date.locales.weekdayNames: string[]`
+	 * **Requires** `Date.locales.monthNames: string[]` and `Date.locales.weekdayNames: string[]`.
 	 *
 	 * @param formatString String containing format tokens.
 	 * Valid format tokens are:
@@ -78,12 +79,12 @@ interface Date {
 	format(formatString: string): string;
 
 	/**
-	 * Numeric date string (`"YYYY-MM-DD"`)
+	 * Numeric date string (`"YYYY-MM-DD"`).
 	 */
 	toIsoDate(): string;
 
 	/**
-	 * Numeric month string (`"YYYY-MM"`)
+	 * Numeric month string (`"YYYY-MM"`).
 	 */
 	toMonthString(): string;
 }
@@ -97,30 +98,30 @@ interface HTMLElement {
 
 	/**
 	 * Sets this elements property values.
-	 * @param props Object of `[key: string]: any` properties to set to the HTML element
+	 * @param props Object of `[key: string]: any` properties to set to the HTML element.
 	 */
-	assginProperties(props: Object);
+	assginProperties(props: Object): void;
 
 	/**
 	 * Adds or removes a CSS class to this element by condition.
-	 * @param className Name of CSS class to add/remove to this element
-	 * @param condition Condition whether to add (`true`) or remove (`false`) the class
+	 * @param className Name of CSS class to add/remove to this element.
+	 * @param condition Condition whether to add (`true`) or remove (`false`) the class.
 	 */
-	setClassConditional(className: String, condition: Boolean);
+	setClassConditional(className: String, condition: Boolean): void;
 
 	/**
 	 * Sets this elements style.
-	 * @param styles Object of `[key: string]: String` style items to set to the HTML elements style
+	 * @param styles Object of `[key: string]: String` style items to set to the HTML elements style.
 	 */
-	setStyles(styles: Object);
+	setStyles(styles: Object): void;
 }
 
 interface Set {
 	/**
 	 * Excludes items from this set.
-	 * @param iterable Items to exclude from the set
+	 * @param iterable Items to exclude from the set.
 	 */
-	exclude(iterable: Iterable);
+	exclude(iterable: Iterable): void;
 }
 
 interface String {

@@ -16,8 +16,8 @@ function myxExpensesDataindex ()
 
 	/**
 	 * Sets an entry for a _fileindex/month_ into the toc data.
-	 * @param {MonthString} month Month to register
-	 * @param {Number} [fileNumber] Data file number; if not given and the month is already registered, nothing happens. If it's a new month, it will be assigned to a fileNumber automatically.
+	 * @param {MonthString} month Month to register.
+	 * @param {number} [fileNumber] Data file number; if not given and the month is already registered, nothing happens. If it's a new month, it will be assigned to a fileNumber automatically.
 	 */
 	function register (month, fileNumber = null)
 	{
@@ -30,8 +30,8 @@ function myxExpensesDataindex ()
 	}
 
 	/**
-	 * Returns all registerd months.
-	 * @returns {Array<MonthString>} All registered months in ascending order
+	 * Returns all registerd months in ascending order.
+	 * @returns {Array<MonthString>} All registered months.
 	 */
 	function getAllMonths ()
 	{
@@ -45,7 +45,7 @@ function myxExpensesDataindex ()
 
 	/**
 	 * Provides all months that are contained in a specific file.
-	 * @param {Number} fileNumber Number of file from which to get contained months
+	 * @param {number} fileNumber Number of file from which to get contained months.
 	 * @returns {Array<MonthString>} All months that are contained in the file
 	 */
 	function getAllMonthInFile (fileNumber)
@@ -58,12 +58,12 @@ function myxExpensesDataindex ()
 	 * 
 	 * If the month does not exist in any file yet, it will be assigned automatically to eithter the lastest or a new file.
 	 * 
-	 * @param {MonthString} month Month to find it's containing file
-	 * @returns {Number} Number of the file that does contain the month
+	 * @param {MonthString} month Month to find it's containing file.
+	 * @returns {number} Number of the file that does contain the month.
 	 */
 	function getFileindexForMonth (month)
 	{
-		/** @type {Number} */
+		/** @type {number} */
 		let result = null;
 		for (let arrayIndex = 0, dataLength = data.length; arrayIndex < dataLength; arrayIndex += 1)
 		{
