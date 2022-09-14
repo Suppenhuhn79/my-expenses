@@ -41,6 +41,7 @@ let myx = function ()
 	let statistics = myxStatistics();
 
 	let dataSelectionMenu = new Menubox("data-selection", {
+		css: "grey",
 		items: (function _buildDataMenuboxItems ()
 		{
 			let _items = [];
