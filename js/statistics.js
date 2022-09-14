@@ -182,14 +182,33 @@ function myxStatistics ()
 
 	/**
 	 * Filter to exclude categories or payment methods.
+	 * @type {ExpensesFilter}
 	 */
-	let currentFilter = new ExpensesFilter();
+	let currentFilter;
 
 	/** @type {AggregationResult} */
 	let data;
 
 	/** @type {Array<MonthString>} */
 	let actualCalculatedMonths;
+
+	let filterMenu = new Menubox("sta-filter", {
+		title: "Expenses filter",
+		css: "buttons-as-items",
+		items: [
+			{
+				key: "__default__",
+				label: "Default",
+				iconHtml: FA.renderSolid("filter")
+			},
+			{
+				key: "__none__",
+				label: "No filter",
+				iconHtml: FA.renderSolid("ban")
+			}
+		]
+		// TODO: filter menu buttons
+	}, onFilterMenuboxEvent);
 
 	let chartMenu = new Menubox("sta.chart", {
 		title: "Chart",
@@ -214,8 +233,8 @@ function myxStatistics ()
 
 	elements.get("filter-select-button").onclick = function onFilterButtonClick (event)
 	{
-		// TODO: implement statistics filter selection
-		myx.showNotification("Not implemented yet.");
+		// TODO: add user filters to menu
+		filterMenu.popup(event, null, event.target, "below bottom, end right");
 	};
 
 	elements.get("chart-select-button").onclick = (mouseEvent) => chartMenu.popup(mouseEvent, null, elements.get("chart-select-button"), "below bottom, center");
@@ -350,8 +369,9 @@ function myxStatistics ()
 		{
 			result = (new Date(actualCalculatedMonths[actualCalculatedMonths.length - 1])).format("mmmyy") + "-" + result;
 		}
-		// TODO: filters
-		result += ", all categories, all payment methods";
+		let catInfo = (currentFilter.cats.size === 0) ? "all" : (() => { let a = ExpensesFilter.allCategories.size; return a - currentFilter.cats.size + "/" + a; })();
+		let pmtInfo = (currentFilter.pmts.size === 0) ? "all" : (() => { let a = ExpensesFilter.allPaymentMethods.size; return a - currentFilter.pmts.size + "/" + a; })();
+		result += ", " + catInfo + " categories, " + pmtInfo + " payment methods";
 		return result;
 	}
 
@@ -430,6 +450,7 @@ function myxStatistics ()
 		choices.set("time-range-mode", "month");
 		choices.set("calculation-mode", "sum");
 		timerange.selectMonth(myx.expenses.selectMonth);
+		currentFilter ||= myx.defaultFilter;
 		entering = false;
 		performAggregation();
 	}
@@ -474,6 +495,26 @@ function myxStatistics ()
 			cat: catId,
 			months: settings.selectedTime.months
 		}, MODULE_NAME);
+	}
+
+	/**
+	 * Event handler for selecting a filter from the filters menubox.
+	 * Sets the selected filter the `currentFilter` and performs the statistics calculation.
+	 * @param {MenuboxEvent} menuboxEvent Triggerin event.
+	 */
+	function onFilterMenuboxEvent (menuboxEvent)
+	{
+		switch (menuboxEvent.itemKey)
+		{
+			case "__default__":
+				currentFilter = myx.defaultFilter;
+				break;
+			case "__none__":
+				currentFilter = new ExpensesFilter();
+				break;
+			// TODO: consider user filters;
+		}
+		performAggregation();
 	}
 
 	choices.onChoose("time-range-mode", onTimerangemodeChosen);
