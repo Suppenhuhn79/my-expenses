@@ -184,7 +184,7 @@ class FAGlyph
 }
 
 /**
- * fontAwesome glyph codes and functions.
+ * FontAwesome glyph codes and functions.
  */
 class FA
 {
@@ -258,6 +258,16 @@ class FA
 		name = name.replaceAll(/-/g, "_");
 		let result = FA.ICONS[name];
 		return (!!result) ? "&#x" + result + ";" : "[" + name + "]";
+	}
+
+	/**
+	 * Returns a HTML `<i>` element displaying the icon in FontAwesome _solid_ style.
+	 * @param {string} name Name of desired FontAwesome icon.
+	 * @returns {HTMLElement} HTML element containing the icon.
+	 */
+	static renderSolid (name)
+	{
+		return htmlBuilder.newElement("i.fas.icon", FA.toHTML(name));
 	}
 
 	constructor()
@@ -472,7 +482,7 @@ class FilterMenu
 					key: "_pmts",
 					label: "Payment methods:",
 					enabled: false,
-					iconHtml: htmlBuilder.newElement("i.fas.icon", FA.toHTML("wallet"))
+					iconHtml: FA.renderSolid("wallet")
 				},
 				{
 					html: this.pmtSelector.element,
@@ -481,7 +491,7 @@ class FilterMenu
 					key: "_cats",
 					label: "Categories:",
 					enabled: false,
-					iconHtml: htmlBuilder.newElement("i.fas.icon", FA.toHTML("boxes"))
+					iconHtml: FA.renderSolid("boxes")
 				},
 				{
 					html: this.catSelector.element

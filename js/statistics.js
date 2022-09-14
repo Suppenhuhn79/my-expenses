@@ -197,17 +197,17 @@ function myxStatistics ()
 			{
 				key: "pie",
 				label: "Distribution by category",
-				iconHtml: htmlBuilder.newElement("i.fas.icon", FA.toHTML("chart-pie"))
+				iconHtml: FA.renderSolid("chart-pie")
 			},
 			{
 				key: "areat",
 				label: "Course over time",
-				iconHtml: htmlBuilder.newElement("i.fas.icon", FA.toHTML("chart-area"))
+				iconHtml: FA.renderSolid("chart-area")
 			},
 			{
 				key: "none",
 				label: "None",
-				iconHtml: htmlBuilder.newElement("i.fas.icon", FA.toHTML("ban"))
+				iconHtml: FA.renderSolid("ban")
 			}
 		]
 	});

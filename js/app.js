@@ -50,7 +50,7 @@ let myx = function ()
 				_items.push({
 					key: dataTab.tab,
 					label: dataTab.label,
-					iconHtml: htmlBuilder.newElement("i.fas.icon", FA.toHTML(dataTab.icon))
+					iconHtml: FA.renderSolid(dataTab.icon)
 				});
 			}
 			return _items;
