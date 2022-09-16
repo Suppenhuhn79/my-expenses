@@ -218,23 +218,25 @@ function myxPaymentMethods ()
 	 */
 	function prompt (alignElement, callback)
 	{
-		let menuItems = [];
-		for (let id of order)
+		function _buildMenuboxItems (menuboxItems)
 		{
-			menuItems.push({
-				key: id,
-				label: data.get(id).label,
-				iconHtml: data.get(id).renderIcon()
-			});
+			for (let id of order)
+			{
+				menuboxItems.push({
+					key: id,
+					label: data.get(id).label,
+					iconHtml: data.get(id).renderIcon()
+				});
+			}
 		}
-		let menubox = new Menubox("pmt.selection", { items: menuItems }, (event) =>
+		function _onMenuboxItemClick (event)
 		{
 			if (typeof callback === "function")
 			{
 				callback(event.itemKey);
 			}
-		});
-		menubox.popup(null, null, alignElement, "end right, middle");
+		};
+		myxMenuboxes.get("pmt-select-pmt", _onMenuboxItemClick, _buildMenuboxItems, true).popup(null, null, alignElement, "end right, middle");
 	}
 
 	/**

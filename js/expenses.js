@@ -273,7 +273,14 @@ function myxExpenses ()
 	elements.get("cancel-multiselect-button").onclick = exitMultiselectMode;
 	elements.get("add-expense-button").onclick = onAddExpenseClick;
 	elements.get("nav-current").onclick = onNavCurrentClick;
-	elements.get("edit-multiselect-button").onclick = function onEditMultiselectButtonClick () { myx.showNotification("Not implemented yet."); };
+	elements.get("edit-multiselect-button").onclick = function onMultiselectEditButtonClick (event)
+	{
+		let selecteCount = elements.get("content").querySelectorAll(".multiselect-chosen").length;
+		let multiselectMenubox = myxMenuboxes.get("exp-multiselect-edits", onMultiselectMenuboxClick);
+		multiselectMenubox.setTitle("Edit " + selecteCount + " expenses");
+		multiselectMenubox.popup(event, null, event.target, "below bottom, end right");
+		myx.showNotification("Not implemented yet.");
+	};
 
 	/**
 	 * Initializes the module.
@@ -874,7 +881,7 @@ function myxExpenses ()
 				label: monthAsDate.format("mmmm yyyy")
 			});
 		}
-		let menubox = new Menubox("exp.months-selection", { items: menuItems }, (event) =>
+		let menubox = new Menubox("exp-months-selection", { items: menuItems }, (event) =>
 		{
 			if (typeof callback === "function")
 			{
@@ -995,6 +1002,33 @@ function myxExpenses ()
 				{
 					popupEditor(expense, Number(itemElement.dataset.index));
 				}, 100);
+		}
+	}
+
+	/**
+	 * Event handler for selecting an action from the multiselect menu.
+	 * This is a dummy by now.
+	 * 
+	 * // TODO: implement all events.
+	 * 
+	 * @param {MenuboxEvent} menuboxEvent Triggering event.
+	 */
+	function onMultiselectMenuboxClick (menuboxEvent)
+	{
+		function _buildMenuboxItems (menuboxItems)
+		{
+			menuboxItems.push(
+				{
+					html: new PaymentMethodSelector(console.log, { class: "wide-flex" }, false).element
+				}
+			);
+		}
+		console.log(menuboxEvent);
+		switch (menuboxEvent.itemKey)
+		{
+			case "edit-pmt":
+				myxMenuboxes.get("exp-change-payment-method", confirm.log, _buildMenuboxItems).popup();
+				break;
 		}
 	}
 

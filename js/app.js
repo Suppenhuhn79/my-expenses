@@ -40,34 +40,28 @@ let myx = function ()
 	let repeatings = myxRepeatingExpenses();
 	let statistics = myxStatistics();
 
-	let dataSelectionMenu = new Menubox("data-selection", {
-		css: "grey",
-		items: (function _buildDataMenuboxItems ()
-		{
-			let _items = [];
-			for (let dataTab of DATA_TABS)
-			{
-				_items.push({
-					key: dataTab.tab,
-					label: dataTab.label,
-					iconHtml: FA.renderSolid(dataTab.icon)
-				});
-			}
-			return _items;
-		})()
-	}, dataSelectionMenuItemCallback);
-
 	/**
 	 * Action for clicking the data-selection button in the bottom menu.
 	 * Switches to the recently selected data tab and also pops up a menu to select another data tab.
 	 */
 	bottomButtonElements.get("data-selection-button").onclick = function onDataSelectionButtonClick (event)
 	{
+		function _buildMenuboxItems (menuboxItems)
+		{
+			for (let dataTab of DATA_TABS)
+			{
+				menuboxItems.push({
+					key: dataTab.tab,
+					label: dataTab.label,
+					iconHtml: FA.renderSolid(dataTab.icon)
+				});
+			}
+		}
 		let dataChoiceButton = event.target.closest("div");
 		dataChoiceButton.classList.add("chosen");
 		if (choices.get("active-tab") === dataChoiceButton.dataset.current)
 		{
-			dataSelectionMenu.popup(event, null, dataChoiceButton, "start left, above top");
+			myxMenuboxes.get("app-select-data-tab", dataSelectionMenuItemCallback, _buildMenuboxItems).popup(event, null, dataChoiceButton, "start left, above top");
 		}
 		else
 		{

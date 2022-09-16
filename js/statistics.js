@@ -192,24 +192,6 @@ function myxStatistics ()
 	/** @type {Array<MonthString>} */
 	let actualCalculatedMonths;
 
-	let filterMenu = new Menubox("sta-filter", {
-		title: "Expenses filter",
-		css: "buttons-as-items",
-		items: [
-			{
-				key: "__default__",
-				label: "Default",
-				iconHtml: FA.renderSolid("filter")
-			},
-			{
-				key: "__none__",
-				label: "No filter",
-				iconHtml: FA.renderSolid("ban")
-			}
-		]
-		// TODO: filter menu buttons
-	}, onFilterMenuboxEvent);
-
 	let chartMenu = new Menubox("sta.chart", {
 		title: "Chart",
 		items: [
@@ -234,7 +216,7 @@ function myxStatistics ()
 	elements.get("filter-select-button").onclick = function onFilterButtonClick (event)
 	{
 		// TODO: add user filters to menu
-		filterMenu.popup(event, null, event.target, "below bottom, end right");
+		myxMenuboxes.get("sta-filters", onFilterMenuboxEvent).popup(event, null, event.target, "below bottom, end right");
 	};
 
 	elements.get("chart-select-button").onclick = (mouseEvent) => chartMenu.popup(mouseEvent, null, elements.get("chart-select-button"), "below bottom, center");
