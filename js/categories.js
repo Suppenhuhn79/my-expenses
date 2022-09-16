@@ -395,7 +395,7 @@ function myxCategories ()
 		tabMode.set(CategoriesTabMode.EDIT);
 		iconEditor.popup(itemToEdit,
 			{
-				iconType: EditableIconType.WHITE_ON_COLOR,
+				iconType: IconStyle.WHITE_ON_COLOR,
 				title: (creatingNewItem) ? "New category" : "Edit category",
 				headline: (!!masterId) ? "Subcategory of " + data.get(masterId).label : "",
 				defaultLabel: Category.DEFAULT_LABEL,
@@ -404,7 +404,7 @@ function myxCategories ()
 		{
 			if (creatingNewItem)
 			{
-				id = myx.newId();
+				id = newId();
 				let newCategory = new Category(editedObj, id);
 				data.set(id, newCategory);
 				if (masterId)

@@ -1,15 +1,10 @@
-const EditableIconType = {
-	COLOR_ON_WHITE: 1,
-	WHITE_ON_COLOR: 2
-};
-
 /**
  * Interface of common editable icon properties.
  */
 class EditableIcon
 {
 	/**
-	 * @param {{label: String, glyph: FAGlyph, color: string}} src Object from which to create an editable icon
+	 * @param {EditableIcon} src Object from which to create an editable icon.
 	 */
 	constructor(src)
 	{
@@ -339,7 +334,7 @@ let iconEditor = new function ()
 	 */
 	function setIconColor (color)
 	{
-		if (_options.iconType === EditableIconType.WHITE_ON_COLOR)
+		if (_options.iconType === IconStyle.WHITE_ON_COLOR)
 		{
 			elements.get("icon-preview").setStyles({
 				backgroundColor: color,
@@ -463,7 +458,7 @@ let iconEditor = new function ()
 
 	this.getItems = function ()
 	{
-		/** @type {Array<ISelectableIcon>} */
+		/** @type {Array<SelectableIcon>} */
 		let items = [];
 
 		for (let glyphCode of [].concat(...Object.values(ICON_LIBRARAY)))

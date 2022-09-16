@@ -12,11 +12,10 @@
  * Callback function for `FilterMenu`s.
  * @param {ExpensesFilter} filter Set expenses filter.
  * 
+ * @typedef SelectableIcon
+ * Interface for icons given for selection to selectors the `Selector` class.
+ * @property {IdString} id Id of the selectable icon.
+ * @property {function(): HTMLElement} renderLabeledIcon Function that renders the icon.
+ * @property {string} color Color of the icon.
  * 
- * @typedef ISelectableIcon
- * Interface for icons to the `Selector` class.
- * @property {IdString} id
- * @property {function(): HTMLElement} renderLabeledIcon
- * @property {string} color
  */
-

@@ -97,7 +97,7 @@ class RepeatingExpense
 	constructor(id, expense, interval)
 	{
 		/** @type {IdString} */
-		this.id = id || myx.newId();
+		this.id = id || newId();
 
 		/**
 		 * Expense that does repeat in the given interval. Does have the date of its last execution.
@@ -196,7 +196,7 @@ function myxRepeatingExpenses ()
 	{
 		if (interval?.isValid())
 		{
-			id ||= myx.newId();
+			id ||= newId();
 			if (order.includes(id) === false)
 			{
 				order.push(id);

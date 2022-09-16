@@ -61,6 +61,38 @@ class PaymentMethodSelector extends Selector
 		let items = (activeOnly) ? myx.paymentMethods.active : myx.paymentMethods.all;
 		super(callback, items, options);
 	}
+
+	/**
+	 * Selects (highlights) a item within the selection.
+	 * @param {IdString} id Category id to select.
+	 * @param {boolean} [scrollIntoView] Wheter to scroll the selected item into view (`true`) or not (`false`, default).
+	 */
+	highlightItem (id, scrollIntoView)
+	{
+		for (let otherElement of this.element.querySelectorAll("[data-id]"))
+		{
+			otherElement.setStyles({
+				backgroundColor: null,
+				color: null
+			});
+			otherElement.querySelector("i").style.color = this.itemColors.get(otherElement.dataset.id);
+		};
+		let color = this.itemColors.get(id);
+		let selectedElement = this.element.querySelector("[data-id='" + id + "']");
+		if (!!selectedElement)
+		{
+			selectedElement.setStyles({
+				backgroundColor: color,
+				color: "#fff"
+			});
+			selectedElement.querySelector("i").style.color = "#fff";
+			if (scrollIntoView)
+			{
+				selectedElement.scrollIntoView({ inline: "center" });
+			}
+		}
+	};
+
 };
 
 const PaymentMethodTabMode = {
@@ -278,7 +310,7 @@ function myxPaymentMethods ()
 		tabMode.set(PaymentMethodTabMode.EDIT);
 		iconEditor.popup(itemToEdit,
 			{
-				iconType: EditableIconType.COLOR_ON_WHITE,
+				iconType: IconStyle.COLOR_ON_WHITE,
 				iconClass: "paymentmethod",
 				title: (creatingNewItem) ? "New payment method" : "Edit payment method",
 				defaultLabel: PaymentMethod.DEFAULT_LABEL,
@@ -289,7 +321,7 @@ function myxPaymentMethods ()
 			{
 				if (creatingNewItem)
 				{
-					id = myx.newId();
+					id = newId();
 					let newPmt = new PaymentMethod(editedObj, id);
 					data.set(id, newPmt);
 					order.push(id);

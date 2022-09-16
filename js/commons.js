@@ -1,4 +1,16 @@
 /**
+ * Style of how icons are colorized.
+ * @readonly
+ * @enum {number}
+ */
+const IconStyle = {
+	/** A colored icon on a white background. */
+	COLOR_ON_WHITE: 1,
+	/** A white icon on a colored background. */
+	WHITE_ON_COLOR: 2
+};
+
+/**
  * Any user data items.
  */
 class UserDataItem
@@ -13,7 +25,7 @@ class UserDataItem
 	constructor(src, id)
 	{
 		/** @type {IdString} */
-		this.id = src?.id || ((!!id) ? id : myx.newId());
+		this.id = src?.id || ((!!id) ? id : newId());
 
 		/** @type {string} */
 		this.label = src?.label || this.constructor.DEFAULT_LABEL;
@@ -199,6 +211,7 @@ class FA
 		backward: "f04a",
 		ban: "f05e",
 		bars: "f0c9",
+		box_open: "f49e",
 		boxes: "f468",
 		calendar: "f133",
 		calendar_alt: "f073",
@@ -285,7 +298,7 @@ class Selector
 {
 	/**
 	 * @param {SelectorCallback} callback Callback on item selection.
-	 * @param {Array<ISelectableIcon>} items Items to be availible for selection in this selector.
+	 * @param {Array<SelectableIcon>} items Items to be availible for selection in this selector.
 	 * @param {SelectorOptions} [options] Configuration of this selector.
 	 */
 	constructor(callback, items, options)
@@ -310,7 +323,7 @@ class Selector
 
 		/**
 		 * Items to be availible for selection in this selector.
-		 * @type {Array<ISelectableIcon>}
+		 * @type {Array<SelectableIcon>}
 		 */
 		this.items = items;
 
@@ -354,6 +367,8 @@ class Selector
 			eventItem.scrollIntoView();
 			_this.callback(id);
 		};
+
+		this.refresh();
 	}
 
 	/**
@@ -363,25 +378,12 @@ class Selector
 	 */
 	highlightItem (id, scrollIntoView)
 	{
-		/**
-		 * Sets the color style value on all child elements of _ele_.
-		 * @param {HTMLElement} ele 
-		 * @param {string} val 
-		 */
-		function _setChildElementsColor (ele, val)
-		{
-			for (let e of ele.children)
-			{
-				e.style.color = val;
-			}
-		}
 		for (let otherElement of this.element.querySelectorAll("[data-id]"))
 		{
 			otherElement.setStyles({
 				backgroundColor: null,
 				color: null
 			});
-			_setChildElementsColor(otherElement, null);
 		};
 		let color = this.itemColors.get(id);
 		let selectedElement = this.element.querySelector("[data-id='" + id + "']");
@@ -391,7 +393,6 @@ class Selector
 				backgroundColor: color,
 				color: "#fff"
 			});
-			_setChildElementsColor(selectedElement, "#fff");
 			if (scrollIntoView)
 			{
 				selectedElement.scrollIntoView({ inline: "center" });
@@ -469,10 +470,7 @@ class FilterMenu
 		this.pmtSelector = new PaymentMethodSelector(onMenuboxClick, { multiselect: true, class: "wide-flex" }, false);
 		this.catSelector = new CategorySelector(console.log, { multiselect: true, class: "wide-flex" });
 		this.pmtSelector.element.style = "padding: 0.5em; max-width: 85vw; overflow-x: scroll;";
-		this.pmtSelector.refresh();
-
 		this.catSelector.element.style = "padding: 0.5em; max-width: 85vw; overflow-x: scroll;";
-		this.catSelector.refresh();
 
 		let mbConfig = {
 			title: "Expenses Filter",

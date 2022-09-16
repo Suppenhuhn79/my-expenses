@@ -215,15 +215,6 @@ let myx = function ()
 	};
 
 	/**
-	 * Gives an identifier string.
-	 * @return {IdString} New identifier.
-	 */
-	function newIdString ()
-	{
-		return (Math.floor((Math.random() * 1e12))).toString(16).substring(0, 8);
-	}
-
-	/**
 	 * Formats an expense amount as a string with locale separators and currency symbol.
 	 * @param {number} num Number to format as locale currency amount.
 	 * @returns {string} Formated amount.
@@ -329,7 +320,6 @@ let myx = function ()
 		loadFile: loadFile,
 		addExpense: expenses.edit,
 		setExpenseFilter: expenses.setFilter,
-		newId: newIdString,
 		formatAmountLocale: formatAmountLocale,
 		showNotification: showNotification,
 		defaultFilter: new ExpensesFilter(),
@@ -338,6 +328,15 @@ let myx = function ()
 		xhrError: xhrError
 	};
 }();
+
+/**
+ * Generates an identifier string (eight characters of numbers and latin letters).
+ * @return {IdString} New identifier.
+ */
+function newId ()
+{
+	return (Math.floor((Math.random() * 1e16))).toString(36).substring(0, 8);
+}
 
 Date.locales = {
 	monthNames: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
