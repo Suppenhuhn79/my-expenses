@@ -25,9 +25,9 @@ class Menubox
 		this.selectMode = menuJson.selectMode ?? ((menuJson.multiselect === true) ? Menubox.SELECT_MODE.multiselect : Menubox.SELECT_MODE.normal);
 		this.multiselect = ([Menubox.SELECT_MODE.multiselect, Menubox.SELECT_MODE.multiselect_interactive].includes(this.selectMode));
 		this.items = {};
-		this.adjust = Object.assign({visibility: ["hidden", "visible"]}, menuJson.adjust);
+		this.adjust = Object.assign({ visibility: ["hidden", "visible"] }, menuJson.adjust);
 		this.element = htmlBuilder.newElement("div.menubox", // wrapper DIV is required for transistions
-			{'data-menubox': id, onclick: (evt) => { evt.stopPropagation(); }},
+			{ 'data-menubox': id, onclick: (evt) => { evt.stopPropagation(); } },
 			htmlBuilder.newElement("div", htmlBuilder.newElement("div.items"))
 		);
 		if (_parentMenubox)
@@ -54,7 +54,7 @@ class Menubox
 			for (let menuButton of menuJson.buttons)
 			{
 				buttonsContainer.appendChild(htmlBuilder.newElement("div.menubutton",
-					{'data-menubutton': menuButton.key, onclick: Menubox.onMenuItemClick},
+					{ 'data-menubutton': menuButton.key, onclick: Menubox.onMenuItemClick },
 					menuButton.label ?? menuButton.key)
 				);
 			}
@@ -76,13 +76,13 @@ class Menubox
 
 	static instances = {};
 
-	static hideAll(exceptFor = "")
+	static hideAll (exceptFor = "")
 	{
 		console.warn("Menubox.hideAll() is deprecated and will be removed in the next release. Use Menubox.closeAll() instead.");
 		Menubox.closeAll(exceptFor);
 	};
 
-	static closeAll(exceptFor = "")
+	static closeAll (exceptFor = "")
 	{
 		for (let key in Menubox.instances)
 		{
@@ -93,7 +93,7 @@ class Menubox
 		}
 	};
 
-	static onMenuItemClick(mouseEvent)
+	static onMenuItemClick (mouseEvent)
 	{
 		mouseEvent.stopPropagation();
 		if ((mouseEvent.target instanceof HTMLInputElement === false) && (mouseEvent.target.classList.contains("disabled") === false))
@@ -144,17 +144,17 @@ class Menubox
 				}
 				if (typeof menubox.eventHandler === "function")
 				{
-					menubox.eventHandler(Object.assign(eventDetails, {originalEvent: mouseEvent}));
+					menubox.eventHandler(Object.assign(eventDetails, { originalEvent: mouseEvent }));
 				}
 				else
 				{
-					window.dispatchEvent(new CustomEvent(Menubox.EVENT_ID, {detail: eventDetails}));
+					window.dispatchEvent(new CustomEvent(Menubox.EVENT_ID, { detail: eventDetails }));
 				}
 			}
 		}
 	};
 
-	_setVisibility(visible)
+	_setVisibility (visible)
 	{
 		let styleIndex = (visible) ? 1 : 0;
 		for (let key in this.adjust)
@@ -172,10 +172,11 @@ class Menubox
 		}
 	};
 
-	setItems(itemDefs)
+	setItems (itemDefs)
 	{
 		this.items = {};
 		htmlBuilder.removeAllChildren(this.element.querySelector("div.items"));
+		console.log(this, this.items);
 		if (itemDefs instanceof Array)
 		{
 			for (let itemDef of itemDefs)
@@ -187,14 +188,15 @@ class Menubox
 		{
 			for (let key in itemDefs)
 			{
-				this.appendItem({[key]: itemDefs[key]});
+				this.appendItem({ [key]: itemDefs[key] });
 			}
 		}
 	};
 
-	appendItem(itemDef)
+	appendItem (itemDef)
 	{
-		function _copyProperties(itemDef, itemElement)
+		console.log(this, this.items);
+		function _copyProperties (itemDef, itemElement)
 		{
 			for (let itemDefKey in itemDef)
 			{
@@ -204,13 +206,13 @@ class Menubox
 				}
 			}
 		}
-		function _createInputElement(itemDef)
+		function _createInputElement (itemDef)
 		{
 			let inputElement = htmlBuilder.newElement("input", { type: itemDef.input });
 			_copyProperties(itemDef, inputElement);
 			return inputElement;
 		}
-		function _createSubmenu(menubox, itemElement, itemDef)
+		function _createSubmenu (menubox, itemElement, itemDef)
 		{
 			let submenuId = menubox.id + "::" + itemDef.key;
 			itemElement.setAttribute("data-submenu", submenuId);
@@ -219,12 +221,13 @@ class Menubox
 			menubox.submenus[submenuId] = new Menubox(submenuId, itemDef.submenu, menubox.eventHandler, menubox);
 			menubox.submenus[submenuId].alignment = itemDef.submenu.alignment ?? "start right, below top";
 		}
-		function _appendItemObject(menubox, itemKey, itemElement)
+		function _appendItemObject (menubox, itemKey, itemElement)
 		{
 			menubox.items[itemKey] = {
 				label: itemDef.label,
-				get selected() { return itemElement.classList.contains("selected") },
-				set selected(selected) {
+				get selected () { return itemElement.classList.contains("selected"); },
+				set selected (selected)
+				{
 					if (menubox.multiselect === false)
 					{
 						for (let item of menubox.element.querySelectorAll("[data-menuitem].selected"))
@@ -234,8 +237,8 @@ class Menubox
 					}
 					(selected) ? itemElement.classList.add("selected") : itemElement.classList.remove("selected");
 				},
-				get enabled() { return !itemElement.classList.contains("disabled") },
-				set enabled(enabled = true) { (enabled) ? itemElement.classList.remove("disabled") : itemElement.classList.add("disabled"); },
+				get enabled () { return !itemElement.classList.contains("disabled"); },
+				set enabled (enabled = true) { (enabled) ? itemElement.classList.remove("disabled") : itemElement.classList.add("disabled"); },
 				setVisible: (visible = true) => { itemElement.style.display = (visible) ? null : "none"; },
 				element: itemElement
 			};
@@ -253,7 +256,7 @@ class Menubox
 				}
 				else
 				{
-					itemDef = {separator: {}};
+					itemDef = { separator: {} };
 				}
 				break;
 			}
@@ -265,7 +268,7 @@ class Menubox
 		}
 		else if (itemDef.href)
 		{
-			itemElement = htmlBuilder.newElement("a.menuitem", itemDef.label ?? itemDef.href, {onclick: (evt) => Menubox.closeAll()});
+			itemElement = htmlBuilder.newElement("a.menuitem", itemDef.label ?? itemDef.href, { onclick: (evt) => Menubox.closeAll() });
 			_copyProperties(itemDef, itemElement);
 		}
 		else if ((itemDef.html) && (itemDef.key === undefined))
@@ -277,7 +280,7 @@ class Menubox
 			if (!this.items[itemDef.key])
 			{
 				itemElement = htmlBuilder.newElement("div.menuitem",
-					{'data-menuitem': itemDef.key, onclick: itemDef.onclick ?? Menubox.onMenuItemClick},
+					{ 'data-menuitem': itemDef.key, onclick: itemDef.onclick ?? Menubox.onMenuItemClick },
 					itemDef.html ?? itemDef.label ?? ((itemDef.input) ? "" : itemDef.key)
 				);
 				if (itemDef.input)
@@ -321,12 +324,12 @@ class Menubox
 		}
 	};
 
-	selectItem(itemKey, beSelected = true)
+	selectItem (itemKey, beSelected = true)
 	{
 		this.items[itemKey].selected = beSelected;
 	};
 
-	setTitle(title)
+	setTitle (title)
 	{
 		let wrapperElement = this.element.firstElementChild;
 		if (typeof title === "string")
@@ -345,7 +348,7 @@ class Menubox
 		}
 	};
 
-	popup(mouseEvent, context = null, anchorElement = null, adjustment = "start left, below bottom")
+	popup (mouseEvent, context = null, anchorElement = null, adjustment = "start left, below bottom")
 	{
 		if (!this.parentMenubox)
 		{
@@ -353,8 +356,8 @@ class Menubox
 		}
 		let itemsElement = this.element.querySelector("div.items");
 		let isFixed = (this.element.style.position === "fixed");
-		let scrollPos = (isFixed) ? {top: 0, left: 0} : {top: document.documentElement.scrollTop, left: document.documentElement.scrollLeft};
-		itemsElement.scrollTo({top: 0});
+		let scrollPos = (isFixed) ? { top: 0, left: 0 } : { top: document.documentElement.scrollTop, left: document.documentElement.scrollLeft };
+		itemsElement.scrollTo({ top: 0 });
 		htmlBuilder.styleElement(itemsElement, {
 			height: null,
 			overflowY: null
@@ -393,12 +396,12 @@ class Menubox
 		this._setVisibility(true);
 	};
 
-	close()
+	close ()
 	{
 		this._setVisibility(false);
 	};
 
-	static dialogBox(title, lines, buttons)
+	static dialogBox (title, lines, buttons)
 	{
 		return new Promise((resolve) =>
 		{
@@ -421,15 +424,15 @@ class Menubox
 					}
 					else if (!!rexMatch[3])
 					{
-						lineItems.push(htmlBuilder.newElement("a", {href: rexMatch[3], target: "_blank"}, rexMatch[4]));
+						lineItems.push(htmlBuilder.newElement("a", { href: rexMatch[3], target: "_blank" }, rexMatch[4]));
 					}
 					line = line.substring(line.indexOf(rexMatch[0]) + rexMatch[0].length);
 				}
 				lineItems.push(line);
-				items.push({html: htmlBuilder.newElement("p", ...lineItems)});
+				items.push({ html: htmlBuilder.newElement("p", ...lineItems) });
 			}
 			/* fake Menubox as dialogbox */
-			let dialogBox = new Menubox("__dialogbox__", {position: "fixed", css: "dialogbox", title: title, items: items, buttons: buttons},
+			let dialogBox = new Menubox("__dialogbox__", { position: "fixed", css: "dialogbox", title: title, items: items, buttons: buttons },
 				(menuboxEvent) =>
 				{
 					Menubox.instances.__dialogbox__.close();
@@ -448,13 +451,15 @@ class Menubox
 
 };
 
-window.addEventListener("click", (mouseEvent) => {
+window.addEventListener("click", (mouseEvent) =>
+{
 	if (mouseEvent.target.closest("[data-menubox]") === null)
 	{
 		Menubox.closeAll();
 	}
 });
-window.addEventListener("keydown", (keyEvent) => {
+window.addEventListener("keydown", (keyEvent) =>
+{
 	if (keyEvent.keyCode === 27)
 	{
 		Menubox.closeAll();

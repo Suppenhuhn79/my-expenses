@@ -218,8 +218,9 @@ function myxPaymentMethods ()
 	 */
 	function prompt (alignElement, callback)
 	{
-		function _buildMenuboxItems (menuboxItems)
+		function _buildMenuboxItems (/** @type {Array<MenuboxItem>} */ menuboxItems)
 		{
+			menuboxItems.splice(0, menuboxItems.length);
 			for (let id of order)
 			{
 				menuboxItems.push({
