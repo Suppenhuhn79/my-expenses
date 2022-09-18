@@ -2,6 +2,7 @@
 	background-color: #fff;
 	box-shadow: 0.1rem 0.1rem 0.5rem 0.1rem #00000080;
 	z-index: 200;
+	color: #888;
 }
 
 .menubox .title {
@@ -42,6 +43,10 @@
 	justify-content: center;
 }
 
+.menubox [data-menuitem="delete"] .icon {
+	color: #f00;
+}
+
 .menubox .separator {
 	border-top: 1px solid #ccc;
 	margin: 0.2em 1em;
@@ -64,12 +69,17 @@
 	margin-left: 0.5em;
 }
 
-.menubox[data-menubox="exp.months-selection"] .menuitem {
+.menubox[data-menubox="exp-months-selection"] {
+	max-height: 75%;
+	overflow-y: scroll;
+}
+.menubox[data-menubox="exp-months-selection"] .menuitem {
 	text-align: center;
 	padding: 1em 3em;
 	display: block;
 	border: none;
 }
+
 .menubox.filter .menuitem.disabled {
 	color: #aaa;
 	padding-bottom: 0;

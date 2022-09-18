@@ -18,7 +18,7 @@ let myxMenuboxes = new function ()
 				{
 					key: "edit-cat",
 					label: "Change category",
-					iconHtml: FA.renderSolid("box_open")
+					iconHtml: FA.renderSolid("boxes")
 				},
 				{
 					key: "edit-pmt",
@@ -28,7 +28,7 @@ let myxMenuboxes = new function ()
 				{
 					key: "edit-lbl",
 					label: "Change label",
-					iconHtml: FA.renderSolid("tag")
+					iconHtml: FA.renderSolid("tags")
 				},
 				{
 					key: "delete",
