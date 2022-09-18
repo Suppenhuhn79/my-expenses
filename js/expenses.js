@@ -1015,9 +1015,9 @@ function myxExpenses ()
 	 */
 	function onMultiselectMenuboxClick (menuboxEvent)
 	{
-		function _buildMenuboxItems (menuboxItems)
+		function _buildMenuboxItems (/** @type {Array<MenuboxItem>} */ menuboxItems)
 		{
-			menuboxItems.push(
+			menuboxItems.clear().push(
 				{
 					html: new PaymentMethodSelector(console.log, { class: "wide-flex" }, false).element
 				}
@@ -1027,7 +1027,7 @@ function myxExpenses ()
 		switch (menuboxEvent.itemKey)
 		{
 			case "edit-pmt":
-				myxMenuboxes.get("exp-change-payment-method", confirm.log, _buildMenuboxItems).popup();
+				myxMenuboxes.get("exp-change-payment-method", confirm.log, _buildMenuboxItems, tabMode).popup(null, null, document.body, "center, middle");
 				break;
 		}
 	}

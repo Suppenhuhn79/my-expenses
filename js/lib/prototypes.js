@@ -1,6 +1,12 @@
 /*
  * Array
  */
+Array.prototype.clear = function ()
+{
+	this.splice(0, this.length);
+	return this;
+};
+
 Array.prototype.clone = function ()
 {
 	return [...this.valueOf()];

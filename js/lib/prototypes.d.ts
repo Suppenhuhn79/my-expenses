@@ -1,13 +1,19 @@
 interface Array<T> {
 	/**
+	 * Removes all items from this array.
+	 * @returns This emptied array.
+	 */
+	clear(): Array<T>;
+
+	/**
 	 * Provides a copy of the array as a new array object.
+	 * @returns A ne array as a copy of this array.
 	 */
 	clone(): Array<T>;
 
 	/**
 	 * Removes duplicate items from the array. This affects the actual array.
-	 *
-	 * Returns this array.
+	 * @returns This array with all duplicates removed.
 	 */
 	removeDuplicates(): Array<T>;
 }
@@ -17,9 +23,10 @@ interface Date {
 	 * Returs the count of days between two dates.
 	 * @param start Start date (earlier) of time period.
 	 * @param end End date (later) of time period.
+	 * @returns The count of days between the tow dates.
 	 */
 	static daysBetween(start: Date, end: Date): Number;
-
+	// TODO: doc return values
 	/**
 	 * Returns a new date with a count of days added to the current date.
 	 * @param count Count of days to add.

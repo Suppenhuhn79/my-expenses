@@ -27,8 +27,9 @@
 	width: 100%;
 }
 
-.selector {
-	overflow: scroll;
+.selector.wide-flex {
+	padding: 0.5rem;
+	overflow-x: scroll;
 }
 .selector .item {
 	border-radius: 0.4em;

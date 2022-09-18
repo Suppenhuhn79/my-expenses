@@ -1,8 +1,9 @@
 .menubox {
+	color: #888;
 	background-color: #fff;
+	max-width: calc(100vw - 2rem);
 	box-shadow: 0.1rem 0.1rem 0.5rem 0.1rem #00000080;
 	z-index: 200;
-	color: #888;
 }
 
 .menubox .title {
