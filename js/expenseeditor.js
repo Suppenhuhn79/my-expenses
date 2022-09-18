@@ -1,22 +1,36 @@
+/**
+ * Action to be profomed out of the expense editor.
+ * @enum {string}
+ */
 const ExpenseEditorAction = {
-	/** @enum {string} */
+	/** A new expense is to be added. */
 	ADD: "add",
+	/** An existing expense is being modified. */
 	MODIFY: "modify",
+	/** An existing expense is to be deleted. */
 	DELETE: "delete",
+	/** Changes to an repeating expense are being made or a new repeating expense is being created. */
 	REPEATING: "repeating",
+	/** No changed are being made. */
 	NONE: "none"
 };
 
+/**
+ * Operation mode of the expense editor.
+ * @enum {string}
+ */
 const ExpenseEditorMode = {
-	/** @enum {string} */
+	/** An actual or new expense is being edited. */
 	DEFAULT: "default",
+	/** A repeating expense is being edited. */
 	REPEATING: "repeat"
 };
 
 /**
  * @callback ExpenseEditorCallback
+ * Function to call on an expense editor action (apply edits, delete expense etc.).
  * @param {Expense} editedExpense Expense with the edited properties.
- * @param {ExpenseEditorAction} action Action to perform (add, modify, delete the expense etc.).
+ * @param {keyof ExpenseEditorAction} action Action to perform (one fo the values of `ExpenseEditorAction`).
  */
 
 /**

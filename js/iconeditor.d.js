@@ -1,7 +1,6 @@
 /**
  * @typedef IconEditorOptions
  * Options for the icon editor.
- * @property {EditableIconType} iconType Whether it's a color-on-white or a white-on-color icon.
  * @property {string} title Editors title.
  * @property {string} [headline] Optional headline.
  * @property {string} defaultLabel Icons default label.
@@ -10,12 +9,12 @@
  * @property {any} [context] Context of the icon that is being edited; usually it's the icons item id.
  *
  * @callback IconEditorCallback
+ * Callback function for appyling the changes made to the icon.
  * @param {EditableIcon} editedIcon Edited icon.
  * @returns {void}
  * 
- * @typedef IconEditorDeleteFunction
+ * @callback IconEditorDeleteFunction
  * Function that is called on a delete request.
- * @type {Function}
  * @param {Event} event Event that triggered the delete request.
  * @param {any} context Context of the delete request (out of the options).
  * @returns {boolean} `true` if the icon editor shall be closed (default), otherwise it remains open.
