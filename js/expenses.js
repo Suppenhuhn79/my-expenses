@@ -411,19 +411,16 @@ function myxExpenses ()
 		{
 			expenses = [expenses];
 		}
-		console.log("got to save:", expenses);
 		for (let exp of expenses)
 		{
 			months.push(exp.dat.toMonthString());
 		}
 		months.removeDuplicates().sort();
-		console.log("months to save:", months);
 		for (let month of months)
 		{
 			fileIndexes.push(dataIndex.fileindexOfMonth(month));
 		}
 		fileIndexes.removeDuplicates();
-		console.log("files to save:", fileIndexes);
 		for (let fileIndex of fileIndexes)
 		{
 			let csv = "";
@@ -455,7 +452,6 @@ function myxExpenses ()
 		{
 			expenses = [expenses];
 		}
-		console.log("adding:", expenses);
 		/**
 		 * Collection of all months that have been affected by adding expenses.
 		 * @type {Array<MonthString>} */
@@ -471,7 +467,6 @@ function myxExpenses ()
 		{
 			sortItems(month);
 		}
-		console.log("saving:", expenses);
 		saveToFile(expenses);
 	}
 
@@ -1036,8 +1031,6 @@ function myxExpenses ()
 				break;
 		}
 	}
-
-	myxDebug.publish(dataIndex, "dataIndex"); // debug_only
 
 	return { // publish members
 		get moduleName () { return MODULE_NAME; },
