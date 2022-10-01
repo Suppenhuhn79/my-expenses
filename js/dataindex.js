@@ -77,8 +77,9 @@ function myxExpensesDataindex ()
 		{
 			if (data[data.length - 1].length >= MAX_MONTHS_PER_FILE)
 			{
-				data.push([month]);
+				data.push([]);
 			}
+			data[data.length - 1].push(month);
 			result = data.length;
 			console.debug("Registered new month", month, "in file #", result);
 		}
