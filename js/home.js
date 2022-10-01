@@ -117,7 +117,7 @@ const myxHome = function ()
 	 */
 	function renderProgress ()
 	{
-		let bom = new Date(now.getFullYear(), now.getMonth(), 0);
+		let bom = new Date(now.getFullYear(), now.getMonth(), 1);
 		let eom = now.endOfMonth();
 		let monthProgress = (now - bom) / (eom - bom);
 		htmlBuilder.replaceContent(
