@@ -192,9 +192,7 @@ body {
 .right {
 	text-align: right;
 }
-.flex-fill {
-	flex: 1;
-}
+
 .nowrap {
 	white-space: nowrap;
 }
