@@ -158,12 +158,33 @@ class Category extends UserDataItem
 class CategorySelector extends Selector
 {
 	/**
+	 * Converts a `Category` array to a `SelectableIcon` array that can be used as a selectors `item` set.
+	 * @param {Array<Category>} categories Categories to be converted.
+	 * @returns {Array<SelectableIcon>} Aray of selectable icons.
+	 */
+	static itemsFromCategories (categories)
+	{
+		/** @type {Array<SelectableIcon>} */
+		let result = [];
+		for (let item of categories)
+		{
+			result.push({
+				id: item.id,
+				color: item.color,
+				element: item.renderLabeledIcon()
+			});
+		}
+		return result;
+	}
+
+
+	/**
 	 * @param {SelectorCallback} callback Callback on item selection.
 	 * @param {SelectorOptions} options Configuration of the payment method selector.
 	 */
 	constructor(callback, options)
 	{
-		super(callback, myx.categories.masters, options);
+		super(callback, CategorySelector.itemsFromCategories(myx.categories.masters), options);
 
 		/** @type {CategorySelector} */
 		let _this = this; // Must be accessed after calling `super()`
@@ -190,7 +211,7 @@ class CategorySelector extends Selector
 			eventItem.scrollIntoView();
 			if (id === "__back__")
 			{
-				_this.items = myx.categories.masters;
+				_this.items = CategorySelector.itemsFromCategories(myx.categories.masters);
 				_this.refresh();
 			}
 			else if (myx.categories.get(id).isMaster)
@@ -222,7 +243,7 @@ class CategorySelector extends Selector
 		if (!!selectedId)
 		{
 			let masterOfSelected = (myx.categories.get(selectedId).isMaster) ? myx.categories.get(selectedId) : myx.categories.get(selectedId).master;
-			this.items = [masterOfSelected].concat(masterOfSelected.subCategories);
+			this.items = CategorySelector.itemsFromCategories([masterOfSelected].concat(masterOfSelected.subCategories));
 			this.refresh();
 			this.element.insertBefore(htmlBuilder.newElement("div.item.labeled-icon",
 				{ 'data-id': "__back__", onclick: this._onItemClick },

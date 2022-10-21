@@ -58,7 +58,17 @@ class PaymentMethodSelector extends Selector
 	 */
 	constructor(callback, options, activeOnly)
 	{
-		let items = (activeOnly) ? myx.paymentMethods.active : myx.paymentMethods.all;
+		let set = (activeOnly) ? myx.paymentMethods.active : myx.paymentMethods.all;
+		/** @type {Array<SelectableIcon>} */
+		let items = [];
+		for (let item of set)
+		{
+			items.push({
+				id: item.id,
+				color: item.color,
+				element: item.renderLabeledIcon()
+			});
+		}
 		super(callback, items, options);
 	}
 

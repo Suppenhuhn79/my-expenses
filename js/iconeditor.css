@@ -54,24 +54,30 @@
 	padding: 0 0.5em;
 }
 
-#icon-editor [name="icon-list"],
+/* #icon-editor [name="icon-list"], */ /* DEPRECATED */
+#icon-editor .selector,
 #icon-editor [name="colorselector-bubbles"] {
 	padding: 0 1rem;
-	font-size: 1.3rem;
+	font-size: 1.2rem;
 	color: #888;
 }
 
 #icon-editor .color-bubble,
-#icon-editor .icon {
+#icon-editor .icon, /* DEPRECATED */
+#icon-editor .item {
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	border: 4px solid white;
 	border-radius: 100%;
-	font-size: 1em;
+	/* font-size: 1em; */
 	width: 2em;
 	height: 2em;
 	margin: 0.5em;
+}
+#icon-editor .icon {
+	font-size: 1.2rem;
+	color: #666;
 }
 #icon-editor .icon.chosen {
 	box-shadow: 0 0 0 4px #aaa;
@@ -79,7 +85,7 @@
 
 .autowrap-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, 2.5em);
+	grid-template-columns: repeat(auto-fill, 3.5em);
 	justify-content: center;
 	justify-items: center;
 	align-content: start;

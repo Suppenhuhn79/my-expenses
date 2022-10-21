@@ -413,7 +413,7 @@ class Selector
 			this.itemColors.set(item.id, item.color);
 			this.element.appendChild(htmlBuilder.newElement("div.item.click",
 				{ 'data-id': item.id, onclick: this._onItemClick },
-				item.renderLabeledIcon())
+				item.element)
 			);
 		}
 		if (selectedId)

@@ -15,7 +15,7 @@
  * @typedef SelectableIcon
  * Interface for icons given for selection to selectors the `Selector` class.
  * @property {IdString} id Id of the selectable icon.
- * @property {function(): HTMLElement} renderLabeledIcon Function that renders the icon.
+ * @property {HTMLElement} element HTML element that reprsents the icon.
  * @property {string} color Color of the icon.
  * 
  */

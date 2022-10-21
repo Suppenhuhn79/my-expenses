@@ -319,11 +319,14 @@ let iconEditor = new function ()
 
 	FA.applyOn(elements.get());
 	colorSelector(elements.get("colorselector-bubbles"), 27);
+
+	// TODO: replace by a parameter
 	for (let glyphCode of [].concat(...Object.values(ICON_LIBRARAY)))
 	{
 		let glyph = new FAGlyph(glyphCode);
 		elements.get("icon-list").appendChild(htmlBuilder.newElement("div.icon." + glyph.scope, { "data-choice-value": glyph.value }, glyph.htmlEntity));
 	};
+
 	document.getElementById("client").appendChild(elements.get());
 	choices.onChoose("iconeditor-icon", renderGlyph);
 	choices.onChoose("iconeditor-color", setIconColor);
@@ -342,7 +345,7 @@ let iconEditor = new function ()
 				fontSize: "1em"
 			});
 		}
-		else 
+		else
 		{
 			elements.get("icon-preview").setStyles({
 				backgroundColor: "#fff",
@@ -364,7 +367,6 @@ let iconEditor = new function ()
 			glyph = new FAGlyph(glyph);
 		}
 		htmlBuilder.replaceContent(elements.get("icon-preview"), glyph.render());
-		elements.get("icon-list").querySelector("[data-choice-value='" + glyph.value + "']")?.scrollIntoView({ block: "center" });
 		editedIcon.glyph = glyph;
 	};
 
@@ -454,6 +456,7 @@ let iconEditor = new function ()
 		choices.set("iconeditor-icon", editedIcon.glyph.value);
 		choices.set("iconeditor-color", editedIcon.color);
 		choices.set("iconeditor-tab", "icon-selection");
+		elements.get("icon-list").querySelector("[data-choice-value='" + editedIcon.glyph.value + "'").scrollIntoView({ block: "center" });
 	};
 
 	this.getItems = function ()
@@ -463,13 +466,13 @@ let iconEditor = new function ()
 
 		for (let glyphCode of [].concat(...Object.values(ICON_LIBRARAY)))
 		{
-			items.push(new UserDataItem({
+			items.push({
 				id: glyphCode,
 				color: "#888",
-				icon: glyphCode
-			}));
+				element: (new FAGlyph(glyphCode)).render()
+			});
 		};
-		let iconSelection = new Selector(console.log, items, { class: "no-labels" });
+		let iconSelection = new Selector(console.log, items, { class: "autowrap-grid flex-fill overflow-scroll no-labels" });
 		myxDebug.publish(iconSelection, "is");
 		iconSelection.refresh();
 		htmlBuilder.replaceContent(
