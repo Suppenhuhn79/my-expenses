@@ -27,10 +27,14 @@ class Category extends UserDataItem
 		 * @type {string?} */
 		this._color = src?.color || "#808080";
 
-		/** @type {Category?} */
+		/**
+		 * This categorys master category, if this is a sub category.
+		 * @type {Category?} */
 		this.master = undefined;
 
-		/** @type {Array<Category>?} */
+		/**
+		 * This categorys sub categories, if this is a master category.
+		 * @type {Array<Category>?} */
 		this.subCategories = [];
 	}
 
