@@ -10,20 +10,17 @@ class RepeatingInterval
 	{
 		/**
 		 * Count of months between interval points.
-		 * @type {number}
-		 */
+		 * @type {number} */
 		this.months = (src?.months > 0) ? src.months : undefined;
 
 		/**
-		* Day of month for a monthly interval to trigger (for preserving execution on last-of-month).
-		* @type {number}
-		*/
+		 * Day of month for a monthly interval to trigger (for preserving execution on last-of-month).
+		 * @type {number} */
 		this.dayOfMonth = (src?.months > 0) ? src?.originalDate || src?.originalDay || src?.dayOfMonth || 1 : undefined; // TODO: remove deprecated property names
 
 		/**
 		 * Count of weeks between interval points.
-		 * @type {number}
-		 */
+		 * @type {number} */
 		this.weeks = src?.weeks || undefined;
 	}
 
@@ -161,7 +158,7 @@ function myxRepeatingExpenses ()
 	 */
 	function fetchData ()
 	{
-		return new Promise((resolve) => 
+		return new Promise((resolve) =>
 		{
 			myx.loadFile(FILE_NAME, DEFAULTS, (obj) =>
 			{

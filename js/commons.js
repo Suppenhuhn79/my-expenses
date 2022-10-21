@@ -11,7 +11,7 @@ const IconStyle = {
 };
 
 /**
- * Any user data items.
+ * Any user data item.
  */
 class UserDataItem
 {
@@ -72,7 +72,7 @@ class UserDataItem
 
 /**
  * Mode handler for my-expenses tabs.
- * 
+ *
  * Preserves data on edits. Updates the UI on switching mode.
  */
 class TabModeHandler
@@ -85,8 +85,8 @@ class TabModeHandler
 
 	/**
 	 * @param {HTMLElement} element Element that contains tab items
-	 * @param {function(): Object} dataGetter `function(): Object` to get the current tab data before switching to "edit" mode.
-	 * @param {function(Object): void} dataSetter `function(data: Object)` to call to reset modified data when cancelling "edit" mode.
+	 * @param {TabModeHandlerGetter} dataGetter `function(): Object` to get the current tab data before switching to "edit" mode.
+	 * @param {TabModeHandlerSetter} dataSetter `function(data: Object)` to call to reset modified data when cancelling "edit" mode.
 	 */
 	constructor(element, dataGetter, dataSetter)
 	{
@@ -96,10 +96,14 @@ class TabModeHandler
 		/** @type {HTMLElement} */
 		this.element = element;
 
-		/** @type {Function} */
+		/**
+		 * Function to call to get the current tab data before switching to "edit" mode.
+		 * @type {TabModeHandlerGetter} */
 		this._dataGetter = dataGetter;
 
-		/** @type {Function} */
+		/**
+		 * Function to call to reset modified data when cancelling "edit" mode.
+		 * @type {TabModeHandlerSetter} */
 		this._dataSetter = dataSetter;
 	}
 
@@ -197,6 +201,7 @@ class FAGlyph
 
 /**
  * FontAwesome glyph codes and functions.
+ * @static
  */
 class FA
 {
@@ -291,7 +296,7 @@ class FA
 
 /**
  * Selector base class.
- * 
+ *
  * Provides functionality for rendering and selecting items.
  */
 class Selector
@@ -305,38 +310,32 @@ class Selector
 	{
 		/**
 		 * This instance, to have it in event handlers where `this` is `window`.
-		 * @type {Selector}
-		 */
+		 * @type {Selector} */
 		let _this = this;
 
 		/**
 		 * Callback on item selection.
-		 * @type {SelectorCallback}
-		 */
+		 * @type {SelectorCallback} */
 		this.callback = callback;
 
 		/**
 		 * Allow seletion of multiple items or single item selection only.
-		 * @type {boolean}
-		 */
+		 * @type {boolean} */
 		this.multiSelect = (options.multiselect === true);
 
 		/**
 		 * Items to be availible for selection in this selector.
-		 * @type {Array<SelectableIcon>}
-		 */
+		 * @type {Array<SelectableIcon>} */
 		this.items = items;
 
 		/**
 		 * Colors of this selectors items; used for formatting selected items.
-		 * @type {Map<IdString, string>}
-		 */
+		 * @type {Map<IdString, string>} */
 		this.itemColors = new Map();
 
 		/**
 		 * Element to render the selection on.
-		 * @type {HTMLElement}
-		 */
+		 * @type {HTMLElement} */
 		this.element = htmlBuilder.newElement("div.selector." + (options.class || "").replaceAll(/\s+/g, ".") + ((this.multiSelect) ? ".multiselect" : ""));
 
 		/**

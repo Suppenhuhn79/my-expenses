@@ -17,38 +17,32 @@ class Expense
 	{
 		/**
 		 * Expense date.
-		 * @type {Date}
-		 */
+		 * @type {Date} */
 		this.dat = new Date();
 
 		/**
 		 * Expense amount.
-		 * @type {number}
-		 */
+		 * @type {number} */
 		this.amt = 0;
 
 		/**
 		 * Expense category - id reference to categories.
-		 * @type {IdString}
-		 */
+		 * @type {IdString} */
 		this.cat = "";
 
 		/**
 		 * Additional descriptive text.
-		 * @type {string}
-		 */
+		 * @type {string} */
 		this.txt = "";
 
 		/**
 		 * Used payment method - id reference to payment methods.
-		 * @type {IdString}
-		 */
+		 * @type {IdString} */
 		this.pmt = "";
 
 		/**
 		 * Repeating expense - id reference to repeating expenses.
-		 * @type {IdString}
-		 */
+		 * @type {IdString} */
 		this.rep = "";
 
 		switch (typeof src)
@@ -160,22 +154,19 @@ class ExpensesFilter
 
 	constructor()
 	{
-		/** 
+		/**
 		 * This filters name.
-		 * @type {string}
-		 */
+		 * @type {string} */
 		this.name = ExpensesFilter.DEFAULT_NAME;
 
 		/**
 		 * Ids of categories to be excluded.
-		 * @type {Set<IdString>}
-		 */
+		 * @type {Set<IdString>} */
 		this.cats = new Set();
 
 		/**
 		 * Ids of payment methods to be excluded.
-		 * @type {Set<IdString>}
-		 */
+		 * @type {Set<IdString>} */
 		this.pmts = new Set();
 	}
 
@@ -289,7 +280,7 @@ function myxExpenses ()
 	 */
 	function init ()
 	{
-		return new Promise((resolve) => 
+		return new Promise((resolve) =>
 		{
 			Promise.allSettled([
 				pageSnippets.import("js/expenseeditor.xml")
@@ -309,7 +300,7 @@ function myxExpenses ()
 	 */
 	function fetchData ()
 	{
-		return new Promise((resolve) => 
+		return new Promise((resolve) =>
 		{
 			/**
 			 * Iterable promises of all file load actions.
@@ -330,11 +321,11 @@ function myxExpenses ()
 
 	/**
 	 * Imports the content of a _data-n.csv_ file.
-	 * 
+	 *
 	 * This does replace all data of the imported months.
-	 * 
+	 *
 	 * Also registers months and file numbers.
-	 * 
+	 *
 	 * @param {number} fileIndex Index (`1..x`) of the file where the data came from.
 	 * @param {string} csvString Native csv data (as in a file).
 	 */
@@ -386,15 +377,15 @@ function myxExpenses ()
 
 	/**
 	 * Saves expenses to a file.
-	 * 
+	 *
 	 * More exactly: saves expenses of all months, that are in the same files as the given dates.
-	 * 
+	 *
 	 * @async
 	 * @param {Expense|Array<Expense>} expenses Months to save data.
 	 */
 	async function saveToFile (expenses)
 	{
-		/** 
+		/**
 		 * Months to be saved.
 		 * @type {Array<MonthString>} */
 		let months = [];
@@ -512,10 +503,10 @@ function myxExpenses ()
 
 	/**
 	 * Sets the current filter and renders the list.
-	 * 
+	 *
 	 * Mode will be set to "search" if there is at least a _pmt_ or a _cat_ filter. Also the title will get a seach hint.
 	 * Otherwise the mode will be "default".
-	 * 
+	 *
 	 * @param {ExpensesFilter} filterObj Filters to set.
 	 * @param {string} originModuleName Module name where the filter came from (where to return to).
 	 */
@@ -554,7 +545,7 @@ function myxExpenses ()
 
 	/**
 	 * Resets the filter. Only filter criteria will be the currently selected month.
-	 * 
+	 *
 	 * Calls `setFilter()`.
 	 */
 	function resetFilter ()
@@ -564,7 +555,7 @@ function myxExpenses ()
 
 	/**
 	 * Exits the "multiselect" mode back to the mode that was active before multiselect.
-	 * 
+	 *
 	 * Deselects all selected items.
 	 */
 	function exitMultiselectMode ()
@@ -590,9 +581,9 @@ function myxExpenses ()
 
 	/**
 	 * Updates a navigation element in the module's title.
-	 * 
+	 *
 	 * If the current month has no data and the target month has no data, too, the element gets hidden.
-	 * 
+	 *
 	 * @param {HTMLDivElement} navElement HTML element to update.
 	 * @param {Date} targetMonth Month to be represented by the nav element.
 	 */
@@ -651,12 +642,12 @@ function myxExpenses ()
 
 	/**
 	 * Puts a list of all expenses matching the current filter to the "content"-element.
-	 * 
+	 *
 	 * For each day with an expense there will be a _headline_.
 	 * Item elements will contain all functionality for all modes.
-	 * 
+	 *
 	 * Also navigation items will be updated.
-	 * 
+	 *
 	 * @param {Date} [scrollToDate] Date to be scrolled to; if omitted, list will try to scroll to _today_.
 	 */
 	function renderList (scrollToDate)
@@ -798,9 +789,9 @@ function myxExpenses ()
 
 	/**
 	 * Pops up an ExpenseEditor to modify an expense or create a new one.
-	 * 
+	 *
 	 * Renders the expenses list afterwards.
-	 * 
+	 *
 	 * @param {Expense} [expense] Expense to edit; if omitted, a new expense will be created.
 	 * @param {number} [dataIndex] Array index (`0..x`) of the current month subset of `data`; required if editing existing data, otherwise to be omitted.
 	 */
@@ -906,7 +897,7 @@ function myxExpenses ()
 
 	/**
 	 * Event handler for clicking the "add expense" button.
-	 * 
+	 *
 	 * Pops up the ExpenseEditor for new expense.
 	 */
 	function onAddExpenseClick ()
@@ -930,9 +921,9 @@ function myxExpenses ()
 
 	/**
 	 * Event handler for pointer-down on list items.
-	 * 
+	 *
 	 * Starts timeout for long-mousedown switching to "multiselect" mode.
-	 * 
+	 *
 	 * @param {Event} event Triggering event.
 	 */
 	function onItemPointerDown (event)
@@ -948,9 +939,9 @@ function myxExpenses ()
 
 	/**
 	 * Event handler for pointer-up on list items.
-	 * 
+	 *
 	 * Redirects to `onItemClick()` event handler if necessary.
-	 * 
+	 *
 	 * @param {Event} event Triggering event.
 	 */
 	function onItemPointerUp (event)
@@ -965,10 +956,10 @@ function myxExpenses ()
 
 	/**
 	 * Event handler for clicks on list items. Actually it is triggered by the pointer-up event.
-	 * 
+	 *
 	 * - In "default" mode, it pops up the ExpenseEditor.
 	 * - In "multiselect" mode, is selects/deselects the expense.
-	 * 
+	 *
 	 * @param {Event} event Triggering event.
 	 */
 	function onItemClick (event)
@@ -1008,9 +999,9 @@ function myxExpenses ()
 	/**
 	 * Event handler for selecting an action from the multiselect menu.
 	 * This is a dummy by now.
-	 * 
+	 *
 	 * // TODO: implement all events.
-	 * 
+	 *
 	 * @param {MenuboxEvent} menuboxEvent Triggering event.
 	 */
 	function onMultiselectMenuboxClick (menuboxEvent)

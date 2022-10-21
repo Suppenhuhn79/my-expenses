@@ -17,8 +17,7 @@ class PaymentMethod extends UserDataItem
 
 		/**
 		 * Whether this payment method is disabled (`true`) or active (`false`).
-		 * @type {boolean}
-		 */
+		 * @type {boolean} */
 		this.isDisabled = false;
 	}
 
@@ -172,7 +171,7 @@ function myxPaymentMethods ()
 	 */
 	function fetchData ()
 	{
-		return new Promise((resolve) => 
+		return new Promise((resolve) =>
 		{
 			myx.loadFile(FILE_NAME, DEFAULTS, (obj) =>
 			{
@@ -311,9 +310,9 @@ function myxPaymentMethods ()
 
 	/**
 	 * Opens the IconEditor for modifing a payment method or creating a new one.
-	 * 
+	 *
 	 * Changes are not saved until `saveToFile()` is called!
-	 * 
+	 *
 	 * @param {IdString} [id] Id of payment method to edit; if empty, a new payment method will be created.
 	 */
 	function promptEditor (id)
