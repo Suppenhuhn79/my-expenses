@@ -22,8 +22,8 @@ class Category extends UserDataItem
 	{
 		super(src, id);
 
-		/** 
-		 * @private Use `color` getter instead.
+		/**
+		 * @private Use `color` getter/setter instead.
 		 * @type {string?} */
 		this._color = src?.color || "#808080";
 
@@ -36,7 +36,7 @@ class Category extends UserDataItem
 
 	/**
 	 * Provides the color of the category.
-	 * 
+	 *
 	 * Only master categories do have own colors. Sub-categories inherit their masters color.
 	 * @returns {string} This categorys color.
 	 */
@@ -58,9 +58,9 @@ class Category extends UserDataItem
 
 	/**
 	 * Gives the full qualified label of this category.
-	 * 
+	 *
 	 * If this is a sub-categoy, the label will be prefixed with the master categorys name.
-	 * 
+	 *
 	 * @returns {string} Full qualified label of this category.
 	 */
 	get fullQualifiedLabel ()
@@ -75,9 +75,9 @@ class Category extends UserDataItem
 
 	/**
 	 * Tells if this is a master category or not.
-	 * 
+	 *
 	 * `true` if this is a master category, `false` if this is a sub-category.
-	 * 
+	 *
 	 * @returns {boolean} Whether this is a master category or not.
 	 */
 	get isMaster ()
@@ -177,7 +177,6 @@ class CategorySelector extends Selector
 		return result;
 	}
 
-
 	/**
 	 * @param {SelectorCallback} callback Callback on item selection.
 	 * @param {SelectorOptions} options Configuration of the payment method selector.
@@ -186,19 +185,16 @@ class CategorySelector extends Selector
 	{
 		super(callback, CategorySelector.itemsFromCategories(myx.categories.masters), options);
 
-		/** @type {CategorySelector} */
-		let _this = this; // Must be accessed after calling `super()`
-
 		/**
 		 * Event handler for clicking an item.
-		 * 
+		 *
 		 * Overloads the parent method to handle switching between master and sub-categories.
 		 *
 		 * Calls the `callback` function.
 		 *
 		 * @param {Event} event Triggering event.
 		 */
-		this._onItemClick = function (event)
+		this._onItemClick = (event) =>
 		{
 			/**
 			 * Actual item.
@@ -211,26 +207,26 @@ class CategorySelector extends Selector
 			eventItem.scrollIntoView();
 			if (id === "__back__")
 			{
-				_this.items = CategorySelector.itemsFromCategories(myx.categories.masters);
-				_this.refresh();
+				this.items = CategorySelector.itemsFromCategories(myx.categories.masters);
+				this.refresh();
 			}
 			else if (myx.categories.get(id).isMaster)
 			{
-				if ((_this.multiSelect !== true) || (_this.element.querySelector(".back") === null))
+				if ((this.multiSelect !== true) || (this.element.querySelector(".back") === null))
 				{
-					_this.refresh(id);
+					this.refresh(id);
 				}
 			}
-			if (_this.multiSelect === true)
+			if (this.multiSelect === true)
 			{
 				// TODO: aint enough setting the class, because we can not get all selected items from the existing elements, but must have a set in this class
 				eventItem.classList.toggle("selected");
 			}
 			else
 			{
-				_this.highlightItem(id, false);
+				this.highlightItem(id, false);
 			}
-			_this.callback(id);
+			this.callback(id);
 		};
 	};
 
@@ -315,7 +311,7 @@ function myxCategories ()
 	 */
 	function fetchData ()
 	{
-		return new Promise((resolve) => 
+		return new Promise((resolve) =>
 		{
 			myx.loadFile(FILE_NAME, DEFAULTS, (obj) =>
 			{
@@ -347,9 +343,9 @@ function myxCategories ()
 
 	/**
 	 * Puts a list of all categories to the "content"-element.
-	 * 
+	 *
 	 * Item elements will contain all functionality for all modes.
-	 * 
+	 *
 	 * @param {string} [mode] Mode to set for the list; remains at current mode if omitted.
 	 */
 	function renderList (mode = tabMode.get())
@@ -399,9 +395,9 @@ function myxCategories ()
 
 	/**
 	 * Opens the IconEditor for modifing a category or creating a new one.
-	 * 
+	 *
 	 * Changes are not saved until `saveToFile()` is called!
-	 * 
+	 *
 	 * @param {IdString} [id] Id of category to edit; if empty, a new category will be created.
 	 * @param {IdString} [masterId] Id of the categorys master category (if it's a sub-category).
 	 */
@@ -412,6 +408,7 @@ function myxCategories ()
 		if ((creatingNewItem) && (masterId))
 		{
 			itemToEdit.color = data.get(masterId).color;
+			itemToEdit.glyph = data.get(masterId).glyph;
 		}
 		tabMode.set(CategoriesTabMode.EDIT);
 		iconEditor.popup(itemToEdit,
@@ -423,6 +420,7 @@ function myxCategories ()
 				canColor: !(!!masterId)
 			}, function editorCallback (editedObj)
 		{
+			// TODO: for sub-categories do not store a glyph if it's the same as its master catergories
 			if (creatingNewItem)
 			{
 				id = newId();
@@ -531,9 +529,9 @@ function myxCategories ()
 
 	/**
 	 * Event handler for clicking the "add" icon in a categorys sub-catergory list.
-	 * 
+	 *
 	 * Pops up the editor to add a nwe sub-category.
-	 * 
+	 *
 	 * @param {MouseEvent} event Triggering event.
 	 */
 	function onAddSubCategoryClick (event)
@@ -544,9 +542,9 @@ function myxCategories ()
 
 	/**
 	 * Handles clicks on master categoris asterisk in "search" mode.
-	 * 
+	 *
 	 * Sets expenses filter to the master category and all sub-categories and switches to expenses tab.
-	 * 
+	 *
 	 * @param {MouseEvent} event Triggering event
 	 */
 	function onSearchAllClick (event)
