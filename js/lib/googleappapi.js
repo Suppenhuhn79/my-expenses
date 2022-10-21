@@ -12,7 +12,7 @@
  * @property {DOMString} url URL to send the request to
  * @property {Object} [headers] Additional headers as `key=value`-pairs
  * @property {Document|XMLHttpRequestBodyInit} [body] Body data to send
- * 
+ *
  * @typedef XhrErrorResponse
  * @type {Object}
  * @property {number} status The returned HTTP status code
@@ -92,7 +92,7 @@ const googleAppApi = {
 	/**
 	 * Initializes the GooglDive-App api. Gets the access token and registers all files to the `files` data.
 	 * Call this after returning from the signIn-referrer.
-	 * @returns {Promise<undefined, XhrErrorResponse>} Returns a Promise: `resolve()` or `reject(XhrErrorResponseObject)`.
+	 * @returns {Promise<void, XhrErrorResponse>} Returns a Promise: `resolve()` or `reject(XhrErrorResponseObject)`.
 	 */
 	init: () => new Promise((resolve, reject) =>
 	{
@@ -136,7 +136,7 @@ const googleAppApi = {
 	* Creates a new file.
 	* The newly created file will be automatically registered within the `files` data.
 	* @param {string} name Name of the file to create
-	* @returns {Promise<undefined, XhrErrorResponse>} Returns a Promise: `resolve()` or `reject(XhrErrorResponseObject)`.
+	* @returns {Promise<void, XhrErrorResponse>} Returns a Promise: `resolve()` or `reject(XhrErrorResponseObject)`.
 	*/
 	createFile: (name) => new Promise((resolve, reject) =>
 	{
@@ -186,7 +186,7 @@ const googleAppApi = {
 	 * Saves data to a file. If the file does not exists, it will be created.
 	 * @param {string} name Name of file to save data to
 	 * @param {string|Object} data Content to write to the file; objects will be automatically serialized
-	 * @returns {Promise<undefined, XhrErrorResponse>} Returns a Promise: `resolve()` or `reject(XhrErrorResponseObject)`.
+	 * @returns {Promise<void, XhrErrorResponse>} Returns a Promise: `resolve()` or `reject(XhrErrorResponseObject)`.
 	 */
 	saveToFile: (name, data) => new Promise((resolve, reject) =>
 	{
@@ -199,7 +199,7 @@ const googleAppApi = {
 				name: name,
 				parents: ["appDataFolder"]
 			};
-			if (typeof data === "object")	
+			if (typeof data === "object")
 			{
 				data = JSON.stringify(data);
 			}
@@ -232,7 +232,7 @@ const googleAppApi = {
 	/**
 	 * Deletes a file. The deleted file will be removed from `files` data.
 	 * @param {string} name Name of file to delete.
-	 * @returns {Promise<undefined, XhrErrorResponse>} Returns a Promise: `resolve()` or `reject(XhrErrorResponseObject)`.
+	 * @returns {Promise<void, XhrErrorResponse>} Returns a Promise: `resolve()` or `reject(XhrErrorResponseObject)`.
 	 */
 	deleteFile: (name) => new Promise((resolve, reject) =>
 	{
