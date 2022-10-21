@@ -4,10 +4,13 @@
 	padding-left: 1em;
 }
 #expense-editor [name="pmt"] {
-	padding: 0.5rem 1rem;
+	padding: 0.5rem;
 }
 #expense-editor [name="pmt"] div .pmt.icon {
 	height: 1.5em;
+}
+#expense-editor [name="pmt"] div .labeled-icon {
+	padding: 0;
 }
 
 #expense-editor input {
