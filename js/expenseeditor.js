@@ -83,6 +83,7 @@ function expenseEditor ()
 
 	let tabMode = new TabModeHandler(elements.get());
 
+	// TODO: distinguish between delete expense and delete repeating interval
 	let confirmDeletePrompt = new Menubox("delete-expense", {
 		title: "Confirm delete expense",
 		items: [],
