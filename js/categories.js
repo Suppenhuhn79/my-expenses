@@ -301,12 +301,12 @@ function myxCategories ()
 		onEnd: onSortEnd
 	});
 
-	elements.get("edit-button").onclick = function onEditButtonClick () { tabMode.set(CategoriesTabMode.EDIT); };
+	elements.get("edit-button").onclick = onEditButtonClick = () => { tabMode.set(CategoriesTabMode.EDIT); };
 	elements.get("apply-edits-button").onclick = saveToFile;
-	elements.get("cancel-edits-button").onclick = function onCancelButtonClick () { tabMode.set(CategoriesTabMode.DEFAULT); renderList(); };
-	elements.get("search-button").onclick = function onSearchButtonClick () { tabMode.set(CategoriesTabMode.SEARCH); };
-	elements.get("cancel-search-button").onclick = function onCancelSeachButtonClick () { tabMode.set(CategoriesTabMode.DEFAULT); };
-	elements.get("add-button").onclick = function onAddButtonClick () { promptEditor(); };
+	elements.get("cancel-edits-button").onclick = onCancelButtonClick = () => { tabMode.set(CategoriesTabMode.DEFAULT); renderList(); };
+	elements.get("search-button").onclick = onSearchButtonClick = () => { tabMode.set(CategoriesTabMode.SEARCH); };
+	elements.get("cancel-search-button").onclick = onCancelSeachButtonClick = () => { tabMode.set(CategoriesTabMode.DEFAULT); };
+	elements.get("add-button").onclick = onAddButtonClick = () => { promptEditor(); };
 
 	/**
 	 * Loads _categories_ from cache or remote file (if modified).

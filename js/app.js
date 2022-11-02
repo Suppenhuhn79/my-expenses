@@ -29,7 +29,7 @@ let myx = function ()
 
 	/**
 	 * Timestamps of when a file was loaded.
-	 * @type {Map<string, Date>} 
+	 * @type {Map<string, Date>}
 	 */
 	let filesLoadTimestamps = new Map();
 
@@ -44,7 +44,7 @@ let myx = function ()
 	 * Action for clicking the data-selection button in the bottom menu.
 	 * Switches to the recently selected data tab and also pops up a menu to select another data tab.
 	 */
-	bottomButtonElements.get("data-selection-button").onclick = function onDataSelectionButtonClick (event)
+	bottomButtonElements.get("data-selection-button").onclick = onDataSelectionButtonClick = (event) =>
 	{
 		function _buildMenuboxItems (menuboxItems)
 		{
@@ -90,12 +90,12 @@ let myx = function ()
 
 	/**
 	 * Loads data from a file. To reduce network traffic, files are cached in the localStorage.
-	 * 
+	 *
 	 * If the file is cached and the remote file is not newer that the cached one, file content is loaded from cache.
 	 * Otherwiese, the file is fetched from remote.
-	 * 
+	 *
 	 * If the file already has been loaded and wasn't modified since then, nothing happens.
-	 * 
+	 *
 	 * @async
 	 * @param {string} name Name of file to load.
 	 * @param {any} defaults Default data if file does not exists or is empty.
@@ -151,11 +151,11 @@ let myx = function ()
 
 	/**
 	 * Event handler for choosing a tab or editor. Usually called by `choices`.
-	 * 
+	 *
 	 * If the tab is a real tab (not an editor), it is set the `activeTab` and its `enter()` method is called.
-	 * 
+	 *
 	 * If the tab is an editor, the bottom buttons are hidden.
-	 * 
+	 *
 	 * @param {string} tabName Name of the chosen tab.
 	 * @param {boolean} interactive `true` the choice was set by a (user) event, otherwise `false`.
 	 */
@@ -198,9 +198,9 @@ let myx = function ()
 
 	/**
 	 * Callback for selecting an item of the data tab selection menubox.
-	 * 
+	 *
 	 * Switches to the selected tab.
-	 * 
+	 *
 	 * @param {Object} menuItemData Data provided by the menubox.
 	 */
 	function dataSelectionMenuItemCallback (menuItemData)
@@ -246,7 +246,7 @@ let myx = function ()
 					categories.fetchData(),
 					paymentMethods.fetchData(),
 					expenses.fetchData(),
-				]).then(() => 
+				]).then(() =>
 				{
 					let currentContentElement = document.querySelector("#client .chosen .content");
 					let currentScrollPosition = currentContentElement?.scrollTop || 0;

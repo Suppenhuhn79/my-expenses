@@ -2,7 +2,7 @@
  * @typedef CalculationMode
  * Defines a statistics calculation mode, which can be totals (sum) or monthly averages.
  * @type {"sum"|"mavg"}
- * 
+ *
  * @typedef TimerangeMode
  * Defines a time range mode, which can be a single month, a full year or all time.
  * @type {"month"|"year"|"all"}
@@ -11,7 +11,7 @@
 /**
  * @namespace myxStatisticsTimerange
  */
-function myxStatisticsTimerange () 
+function myxStatisticsTimerange ()
 {
 	/** @type {TimerangeMode} */
 	let mode = "month";
@@ -213,7 +213,7 @@ function myxStatistics ()
 		]
 	});
 
-	elements.get("filter-select-button").onclick = function onFilterButtonClick (event)
+	elements.get("filter-select-button").onclick = onFilterButtonClick = (event) =>
 	{
 		// TODO: add user filters to menu
 		myxMenuboxes.get("sta-filters", onFilterMenuboxEvent).popup(event, null, event.target, "below bottom, end right");

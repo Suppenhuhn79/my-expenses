@@ -259,12 +259,12 @@ function myxExpenses ()
 	 * @type {boolean} */
 	let ignoreMouseup = false;
 
-	elements.get("back-search-button").onclick = function onSearchButtonClick () { choices.set("active-tab", filter._origin); };
+	elements.get("back-search-button").onclick = onSearchButtonClick = () => { choices.set("active-tab", filter._origin); };
 	elements.get("cancel-search-button").onclick = resetFilter;
 	elements.get("cancel-multiselect-button").onclick = exitMultiselectMode;
 	elements.get("add-expense-button").onclick = onAddExpenseClick;
 	elements.get("nav-current").onclick = onNavCurrentClick;
-	elements.get("edit-multiselect-button").onclick = function onMultiselectEditButtonClick (event)
+	elements.get("edit-multiselect-button").onclick = onMultiselectEditButtonClick = (event) =>
 	{
 		let selecteCount = elements.get("content").querySelectorAll(".multiselect-chosen").length;
 		let multiselectMenubox = myxMenuboxes.get("exp-multiselect-edits", onMultiselectMenuboxClick);

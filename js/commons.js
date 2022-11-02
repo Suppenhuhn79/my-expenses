@@ -309,11 +309,6 @@ class Selector
 	constructor(callback, items, options)
 	{
 		/**
-		 * This instance, to have it in event handlers where `this` is `window`.
-		 * @type {Selector} */
-		let _this = this;
-
-		/**
 		 * Callback on item selection.
 		 * @type {SelectorCallback} */
 		this.callback = callback;
@@ -345,7 +340,7 @@ class Selector
 		 *
 		 * @param {Event} event Triggering event.
 		 */
-		this._onItemClick = function (event)
+		this._onItemClick = (event) =>
 		{
 			/**
 			 * Actual item.
@@ -355,16 +350,16 @@ class Selector
 			 * Id of the clicked items.
 			 * @type {string} */
 			let id = eventItem.dataset.id;
-			if (_this.multiSelect === true)
+			if (this.multiSelect === true)
 			{
 				eventItem.classList.toggle("selected");
 			}
 			else
 			{
-				_this.highlightItem(id);
+				this.highlightItem(id);
 			}
 			eventItem.scrollIntoView();
-			_this.callback(id);
+			this.callback(id);
 		};
 
 		this.refresh();

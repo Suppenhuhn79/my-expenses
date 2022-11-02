@@ -22,10 +22,10 @@ const myxHome = function ()
 
 	/**
 	 * Action for clicking the this months total filter icon.
-	 * 
+	 *
 	 * Switches to statistics tab.
 	 */
-	elements.get("filter-sum-button").onclick = function onFilterSumButtonClick (event)
+	elements.get("filter-sum-button").onclick = onFilterSumButtonClick = (event) =>
 	{
 		let filterMenu = new FilterMenu(myx.defaultFilter, onExpensesFilterSet);
 		filterMenu.popup(event, elements.get("filter-sum-button"), "end right, below bottom");
@@ -34,30 +34,30 @@ const myxHome = function ()
 
 	/**
 	 * Action for clicking the this months total number.
-	 * 
+	 *
 	 * Switches to statistics tab.
 	 */
-	elements.get("this-month-total").onclick = function onThisMonthTotalClick ()
+	elements.get("this-month-total").onclick = onThisMonthTotalClick = () =>
 	{
 		choices.set("active-tab", myx.statistics.moduleName, new Event("dummy, required for interactivity"));
 	};
 
 	/**
 	 * Action for clicking the "forward to expenses" icon.
-	 * 
+	 *
 	 * Switches to expenses tab.
 	 */
-	elements.get("goto-expenses-button").onclick = elements.get("latest-expense-wrapper").onclick = function onGotoExpensesButtonClick ()
+	elements.get("goto-expenses-button").onclick = elements.get("latest-expense-wrapper").onclick = onGotoExpensesButtonClick = () =>
 	{
 		choices.set("active-tab", myx.expenses.moduleName, new Event("dummy, required for interactivity"));
 	};
 
 	/**
 	 * Action for clicking the "edit categories" icon.
-	 * 
+	 *
 	 * Switches to categories tab.
 	 */
-	elements.get("goto-categories-button").onclick = function onGotoCategoriesButtonClick ()
+	elements.get("goto-categories-button").onclick = onGotoCategoriesButtonClick = () =>
 	{
 		choices.set("active-tab", myx.categories.moduleName, new Event("dummy, required for interactivity"));
 	};
@@ -186,9 +186,9 @@ const myxHome = function ()
 
 	/**
 	 * Event handler for selecting a category.
-	 * 
+	 *
 	 * Pops up the ExpenseEditor with the selected category pre-set.
-	 * 
+	 *
 	 * @param {IdString} catId Id of selected category.
 	 */
 	function onCategoryItemClick (event)
@@ -198,7 +198,7 @@ const myxHome = function ()
 
 	/**
 	 * Callback function for setting the expenses filter.
-	 * 
+	 *
 	 * Sets the filter as default filter, renders this month totals and saves user data.
 	 */
 	function onExpensesFilterSet (filter)

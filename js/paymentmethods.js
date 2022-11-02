@@ -157,12 +157,12 @@ function myxPaymentMethods ()
 		function revertData (revertData) { revertData.items = Object.fromEntries(JSON.parse(revertData.items)); fromObject(revertData); }
 	);
 
-	elements.get("edit-button").onclick = function onEditButtonClick () { tabMode.set(PaymentMethodTabMode.EDIT); };
-	elements.get("apply-edits-button").onclick = function onApplyEditsButtonClick () { saveToFile(); };
-	elements.get("cancel-edits-button").onclick = function onCancelEditsButtonClick () { { tabMode.set(PaymentMethodTabMode.DEFAULT); renderList(); }; };
-	elements.get("search-button").onclick = function onSearchButtonClick () { tabMode.set(PaymentMethodTabMode.SEARCH); };
-	elements.get("cancel-search-button").onclick = function onCancelSearchButtonClick () { tabMode.set(PaymentMethodTabMode.DEFAULT); };
-	elements.get("add-button").onclick = function onAddButtonClick () { promptEditor(); };
+	elements.get("edit-button").onclick = onEditButtonClick = () => { tabMode.set(PaymentMethodTabMode.EDIT); };
+	elements.get("apply-edits-button").onclick = onApplyEditsButtonClick = () => { saveToFile(); };
+	elements.get("cancel-edits-button").onclick = onCancelEditsButtonClick = () => { { tabMode.set(PaymentMethodTabMode.DEFAULT); renderList(); }; };
+	elements.get("search-button").onclick = onSearchButtonClick = () => { tabMode.set(PaymentMethodTabMode.SEARCH); };
+	elements.get("cancel-search-button").onclick = onCancelSearchButtonClick = () => { tabMode.set(PaymentMethodTabMode.DEFAULT); };
+	elements.get("add-button").onclick = onAddButtonClick = () => { promptEditor(); };
 
 	/**
 	 * Loads _payment methods_ from cache or remote file (if modified).
