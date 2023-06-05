@@ -83,9 +83,7 @@ function expenseEditor ()
 
 	let tabMode = new TabModeHandler(elements.get());
 
-	// TODO: distinguish between delete expense and delete repeating interval
 	let confirmDeletePrompt = new Menubox("delete-expense", {
-		title: "Confirm delete expense",
 		items: [],
 		buttons: [
 			{ key: "delete" },
@@ -130,8 +128,8 @@ function expenseEditor ()
 	{
 		/**
 		 * Sets an element enabled/disabled by toggeling the `"disabled"` CSS class.
-		 * @param {HTMLElement} element 
-		 * @param {boolean} enabled 
+		 * @param {HTMLElement} element
+		 * @param {boolean} enabled
 		 */
 		function _setElementEnabled (element, enabled)
 		{
@@ -168,7 +166,7 @@ function expenseEditor ()
 
 	/**
 	 * Switches from _default_ mode to _repeat_ mode. In repeat mode the repeating expense is edited, no more the original actual expense.
-	 * 
+	 *
 	 * This is an one way action.
 	 */
 	function switchToRepeatMode ()
@@ -259,7 +257,7 @@ function expenseEditor ()
 	 * Event handler for clicking the "cancel" button.
 	 * Closes the editor with all changes discarded.
 	 */
-	function onCancelClick () 
+	function onCancelClick ()
 	{
 		choices.set("active-tab", originTabName);
 	};
@@ -279,7 +277,7 @@ function expenseEditor ()
 	 * Pops up a menubox for selecting a payment method and applys the selection to the currently edited expense.
 	 * @param {Event} event Triggering event.
 	 */
-	function onPmtClick (event) 
+	function onPmtClick (event)
 	{
 		event.stopPropagation();
 		myx.paymentMethods.prompt(elements.get("pmt"), (pmt) =>
@@ -293,7 +291,7 @@ function expenseEditor ()
 	 * Event handler for key strikes while the annotation text is focused. Handles certain keys to leave the input.
 	 * @param {KeyboardEvent} keyEvent Triggering event.
 	 */
-	function onTxtKeydown (keyEvent) 
+	function onTxtKeydown (keyEvent)
 	{
 		if (["Escape", "Enter"].includes(keyEvent.code))
 		{
@@ -305,7 +303,7 @@ function expenseEditor ()
 	 * Event handler for clicking the "redo" button.
 	 * Switches to _repeat_ mode.
 	 */
-	function onRedoClick () 
+	function onRedoClick ()
 	{
 		if (isEnabled(elements.get("redo")))
 		{
@@ -317,10 +315,11 @@ function expenseEditor ()
 	 * Event handler for clicking the "delete" button.
 	 * Pops up a prompt to confirm or cancel the deletion of the expense or repeating.
 	 */
-	function onDeleteClick (mouseEvent) 
+	function onDeleteClick (mouseEvent)
 	{
 		if (isEnabled(elements.get("delete")))
 		{
+			confirmDeletePrompt.setTitle((tabMode.is(ExpenseEditorMode.REPEATING)) ? "Confirm delete of repetition" : "Confirm delete of expense");
 			confirmDeletePrompt.popup(mouseEvent, null, mouseEvent.target.closest("td"), "start left, above bottom");
 		}
 	};
