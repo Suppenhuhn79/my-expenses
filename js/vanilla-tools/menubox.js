@@ -86,7 +86,8 @@ class Menubox
 	{
 		for (let key in Menubox.instances)
 		{
-			if ((exceptFor.startsWith(key) === false) && (key !== "__dialogbox__"))
+			if (exceptFor.startsWith(key) === false)
+			// if ((exceptFor.startsWith(key) === false) && (key !== "__dialogbox__"))
 			{
 				Menubox.instances[key].close();
 			}
