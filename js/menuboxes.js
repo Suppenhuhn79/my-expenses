@@ -51,7 +51,10 @@ let myxMenuboxes = new function ()
 				}
 			]
 		},
-		"pmt-select-pmt": { items: [] },
+		"pmt-select-pmt": {
+			css: "black",
+			items: []
+		},
 		"sta-filters": {
 			title: "Expenses filter",
 			css: "buttons-as-items",

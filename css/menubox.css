@@ -3,13 +3,13 @@
 }
 .menubox {
 	background-color: #fff;
+	color: var(--menubox-front-color);
 	max-width: calc(100vw - 2rem);
 	box-shadow: 0.1rem 0.1rem 0.5rem 0.1rem #00000080;
 	z-index: 200;
 }
 
 .menubox .title {
-	color: var(--menubox-front-color);
 	font-weight: bold;
 	text-align: center;
 	margin: 0 2em;
@@ -34,6 +34,10 @@
 }
 .menubox .menuitem.itemsbox:hover {
 	background-color: initial;
+}
+
+.menubox.black .menuitem {
+	color: #000;
 }
 
 .menubox .icon {
@@ -65,7 +69,7 @@
 	border: 2px solid #ccc;
 	padding: 0.5em 1rem;
 	text-align: center;
-	color: var(--menubox-front-color);
+	/* color: var(--menubox-front-color); */
 }
 .menubox .menubutton + .menubutton {
 	margin-left: 0.5em;
