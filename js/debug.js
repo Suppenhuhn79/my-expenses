@@ -19,7 +19,7 @@ let myxDebug = {
 			{
 				payload = JSON.stringify(payload, null, "\t");
 			}
-			xhr("PUT", "http://localhost:8800/files/0/myx/" + saveAsFilename, null, payload).then(console.log, console.error);
+			xhr("PUT", "http://localhost:8800/myx-bak/" + saveAsFilename, null, payload).then(console.log, console.error);
 		}
 		);
 	},
