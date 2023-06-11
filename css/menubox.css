@@ -1,3 +1,6 @@
+:root {
+	--menubox-front-color: #888;
+}
 .menubox {
 	background-color: #fff;
 	max-width: calc(100vw - 2rem);
@@ -6,13 +9,12 @@
 }
 
 .menubox .title {
-	--color: #aaa;
-	color: var(--color);
+	color: var(--menubox-front-color);
 	font-weight: bold;
 	text-align: center;
 	margin: 0 2em;
 	padding: 0.7em 0;
-	border-bottom: 2px dotted var(--color);
+	border-bottom: 2px dotted var(--menubox-front-color);
 	white-space: nowrap;
 }
 
@@ -63,6 +65,7 @@
 	border: 2px solid #ccc;
 	padding: 0.5em 1rem;
 	text-align: center;
+	color: var(--menubox-front-color);
 }
 .menubox .menubutton + .menubutton {
 	margin-left: 0.5em;
