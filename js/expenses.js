@@ -270,7 +270,6 @@ function myxExpenses ()
 		let multiselectMenubox = myxMenuboxes.get("exp-multiselect-edits", onMultiselectMenuboxClick);
 		multiselectMenubox.setTitle("Edit " + selecteCount + " expenses");
 		multiselectMenubox.popup(event, null, event.target, "below bottom, end right");
-		myx.showNotification("Not implemented yet.");
 	};
 
 	/**
@@ -381,14 +380,17 @@ function myxExpenses ()
 	 * More exactly: saves expenses of all months, that are in the same files as the given dates.
 	 *
 	 * @async
-	 * @param {Expense|Array<Expense>} expenses Months to save data.
+	 * @param {MonthString|Date|Array<MonthString>|Array<Date>} months Months to save data. May contain duplicates, theses will be removed automatically.
 	 */
-	async function saveToFile (expenses)
+	async function saveToFile (months)
 	{
 		/**
 		 * Months to be saved.
 		 * @type {Array<MonthString>} */
-		let months = [];
+		let months_ = (months instanceof Array) ? months : [months];
+		months_ = months_.map((v) => (v.constructor.name === "Date") ? v.toMonthString() : v);
+		months_.removeDuplicates().sort();
+		window.dataIndex = dataIndex;
 		/**
 		 * Indexes of affected files.
 		 * @type {Array<number>} */
@@ -398,17 +400,9 @@ function myxExpenses ()
 		 * @type {Array<Promise<void>>} */
 		let ops = [];
 		myx.xhrBegin();
-		if (!(expenses instanceof Array))
+		for (let month of months_)
 		{
-			expenses = [expenses];
-		}
-		for (let exp of expenses)
-		{
-			months.push(exp.dat.toMonthString());
-		}
-		months.removeDuplicates().sort();
-		for (let month of months)
-		{
+			data[month] = data[month].filter((v) => v instanceof Expense);
 			fileIndexes.push(dataIndex.fileindexOfMonth(month));
 		}
 		fileIndexes.removeDuplicates();
@@ -439,15 +433,12 @@ function myxExpenses ()
 	 */
 	function add (expenses)
 	{
-		if ((expenses instanceof Array) === false)
-		{
-			expenses = [expenses];
-		}
+		let expenses_ = (expenses instanceof Array) ? expenses : [expenses];
 		/**
 		 * Collection of all months that have been affected by adding expenses.
 		 * @type {Array<MonthString>} */
 		let monthsAffected = [];
-		for (let item of expenses)
+		for (let item of expenses_)
 		{
 			let month = item.dat.toMonthString();
 			data[month] ||= [];
@@ -458,7 +449,37 @@ function myxExpenses ()
 		{
 			sortItems(month);
 		}
-		saveToFile(expenses);
+		saveToFile(monthsAffected);
+	}
+
+	/**
+	 * @typedef ExpenseRef
+	 * @property {Date} date
+	 * @property {number} index
+	 */;
+	/**
+	* Deletes expenses from `data` and saves files.
+	* @param {ExpenseRef|Array<ExpenseRef>} expenseRefs References of expenses to be deleted.
+	*/
+	function remove (expenseRefs)
+	{
+		let expenseRefs_ = (expenseRefs instanceof Array) ? expenseRefs : [expenseRefs];
+		/**
+		 * Collection of all months that have been affected by adding expenses.
+		 * @type {Array<MonthString>} */
+		let monthsAffected = [];
+		for (let expenseRef of expenseRefs_)
+		{
+			let month = expenseRef.date.toMonthString();
+			data[month][expenseRef.index] = null;
+			monthsAffected.push(month);
+		}
+		monthsAffected.removeDuplicates().sort();
+		for (let month of monthsAffected)
+		{
+			data[month] = data[month].filter((v) => v instanceof Expense);
+		}
+		saveToFile(monthsAffected);
 	}
 
 	/**
@@ -477,7 +498,7 @@ function myxExpenses ()
 	 */
 	function hasActualData (month)
 	{
-		if (month.constructor.name === "Date")
+		if (month instanceof Date)
 		{
 			month = month.toMonthString();
 		}
@@ -822,7 +843,7 @@ function myxExpenses ()
 					{
 						data[originalMonth][dataIndex] = new Expense(editedItem);
 						sortItems(originalMonth);
-						saveToFile(data[originalMonth][dataIndex]);
+						saveToFile(originalMonth);
 					}
 					else
 					{
@@ -833,9 +854,8 @@ function myxExpenses ()
 				}
 				else if (action === ExpenseEditorAction.DELETE)
 				{
-					data[originalMonth].splice(dataIndex, 1);
+					remove({ date: originalItem.dat, index: dataIndex });
 					scrollToDate = originalItem.dat;
-					saveToFile(originalItem);
 				}
 				else if (action === ExpenseEditorAction.REPEATING)
 				{
@@ -1014,16 +1034,45 @@ function myxExpenses ()
 				}
 			);
 		}
-		console.log(menuboxEvent);
+		let expenseRefs = [];
+		for (let selectedElement of elements.get("content").querySelectorAll(".multiselect-chosen"))
+		{
+			expenseRefs.push({
+				date: new Date(selectedElement.dataset.month),
+				index: Number(selectedElement.dataset.index)
+			});
+		}
 		switch (menuboxEvent.itemKey)
 		{
 			case "edit-pmt":
 				myxMenuboxes.get("exp-change-payment-method", confirm.log, _buildMenuboxItems, tabMode).popup(null, null, document.body, "center, middle");
+				myx.showNotification("Not implemented yet.");
 				break;
+			case "delete":
+				Menubox.dialogBox("Confirm deletion of " + expenseRefs.length + " expenses",
+					"",
+					[
+						{ key: "delete" },
+						{ key: "cancel" }
+					])
+					.then((buttonKey) =>
+					{
+						console.log(buttonKey);
+						if (buttonKey === "delete")
+						{
+							remove(expenseRefs);
+							exitMultiselectMode();
+							renderList();
+						}
+					});
+				break;
+			default:
+				myx.showNotification("Not implemented yet.");
 		}
 	}
 
 	return { // publish members
+		dataIndex: dataIndex, // debug_only
 		get moduleName () { return MODULE_NAME; },
 		get data () { return data; },
 		init: init,
